@@ -1,13 +1,19 @@
 <?php
 
 use Livewire\Component;
+use Livewire\Attributes\Layout;
 
-new class extends Component
+new #[Layout('layouts.panels.administrator')] class extends Component
 {
     //
 };
 ?>
 
-<div>
-    {{-- Order your soul. Reduce your wants. - Augustine --}}
-</div>
+<x-slot name="title">
+    Users
+</x-slot>
+
+
+<flux:main>
+    {{-- Because you are alive, everything is possible. - Thich Nhat Hanh --}}
+</flux:main>

@@ -1,13 +1,19 @@
 <?php
 
 use Livewire\Component;
+use Livewire\Attributes\Layout;
 
-new class extends Component
+new #[Layout('layouts.panels.administrator')] class extends Component
 {
     //
 };
 ?>
 
-<div>
-    {{-- It is quality rather than quantity that matters. - Lucius Annaeus Seneca --}}
-</div>
+<x-slot name="title">
+    Permissions
+</x-slot>
+
+
+<flux:main>
+    {{-- Because you are alive, everything is possible. - Thich Nhat Hanh --}}
+</flux:main>

@@ -8,6 +8,6 @@ new class extends Component
 };
 ?>
 
-<div>
+<flux:main>
     {{-- Because you are alive, everything is possible. - Thich Nhat Hanh --}}
-</div>
+</flux:main>

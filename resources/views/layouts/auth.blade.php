@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ __('common.direction') }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ __('main.direction') }}">
 @include('partials.layouts.head')
 <body class="min-h-screen bg-white dark:bg-zinc-800 antialiased">
 <div class="flex min-h-screen">
