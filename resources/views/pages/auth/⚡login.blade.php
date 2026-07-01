@@ -1,7 +1,7 @@
 <?php
 
 use App\Livewire\Forms\AuthForm;
-use FluxUI\Flux;
+use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -18,6 +18,14 @@ new #[Layout('layouts::auth')] class extends Component
         $this->form->validateOnly('mobile');
 
         $user = $this->form->getUser();
+
+        if ($user->oneTimePasswords()->where('expires_at', '>', now())->exists()) {
+            Flux::toast(__('main.otp_still_valid'), variant: 'warning');
+
+            $this->otpSent = true;
+
+            return;
+        }
 
         $user->sendOneTimePassword();
 

@@ -13,6 +13,7 @@ return [
     'change_mobile' => 'Change Mobile Number',
     'invalid_otp' => 'Invalid verification code',
     'otp_sent' => 'Verification code sent',
+    'otp_still_valid' => 'The previous code is still valid. Please try again after it expires.',
     'seconds' => 'seconds',
     'please_wait' => 'Please wait',
     'login' => 'Login',
