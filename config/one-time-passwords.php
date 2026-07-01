@@ -68,7 +68,7 @@ return [
     /*
      * The notification used to send a one-time password to a user
      */
-    'notification' => OneTimePasswordNotification::class,
+    'notification' => \App\Notifications\CustomOneTimePasswordNotification::class,
 
     /*
      * These class are responsible for performing core tasks regarding one-time passwords.

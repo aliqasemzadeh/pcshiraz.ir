@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Notifications\Channels\TextMessageChannel;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +21,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Notification::extend('text-message', function ($app) {
+            return $app->make(TextMessageChannel::class);
+        });
     }
 }
