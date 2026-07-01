@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Enums\PriceTypeEnum;
 use App\Enums\ItemTypeEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -41,6 +43,20 @@ class Item extends Model implements HasMedia
     public function itemPrices(): HasMany
     {
         return $this->hasMany(ItemPrice::class);
+    }
+
+    public function latestPriceByType(PriceTypeEnum $type): HasOne
+    {
+        return $this->hasOne(ItemPrice::class)
+            ->where('price_type', $type)
+            ->latestOfMany();
+    }
+
+    public function getLatestPrice(?PriceTypeEnum $type = null): ?string
+    {
+        $type ??= config('main.default_price_type');
+
+        return $this->latestPriceByType($type)->first()?->price;
     }
 
     public function registerMediaCollections(): void
