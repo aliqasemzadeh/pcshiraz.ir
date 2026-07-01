@@ -15,6 +15,8 @@ return new class extends Migration
             $table->foreignId('brand_id')->constrained()->cascadeOnDelete();
             $table->foreignId('category_id')->constrained()->cascadeOnDelete();
 
+            $table->string('item_type')->default('product')->index();
+
             $table->unsignedBigInteger('group_id')->nullable()->index();
             $table->boolean('is_main')->default(false);
 
