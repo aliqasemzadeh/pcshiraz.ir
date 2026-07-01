@@ -1,13 +1,15 @@
 <?php
 
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-new class extends Component
+new #[Layout('layouts::auth')] class extends Component
 {
     //
 };
 ?>
 
 <div>
-    {{-- We must ship. - Taylor Otwell --}}
+
+    <flux:button variant="primary" class="w-full">Send invite</flux:button>
 </div>

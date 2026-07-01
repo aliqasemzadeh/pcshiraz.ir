@@ -1,0 +1,3 @@
+@livewireScripts
+@fluxScripts
+<flux:toast />
