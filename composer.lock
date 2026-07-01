@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a137f109b80d4098baa1aa85937a68f5",
+    "content-hash": "9a9c56a125bc5ec40dcc4d199d9e434b",
     "packages": [
         {
             "name": "archtechx/enums",
@@ -5530,6 +5530,74 @@
                 "source": "https://github.com/ramsey/uuid/tree/4.9.3"
             },
             "time": "2026-06-18T03:57:49+00:00"
+        },
+        {
+            "name": "revoltify/subscriptionify",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/revoltify/subscriptionify.git",
+                "reference": "a665d548ffa08a0930db96dcd1d56a1464c5b4a4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/revoltify/subscriptionify/zipball/a665d548ffa08a0930db96dcd1d56a1464c5b4a4",
+                "reference": "a665d548ffa08a0930db96dcd1d56a1464c5b4a4",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^11.0||^12.0||^13.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "driftingly/rector-laravel": "^2.3",
+                "larastan/larastan": "^3.9",
+                "laravel/pint": "^1.29",
+                "orchestra/testbench": "^10.11||11.1.0",
+                "pestphp/pest": "^3.8.6||^4.7.3",
+                "pestphp/pest-plugin-laravel": "^3.2.0||^4.1.0",
+                "pestphp/pest-plugin-type-coverage": "^3.6.1||^4.0.4"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Revoltify\\Subscriptionify\\SubscriptionifyServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Revoltify\\Subscriptionify\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Revoltify",
+                    "email": "support@revoltify.net"
+                }
+            ],
+            "description": "Feature-based subscription management for Laravel",
+            "homepage": "https://github.com/revoltify/subscriptionify",
+            "keywords": [
+                "billing",
+                "features",
+                "laravel",
+                "metered",
+                "plans",
+                "saas",
+                "subscription",
+                "usage"
+            ],
+            "support": {
+                "issues": "https://github.com/revoltify/subscriptionify/issues",
+                "source": "https://github.com/revoltify/subscriptionify"
+            },
+            "time": "2026-06-24T03:45:04+00:00"
         },
         {
             "name": "spatie/eloquent-sortable",
