@@ -54,4 +54,9 @@ class Domain extends Model
     {
         return $this->hasMany(Brand::class);
     }
+
+    public function inventories(): HasMany
+    {
+        return $this->hasMany(Inventory::class);
+    }
 }
