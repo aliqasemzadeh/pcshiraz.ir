@@ -8,7 +8,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['user_id', 'title', 'domain', 'description', 'settings'])]
+#[Fillable([
+    'user_id',
+    'title',
+    'domain',
+    'description',
+    'meta',
+])]
 class Domain extends Model
 {
     use SoftDeletes;
@@ -21,7 +27,7 @@ class Domain extends Model
     protected function casts(): array
     {
         return [
-            'settings' => 'array',
+            'meta' => 'array',
         ];
     }
 

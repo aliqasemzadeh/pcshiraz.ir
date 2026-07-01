@@ -34,6 +34,8 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('meta_description')->nullable();
 
+            $table->json('meta')->nullable();
+
             $table->softDeletes();
             $table->timestamps();
 

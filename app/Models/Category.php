@@ -10,7 +10,14 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-#[Fillable(['domain_id', 'title', 'seo_title', 'slug', 'meta', 'sort_order'])]
+#[Fillable([
+    'domain_id',
+    'title',
+    'slug',
+    'seo_title',
+    'sort_order',
+    'meta',
+])]
 class Category extends Model implements HasMedia
 {
     use InteractsWithMedia, SoftDeletes;

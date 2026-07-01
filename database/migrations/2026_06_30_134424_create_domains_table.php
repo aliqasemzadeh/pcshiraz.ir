@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('domain');
             $table->string('description')->nullable();
-            $table->json('settings')->nullable();
+            $table->json('meta')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

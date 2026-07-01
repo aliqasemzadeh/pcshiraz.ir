@@ -7,7 +7,16 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['item_id', 'price_type', 'price', 'sale_price', 'meta', 'sales_cap', 'total_sales_count', 'is_active'])]
+#[Fillable([
+    'item_id',
+    'price_type',
+    'price',
+    'sale_price',
+    'sales_cap',
+    'total_sales_count',
+    'is_active',
+    'meta',
+])]
 class ItemPrice extends Model
 {
     protected static function booted(): void

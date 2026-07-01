@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('domain_id')->constrained()->cascadeOnDelete();
             $table->string('title');
             $table->text('description')->nullable();
+            $table->unsignedInteger('sort_order')->default(0);
+            $table->json('meta')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

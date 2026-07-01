@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\PriceTypeEnum;
 use App\Enums\ItemTypeEnum;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,6 +15,26 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Tags\HasTags;
 
+#[Fillable([
+    'domain_id',
+    'brand_id',
+    'category_id',
+    'item_type',
+    'group_id',
+    'is_main',
+    'title',
+    'slug',
+    'description',
+    'color_code',
+    'color_name',
+    'weight',
+    'length',
+    'width',
+    'height',
+    'seo_title',
+    'meta_description',
+    'meta',
+])]
 class Item extends Model implements HasMedia
 {
     use InteractsWithMedia, HasTags, SoftDeletes;
@@ -23,6 +44,7 @@ class Item extends Model implements HasMedia
         return [
             'item_type' => ItemTypeEnum::class,
             'is_main' => 'boolean',
+            'meta' => 'array',
         ];
     }
 

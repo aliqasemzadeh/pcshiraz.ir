@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('title');
             $table->string('seo_title')->nullable();
             $table->string('slug');
-            $table->json('meta')->nullable();
             $table->unsignedInteger('sort_order')->default(0);
+            $table->json('meta')->nullable();
             $table->timestamps();
             $table->softDeletes();
 
