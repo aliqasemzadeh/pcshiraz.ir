@@ -9,7 +9,7 @@ new #[Layout('layouts::auth')] class extends Component
 };
 ?>
 
-<div>
-
+<form class="space-y-6">
+    <flux:input type="number" label="Email" />
     <flux:button variant="primary" class="w-full">Send invite</flux:button>
-</div>
+</form>

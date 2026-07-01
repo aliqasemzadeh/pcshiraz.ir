@@ -6,7 +6,7 @@
     <div class="flex-1 flex justify-center items-center">
         <div class="w-80 max-w-80 space-y-6">
             <div class="flex justify-center opacity-50">
-                {{ config('common.name') }}
+                {{ __('main.login_or_register') }}
             </div>
             {{ $slot }}
             @include('partials.layouts.theme')

@@ -13,7 +13,7 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\OneTimePasswords\Models\Concerns\HasOneTimePasswords;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['mobile', 'first_name', 'last_name', 'email', 'password', 'national_code', 'birth_date'])]
+#[Fillable(['mobile', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -41,5 +41,15 @@ class User extends Authenticatable
     public function domains(): HasMany
     {
         return $this->hasMany(Domain::class);
+    }
+
+    /**
+     * Get the customers for the user.
+     *
+     * @return HasMany<Customer, $this>
+     */
+    public function customers(): HasMany
+    {
+        return $this->hasMany(Customer::class);
     }
 }
