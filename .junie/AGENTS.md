@@ -58,11 +58,11 @@
 33-In forms and modals only user w-full buttons and only save
 34-try to use colors
 35- for edit and delete use these buttons
-<flux:tooltip content="{{ __('main.edit') }}">
+<flux:tooltip content="{{ __('actions.edit') }}">
 <flux:button size="xs" variant="primary" color="blue" icon="pencil" icon:variant="outline" wire:click="$dispatch('panels.administrator.user.edit.assign-data', { user: {{ $user->id }} })" />
 </flux:tooltip>
 
-                                    <flux:tooltip content="{{ __('main.delete') }}">
+                                    <flux:tooltip content="{{ __('actions.delete') }}">
                                         <flux:button size="xs" variant="primary" color="red" icon="trash" icon:variant="outline" wire:click="delete({{ $user->id }})" wire:confirm="{{ __('main.are_you_sure') }}" />
                                     </flux:tooltip>
 36-Livewire events use Livewire\Attributes\On; and use $this->dispatch('event-name');
@@ -102,7 +102,7 @@ new class extends Component {
 
         <flux:card>
             <div class="mb-4">
-                <flux:input wire:model.live.debounce.300ms="search" icon="search" placeholder="{{ __('main.search') }}..." />
+                <flux:input wire:model.live.debounce.300ms="search" icon="search" placeholder="{{ __('actions.search') }}..." />
             </div>
 
             <flux:table :paginate="$this->users">
@@ -121,11 +121,11 @@ new class extends Component {
                             <flux:table.cell>{{ $user->email }}</flux:table.cell>
                             <flux:table.cell align="end">
                                 <div class="flex justify-end gap-2">
-                                    <flux:tooltip content="{{ __('main.edit') }}">
+                                    <flux:tooltip content="{{ __('actions.edit') }}">
                                         <flux:button size="xs" variant="primary" color="blue" icon="pencil" icon:variant="outline" wire:click="$dispatch('panels.administrator.user.edit.assign-data', { user: {{ $user->id }} })" />
                                     </flux:tooltip>
 
-                                    <flux:tooltip content="{{ __('main.delete') }}">
+                                    <flux:tooltip content="{{ __('actions.delete') }}">
                                         <flux:button size="xs" variant="primary" color="red" icon="trash" icon:variant="outline" wire:click="delete({{ $user->id }})" wire:confirm="{{ __('main.are_you_sure') }}" />
                                     </flux:tooltip>
                                 </div>
@@ -195,3 +195,5 @@ try Fillable instead of $fillable array.
     <flux:breadcrumbs.item>Post</flux:breadcrumbs.item>
 </flux:breadcrumbs>
 56-All configurable in config/main.php
+57-For actions use text like "Edit" and "Delete" use lang/fa/actions.php and lang/en/actions.php dont add new word in language files.
+
