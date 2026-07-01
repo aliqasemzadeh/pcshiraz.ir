@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 #[Fillable(['domain_id', 'title', 'seo_title', 'slug', 'meta', 'sort_order'])]
 class Category extends Model implements HasMedia
@@ -30,6 +31,21 @@ class Category extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('logo_image')
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp', 'image/avif'])
             ->singleFile();
+    }
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+            ->width(300)
+            ->height(300)
+            ->sharpen(10)
+            ->nonQueued();
+
+        $this->addMediaConversion('optimized')
+            ->format('webp')
+            ->quality(80)
+            ->nonQueued();
     }
 }
