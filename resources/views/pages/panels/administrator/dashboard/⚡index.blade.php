@@ -10,7 +10,7 @@ new #[Layout('layouts.panels.administrator')] class extends Component
 ?>
 
 <x-slot name="title">
-    Dashboard
+    {{ __('main.dashboard') }}
 </x-slot>
 
 
