@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('color_code')->nullable();
+
             $table->integer('weight')->nullable();
             $table->integer('length')->nullable();
             $table->integer('width')->nullable();
