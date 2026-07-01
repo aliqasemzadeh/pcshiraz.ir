@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9a9c56a125bc5ec40dcc4d199d9e434b",
+    "content-hash": "9a1966439d97e6792fe8514325c07ae1",
     "packages": [
         {
             "name": "archtechx/enums",
@@ -5912,6 +5912,82 @@
                 }
             ],
             "time": "2026-06-24T08:31:39+00:00"
+        },
+        {
+            "name": "spatie/laravel-one-time-passwords",
+            "version": "1.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/laravel-one-time-passwords.git",
+                "reference": "45ca723dcd0ccd25268850dc1185b2038e0c1a85"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/laravel-one-time-passwords/zipball/45ca723dcd0ccd25268850dc1185b2038e0c1a85",
+                "reference": "45ca723dcd0ccd25268850dc1185b2038e0c1a85",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^12.0|^13.0",
+                "php": "^8.4",
+                "spatie/laravel-package-tools": "^1.92.7"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.25.1",
+                "livewire/livewire": "^3.7|^4.0",
+                "nunomaduro/collision": "^8.8.3",
+                "orchestra/testbench": "^10.0.0|^11.0",
+                "pestphp/pest": "^3.0|^4.1.5",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0",
+                "phpstan/phpstan": "^2.1.32",
+                "spatie/laravel-ray": "^1.43.1"
+            },
+            "suggest": {
+                "livewire/flux": "For an enhanced OTP input UI component"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Spatie\\OneTimePasswords\\OneTimePasswordsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\OneTimePasswords\\": "src/",
+                    "Spatie\\OneTimePasswords\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Use one-time passwords (OTP) to authenticate in your Laravel app",
+            "homepage": "https://github.com/spatie/laravel-one-time-passwords",
+            "keywords": [
+                "laravel",
+                "laravel-one-time-passwords",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/laravel-one-time-passwords/issues",
+                "source": "https://github.com/spatie/laravel-one-time-passwords/tree/1.1.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/Spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-05-11T08:30:31+00:00"
         },
         {
             "name": "spatie/laravel-package-tools",
