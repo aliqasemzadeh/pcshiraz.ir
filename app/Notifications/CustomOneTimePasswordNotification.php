@@ -5,6 +5,7 @@ namespace App\Notifications;
 use App\Jobs\Notification\SendSmsMessageJob;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Facades\Log;
 use Spatie\OneTimePasswords\Notifications\OneTimePasswordNotification;
 
 class CustomOneTimePasswordNotification extends OneTimePasswordNotification
@@ -29,6 +30,13 @@ class CustomOneTimePasswordNotification extends OneTimePasswordNotification
      */
     public function toTextMessage(object $notifiable): array
     {
+        if (config('app.debug')) {
+            Log::debug('OTP for debug', [
+                'mobile' => $notifiable->mobile,
+                'code' => $this->oneTimePassword->password,
+            ]);
+        }
+
         $domain = $notifiable->domains()->first();
 
         $domainTitle = $domain?->title ?? config('app.name');
