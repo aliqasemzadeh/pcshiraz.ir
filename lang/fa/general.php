@@ -50,4 +50,7 @@ return [
     'search_categories' => 'جستجوی دسته‌ها...',
     'select_a_category' => 'یک دسته را انتخاب کنید',
     'browse_categories' => 'مرور دسته‌ها',
+    'shop_hero_headline' => 'خرید هوشمند، تجربهٔ یکپارچه',
+    'shop_hero_sub' => 'از میان دسته‌ها و برندها انتخاب کنید؛ جستجو کنید و سریع به کالای مورد نظر برسید.',
+    'shop_hero_cta_search' => 'جستجوی کالا',
 ];

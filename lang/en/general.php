@@ -50,4 +50,7 @@ return [
     'search_categories' => 'Search categories...',
     'select_a_category' => 'Select a category',
     'browse_categories' => 'Browse categories',
+    'shop_hero_headline' => 'Smart shopping, seamless experience',
+    'shop_hero_sub' => 'Browse categories and brands, search quickly, and find what you need.',
+    'shop_hero_cta_search' => 'Search products',
 ];
