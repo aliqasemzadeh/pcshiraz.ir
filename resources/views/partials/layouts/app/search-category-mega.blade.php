@@ -45,7 +45,7 @@
     >
         <x-lucide-layout-grid class="me-1.5 h-4 w-4" />
         <span class="hidden max-w-28 truncate sm:inline" x-text="selectedLabel"></span>
-        <x-lucide-chevron-down class="ms-1.5 h-4 w-4 transition" :class="open && 'rotate-180'" />
+        <x-lucide-chevron-down class="ms-1.5 h-4 w-4 transition" x-bind:class="open && 'rotate-180'" />
     </button>
 
     <div
