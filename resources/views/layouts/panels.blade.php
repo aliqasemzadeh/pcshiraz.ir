@@ -12,7 +12,7 @@
     })();
 </script>
 
-<nav class="fixed top-0 z-40 w-full border-b border-nav-border bg-navbar md:ps-64">
+<nav class="fixed top-0 z-40 w-full border-b border-navbar-border bg-navbar md:ps-64">
     <div class="px-3 py-3 lg:px-5 lg:ps-3">
         <div class="flex items-center justify-between">
             <div class="flex items-center justify-start rtl:justify-end">
@@ -22,19 +22,19 @@
                     data-drawer-placement="{{ __('general.direction') === 'rtl' ? 'right' : 'left' }}"
                     aria-controls="panel-sidebar"
                     type="button"
-                    class="inline-flex items-center justify-center rounded-lg p-2.5 text-sm text-navbar-fg hover:bg-sidebar-hover focus:ring-2 focus:ring-brand/30 focus:outline-none md:hidden"
+                    class="inline-flex items-center justify-center rounded-lg p-2.5 text-sm text-navbar-fg hover:bg-navbar-hover hover:text-navbar-title focus:ring-2 focus:ring-brand/30 focus:outline-none md:hidden"
                 >
                     <span class="sr-only">Open sidebar</span>
                     <x-lucide-menu class="h-6 w-6" />
                 </button>
                 <a href="{{ route('home') }}" wire:navigate class="ms-2 flex md:me-24">
-                    <span class="self-center text-xl font-semibold whitespace-nowrap text-ink">{{ config('app.name') }}</span>
+                    <span class="self-center text-xl font-semibold whitespace-nowrap text-navbar-title">{{ config('app.name') }}</span>
                 </a>
             </div>
             <div class="flex items-center gap-3">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-navbar-fg hover:bg-sidebar-hover hover:text-ink">
+                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-navbar-fg hover:bg-navbar-hover hover:text-navbar-title">
                         <x-lucide-log-out class="h-4 w-4" />
                         {{ __('general.logout') }}
                     </button>
