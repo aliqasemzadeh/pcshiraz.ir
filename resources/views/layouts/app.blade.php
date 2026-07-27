@@ -14,7 +14,7 @@
 
 @include('partials.layouts.app.navbar')
 
-<main class="mx-auto max-w-screen-xl px-4 pt-20 pb-24 md:pb-8">
+<main class="mx-auto max-w-screen-xl px-4 pt-16 pb-24 md:pb-8">
     {{ $slot }}
 </main>
 

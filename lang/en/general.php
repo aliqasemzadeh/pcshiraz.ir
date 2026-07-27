@@ -23,6 +23,8 @@ return [
     'cart' => 'Cart',
     'profile' => 'Profile',
     'search' => 'Search',
+    'search_products' => 'Search for products...',
+    'all_categories' => 'All categories',
     'users' => 'Users',
     'roles' => 'Roles',
     'permissions' => 'Permissions',

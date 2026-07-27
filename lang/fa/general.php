@@ -23,6 +23,8 @@ return [
     'cart' => 'سبد خرید',
     'profile' => 'پروفایل',
     'search' => 'جستجو',
+    'search_products' => 'جستجوی کالا...',
+    'all_categories' => 'همه دسته‌ها',
     'users' => 'کاربران',
     'roles' => 'نقش‌ها',
     'permissions' => 'مجوزها',
