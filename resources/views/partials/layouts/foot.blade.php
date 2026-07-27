@@ -1,3 +1,3 @@
 @livewireScripts
-@fluxScripts
-<flux:toast />
+<x-toaster-hub />
+<livewire:modal />
