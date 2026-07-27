@@ -14,19 +14,22 @@
         }
     }"
     x-init="apply(theme)"
+    class="shrink-0"
 >
     <button
         type="button"
         @click="cycle()"
         @class([
-            'inline-flex items-center justify-center rounded-lg p-1.5',
+            'inline-flex shrink-0 items-center justify-center rounded-lg p-2.5',
             'bg-white/20 text-white/80 hover:text-white' => $onBrand,
-            'bg-slate-200/80 text-gray-500 hover:text-navbar-fg dark:bg-gray-700 dark:text-gray-400 dark:hover:text-white' => ! $onBrand,
+            'text-navbar-fg hover:bg-slate-100 dark:text-gray-300 dark:hover:bg-gray-700' => ! $onBrand,
         ])
         :title="theme === 'light' ? '{{ __('general.light') }}' : (theme === 'dark' ? '{{ __('general.dark') }}' : '{{ __('general.system') }}')"
     >
-        <x-lucide-sun class="h-4 w-4" x-show="theme === 'light'" x-cloak />
-        <x-lucide-moon class="h-4 w-4" x-show="theme === 'dark'" x-cloak />
-        <x-lucide-monitor class="h-4 w-4" x-show="theme === 'system'" x-cloak />
+        <span class="relative block h-5 w-5 shrink-0">
+            <x-lucide-sun class="absolute inset-0 h-5 w-5" x-show="theme === 'light'" x-cloak />
+            <x-lucide-moon class="absolute inset-0 h-5 w-5" x-show="theme === 'dark'" x-cloak />
+            <x-lucide-monitor class="absolute inset-0 h-5 w-5" x-show="theme === 'system'" x-cloak />
+        </span>
     </button>
 </div>

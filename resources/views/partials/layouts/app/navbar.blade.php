@@ -41,7 +41,7 @@
                 wire:navigate
                 class="hidden shrink-0 items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-strong focus:ring-4 focus:ring-brand/30 focus:outline-none md:inline-flex dark:bg-brand dark:hover:bg-brand-strong dark:focus:ring-brand/40"
             >
-                <x-lucide-log-in class="h-4 w-4" />
+                <x-lucide-log-in class="h-5 w-5 shrink-0" />
                 {{ __('general.login') }}
             </a>
         @endauth
