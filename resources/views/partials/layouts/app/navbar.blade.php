@@ -15,7 +15,7 @@
         <a
             href="{{ route('home') }}"
             wire:navigate
-            class="inline-flex shrink-0 items-center justify-center rounded-lg p-2.5 text-navbar-fg hover:bg-slate-200/70 focus:ring-2 focus:ring-brand/30 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+            class="inline-flex shrink-0 items-center justify-center rounded-lg p-2.5 text-navbar-fg hover:bg-slate-100 focus:ring-2 focus:ring-brand/30 focus:outline-none dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
             title="{{ __('general.cart') }}"
         >
             <x-lucide-shopping-cart class="h-5 w-5" />
@@ -26,7 +26,7 @@
             <a
                 href="{{ route('profile') }}"
                 wire:navigate
-                class="hidden shrink-0 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-navbar-fg hover:bg-slate-200/70 md:inline-flex dark:text-gray-300 dark:hover:bg-gray-700"
+                class="hidden shrink-0 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-navbar-fg hover:bg-slate-100 md:inline-flex dark:text-gray-300 dark:hover:bg-gray-700"
                 title="{{ __('general.profile') }}"
             >
                 <x-lucide-user class="h-5 w-5" />
