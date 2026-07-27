@@ -1,4 +1,3 @@
-@php($onBrand = $onBrand ?? false)
 <div
     x-data="{
         theme: localStorage.getItem('color-theme') || 'system',
@@ -19,11 +18,7 @@
     <button
         type="button"
         @click="cycle()"
-        @class([
-            'inline-flex shrink-0 items-center justify-center rounded-lg p-2.5',
-            'bg-white/20 text-white/80 hover:text-white' => $onBrand,
-            'text-navbar-fg hover:bg-slate-100 dark:text-gray-300 dark:hover:bg-gray-700' => ! $onBrand,
-        ])
+        class="inline-flex shrink-0 items-center justify-center rounded-lg p-2.5 text-navbar-fg hover:bg-sidebar-hover hover:text-ink"
         :title="theme === 'light' ? '{{ __('general.light') }}' : (theme === 'dark' ? '{{ __('general.dark') }}' : '{{ __('general.system') }}')"
     >
         <span class="relative block h-5 w-5 shrink-0">

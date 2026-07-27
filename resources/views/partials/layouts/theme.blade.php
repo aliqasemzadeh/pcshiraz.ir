@@ -1,4 +1,3 @@
-@php($onBrand = $onBrand ?? false)
 <div
     x-data="{
         theme: localStorage.getItem('color-theme') || 'system',
@@ -10,21 +9,13 @@
         }
     }"
     x-init="apply(theme)"
-    @class([
-        'flex shrink-0 items-center gap-0.5 rounded-lg p-0.5',
-        'bg-white/20' => $onBrand,
-        'bg-slate-200/80 dark:bg-gray-700' => ! $onBrand,
-    ])
+    class="flex shrink-0 items-center gap-0.5 rounded-lg bg-canvas p-0.5"
 >
     <button
         type="button"
         @click="apply('light')"
-        :class="theme === 'light' ? '{{ $onBrand ? 'bg-white/90 text-navbar-fg shadow' : 'bg-white shadow dark:bg-gray-600' }}' : ''"
-        @class([
-            'shrink-0 rounded-md p-1.5',
-            'text-white/80 hover:text-white' => $onBrand,
-            'text-gray-500 hover:text-navbar-fg dark:text-gray-400 dark:hover:text-white' => ! $onBrand,
-        ])
+        :class="theme === 'light' ? 'bg-surface text-ink shadow' : ''"
+        class="shrink-0 rounded-md p-1.5 text-navbar-fg hover:text-ink"
         title="{{ __('general.light') }}"
     >
         <x-lucide-sun class="h-5 w-5 shrink-0" />
@@ -32,12 +23,8 @@
     <button
         type="button"
         @click="apply('dark')"
-        :class="theme === 'dark' ? '{{ $onBrand ? 'bg-white/90 text-navbar-fg shadow' : 'bg-white shadow dark:bg-gray-600' }}' : ''"
-        @class([
-            'shrink-0 rounded-md p-1.5',
-            'text-white/80 hover:text-white' => $onBrand,
-            'text-gray-500 hover:text-navbar-fg dark:text-gray-400 dark:hover:text-white' => ! $onBrand,
-        ])
+        :class="theme === 'dark' ? 'bg-surface text-ink shadow' : ''"
+        class="shrink-0 rounded-md p-1.5 text-navbar-fg hover:text-ink"
         title="{{ __('general.dark') }}"
     >
         <x-lucide-moon class="h-5 w-5 shrink-0" />
@@ -45,12 +32,8 @@
     <button
         type="button"
         @click="apply('system')"
-        :class="theme === 'system' ? '{{ $onBrand ? 'bg-white/90 text-navbar-fg shadow' : 'bg-white shadow dark:bg-gray-600' }}' : ''"
-        @class([
-            'shrink-0 rounded-md p-1.5',
-            'text-white/80 hover:text-white' => $onBrand,
-            'text-gray-500 hover:text-navbar-fg dark:text-gray-400 dark:hover:text-white' => ! $onBrand,
-        ])
+        :class="theme === 'system' ? 'bg-surface text-ink shadow' : ''"
+        class="shrink-0 rounded-md p-1.5 text-navbar-fg hover:text-ink"
         title="{{ __('general.system') }}"
     >
         <x-lucide-monitor class="h-5 w-5 shrink-0" />
