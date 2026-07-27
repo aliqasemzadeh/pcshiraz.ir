@@ -1,13 +1,14 @@
 <?php
 
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-new class extends Component
+new #[Layout('layouts.panels')] class extends Component
 {
     //
 };
 ?>
 
 <div>
-    {{-- It is not the man who has too little, but the man who craves more, that is poor. - Seneca --}}
+    <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">{{ __('general.categories') }}</h1>
 </div>
