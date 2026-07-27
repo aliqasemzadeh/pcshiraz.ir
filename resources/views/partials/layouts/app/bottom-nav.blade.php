@@ -1,22 +1,38 @@
-<div class="fixed bottom-0 start-0 z-40 w-full border-t border-nav-border bg-navbar md:hidden dark:border-gray-700 dark:bg-gray-800" x-data>
+<div class="fixed bottom-0 start-0 z-40 w-full border-t border-nav-border bg-navbar md:hidden" x-data>
     <div class="mx-auto grid h-16 max-w-lg grid-cols-4 font-medium">
-        <a href="{{ route('home') }}" wire:navigate class="inline-flex flex-col items-center justify-center px-5 hover:bg-slate-100 dark:hover:bg-gray-700 {{ request()->routeIs('home') ? 'text-brand dark:text-brand' : 'text-navbar-fg dark:text-gray-400' }}">
+        <a
+            href="{{ route('home') }}"
+            wire:navigate
+            @class([
+                'inline-flex flex-col items-center justify-center px-5 hover:bg-sidebar-hover',
+                'text-brand dark:bg-brand-glow/10 dark:text-brand-glow' => request()->routeIs('home'),
+                'text-navbar-fg' => ! request()->routeIs('home'),
+            ])
+        >
             <x-lucide-house class="mb-1 h-5 w-5" />
             <span class="text-xs">{{ __('general.home') }}</span>
         </a>
         <button
             type="button"
             @click="$dispatch('shop-mobile-category-open')"
-            class="inline-flex flex-col items-center justify-center px-5 text-navbar-fg hover:bg-slate-100 dark:text-gray-400 dark:hover:bg-gray-700"
+            class="inline-flex flex-col items-center justify-center px-5 text-navbar-fg hover:bg-sidebar-hover"
         >
             <x-lucide-layout-grid class="mb-1 h-5 w-5" />
             <span class="text-xs">{{ __('general.categories') }}</span>
         </button>
-        <a href="{{ route('home') }}" wire:navigate class="inline-flex flex-col items-center justify-center px-5 text-navbar-fg hover:bg-slate-100 dark:text-gray-400 dark:hover:bg-gray-700">
+        <a href="{{ route('home') }}" wire:navigate class="inline-flex flex-col items-center justify-center px-5 text-navbar-fg hover:bg-sidebar-hover">
             <x-lucide-shopping-cart class="mb-1 h-5 w-5" />
             <span class="text-xs">{{ __('general.cart') }}</span>
         </a>
-        <a href="{{ route('profile') }}" wire:navigate class="inline-flex flex-col items-center justify-center px-5 hover:bg-slate-100 dark:hover:bg-gray-700 {{ request()->routeIs('profile') ? 'text-brand dark:text-brand' : 'text-navbar-fg dark:text-gray-400' }}">
+        <a
+            href="{{ route('profile') }}"
+            wire:navigate
+            @class([
+                'inline-flex flex-col items-center justify-center px-5 hover:bg-sidebar-hover',
+                'text-brand dark:bg-brand-glow/10 dark:text-brand-glow' => request()->routeIs('profile'),
+                'text-navbar-fg' => ! request()->routeIs('profile'),
+            ])
+        >
             <x-lucide-user class="mb-1 h-5 w-5" />
             <span class="text-xs">{{ __('general.profile') }}</span>
         </a>
