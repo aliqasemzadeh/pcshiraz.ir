@@ -17,6 +17,7 @@
         "mallardduck/blade-lucide-icons": "^1.26",
         "masmerise/livewire-toaster": "^2.10",
         "opcodesio/log-viewer": "^3.24",
+        "power-components/livewire-powergrid": "^6.10",
         "revoltify/subscriptionify": "^1.0",
         "sadegh19b/laravel-persian-validation": "^2.1",
         "spatie/laravel-medialibrary": "^11.23",
