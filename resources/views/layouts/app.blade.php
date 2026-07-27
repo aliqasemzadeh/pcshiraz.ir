@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ __('general.direction') }}">
 @include('partials.layouts.head')
-<body class="min-h-screen bg-canvas antialiased dark:bg-gray-900">
+<body class="min-h-screen bg-canvas text-ink antialiased">
 <script>
     (function () {
         const theme = localStorage.getItem('color-theme') || 'system';
