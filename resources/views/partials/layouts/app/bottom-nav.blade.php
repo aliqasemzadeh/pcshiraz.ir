@@ -16,7 +16,7 @@
             <x-lucide-shopping-cart class="mb-1 h-5 w-5" />
             <span class="text-xs">{{ __('general.cart') }}</span>
         </a>
-        <a href="{{ route('profile') }}" wire:navigate class="inline-flex flex-col items-center justify-center px-5 hover:bg-slate-200/50 dark:hover:bg-gray-700 {{ request()->routeIs('profile') ? 'text-brand-strong dark:text-teal-400' : 'text-navbar-fg/60 dark:text-gray-400' }}">
+        <a href="{{ route('profile') }}" wire:navigate class="inline-flex flex-col items-center justify-center px-5 hover:bg-slate-200/50 dark:hover:bg-gray-700 {{ request()->routeIs('profile') ? 'text-brand-strong dark:text-brand-medium' : 'text-navbar-fg/60 dark:text-gray-400' }}">
             <x-lucide-user class="mb-1 h-5 w-5" />
             <span class="text-xs">{{ __('general.profile') }}</span>
         </a>

@@ -87,7 +87,7 @@
                         type="search"
                         x-model="query"
                         placeholder="{{ __('general.search_categories') }}"
-                        class="block w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pe-3 ps-9 text-sm text-gray-900 focus:border-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                        class="block w-full rounded-xl border border-slate-200 bg-white py-2.5 pe-3 ps-9 text-sm text-navbar-fg focus:border-brand focus:ring-brand dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                     >
                 </div>
             </div>
@@ -125,7 +125,7 @@
                         </div>
                         <button
                             type="button"
-                            class="shrink-0 rounded-lg bg-teal-700 px-2.5 py-1.5 text-[11px] font-medium text-white hover:bg-teal-800"
+                            class="shrink-0 rounded-lg bg-brand px-2.5 py-1.5 text-[11px] font-medium text-white hover:bg-brand-strong"
                             x-show="activeCategory"
                             @click="activeCategory && goCategory(activeCategory)"
                         >
