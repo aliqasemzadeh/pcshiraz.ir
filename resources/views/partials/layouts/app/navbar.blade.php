@@ -8,7 +8,10 @@
             @include('partials.layouts.app.search')
         </div>
 
-        <div class="shrink-0">
+        <div class="shrink-0 md:hidden">
+            @include('partials.layouts.theme-compact')
+        </div>
+        <div class="hidden shrink-0 md:block">
             @include('partials.layouts.theme')
         </div>
 
