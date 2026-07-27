@@ -10,7 +10,7 @@ class AuthForm extends Form
 {
     public ?User $user = null;
 
-    #[Validate('required|ir_mobile:zero', as: 'main.mobile')]
+    #[Validate('required|ir_mobile:zero', as: 'general.mobile')]
     public string $mobile = '';
 
     public string $code = '';
