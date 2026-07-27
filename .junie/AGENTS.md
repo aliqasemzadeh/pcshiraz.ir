@@ -12,17 +12,20 @@ You are an expert full-stack developer working on a Laravel project. Your task i
 *   **Livewire:** Version 4 (Do NOT use Volt; use standard `Livewire\Component`)
 *   **UI Library:** Flowbite (https://flowbite.com/) — full LLM docs: https://raw.githubusercontent.com/themesberg/flowbite/refs/heads/main/llms-full.txt
 *   **Icons:** Lucide via `mallardduck/blade-lucide-icons` (https://lucide.dev/icons). Use Blade components: `<x-lucide-pencil class="w-4 h-4" />`. Icon names use kebab-case matching Lucide (e.g. `pencil`, `trash-2`, `plus`, `search`, `chevron-down`).
+*   **Tables:** `power-components/livewire-powergrid` v6 (https://github.com/Power-Components/livewire-powergrid) — demo/reference: https://github.com/Power-Components/powergrid-demo and https://demo.livewire-powergrid.com. Docs: https://livewire-powergrid.com
 *   **Modals:** `elegantly/livewire-modal` (https://elegantly.dev/livewire-modal) — NOT Flowbite modals/drawers for CRUD forms.
 *   **Toasts:** `masmerise/livewire-toaster` — use `Masmerise\Toaster\Toaster` facade.
 *   **Do NOT use FluxUI** (`flux:*` components, `Flux::toast`, `Flux::modal`, `php artisan flux:icon`).
+*   **Do NOT hand-roll HTML `<table>` lists** for CRUD indexes — always use PowerGrid.
 
 ## 2. Architecture & File Structure
-*   **Single-File Component Architecture:** ALWAYS write Livewire components as Single-File Components. Place all PHP logic inside a `<?php ... ?>` block at the top of the `.blade.php` file.
-*   **File Location:** Save these components directly in `resources/views/components/` or `resources/views/pages/`.
-*   **Root Node:** Ensure the HTML portion of the component always has a single root wrapping element.
+*   **Single-File Component Architecture:** ALWAYS write Livewire page/form/modal components as Single-File Components. Place all PHP logic inside a `<?php ... ?>` block at the top of the `.blade.php` file.
+*   **EXCEPTION — PowerGrid Tables:** Table components MUST be class-based and extend `PowerComponents\LivewirePowerGrid\PowerGridComponent`. Create with `php artisan powergrid:create`. Place them under `app/Livewire/` (e.g. `app/Livewire/UserTable.php`, `app/Livewire/Administrator/UserTable.php`). Keep the `*Table` suffix so Tailwind `@source` in `resources/css/app.css` picks them up.
+*   **File Location:** Save page/form SFCs in `resources/views/components/` or `resources/views/pages/`. Save PowerGrid tables in `app/Livewire/`.
+*   **Root Node:** Ensure the HTML portion of SFC components always has a single root wrapping element.
 *   **Separation of Concerns:** Use AlpineJS for UI manipulation and Livewire strictly for Backend logic.
 *   **Livewire Inclusions:** When loading a Livewire component inside a view, always pass a key: `<livewire:component-name :key="$componentId" />`.
-*   **Pages namespace:** For Livewire pages use `pages::` and SCF (single-file components). Do not convert to class-based components.
+*   **Pages namespace:** For Livewire pages use `pages::` and SCF (single-file components). Do not convert pages to class-based components (PowerGrid tables are the only class-based exception).
 
 ## 3. Database & Eloquent Models
 *   **Attributes:** Use PHP Attributes like `#[Fillable([])]` and `#[Hidden]` from `Illuminate\Database\Eloquent\Attributes` instead of the traditional `$fillable` or `$hidden` arrays.
@@ -58,7 +61,8 @@ In `resources/js/app.js`:
 import '../../vendor/masmerise/livewire-toaster/resources/js';
 ```
 
-Ensure Tailwind content / `@source` includes:
+Ensure Tailwind content / `@source` includes (PowerGrid is already wired in `resources/css/app.css`):
+*   PowerGrid Tailwind 4 CSS import + `@source` for `app/Livewire/*Table.php`, vendor views, and `Tailwind.php` theme
 *   `./vendor/elegantly/livewire-modal/resources/views/**/*.blade.php`
 *   `./vendor/masmerise/livewire-toaster/resources/views/*.blade.php`
 *   Flowbite paths as required by the Flowbite Laravel/Tailwind setup
@@ -72,25 +76,58 @@ Initialize Flowbite for interactive widgets (dropdown, tooltip, datepicker, etc.
 ### Layout & Pages
 *   **Page Titles:** Use `<x-slot name="title">Page Title - {{ config('app.name') }}</x-slot>`.
 *   **Breadcrumbs:** Always include Flowbite breadcrumb markup (`nav` + `ol` with `inline-flex items-center`).
-*   **Cards:** Wrap search/filter and table blocks in Flowbite card containers (`bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 p-4 sm:p-6`).
+*   **Cards:** Optionally wrap the PowerGrid include in a Flowbite card container for page layout consistency. Do NOT build a separate manual search box above PowerGrid — use PowerGrid header search.
 
-### Tables & Lists
-*   Use Flowbite table markup (`relative overflow-x-auto`, `w-full text-sm text-left`, `thead` with `text-xs text-gray-700 uppercase bg-gray-50`).
-*   Implement pagination using `->paginate(config('general.per_page'))` and Laravel pagination links styled with Flowbite pagination classes.
-*   Put search/filter above the table inside the card. Example search input:
-    ```html
-    <div class="relative mb-4">
-        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-            <x-lucide-search class="w-4 h-4 text-gray-500" />
-        </div>
-        <input
-            type="search"
-            wire:model.live.debounce.300ms="search"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-            placeholder="{{ __('general.search') }}..."
-        />
-    </div>
+### Tables & Lists (`livewire-powergrid`)
+*   **Mandatory:** All index/list tables MUST use PowerGrid. Never build custom Blade `<table>` CRUD lists.
+*   **Create:** `php artisan powergrid:create` → class under `app/Livewire/` extending `PowerGridComponent`.
+*   **Docs / patterns:** Follow https://livewire-powergrid.com and the official demo https://github.com/Power-Components/powergrid-demo (e.g. Search With Relationship).
+*   **Unique table name:** Always set `public string $tableName = 'usersTable';` (CamelCase, unique per page). Required for refresh events.
+*   **Setup:** Always enable header search + footer pagination/record count:
+    ```php
+    public function setUp(): array
+    {
+        return [
+            PowerGrid::header()->showSearchInput(),
+            PowerGrid::footer()
+                ->showPerPage(config('general.per_page'))
+                ->showRecordCount(),
+        ];
+    }
     ```
+*   **Datasource:** Return an Eloquent `Builder`. Eager-load every relation used in `fields()` / columns to avoid N+1 (`->with(['category', 'chef'])`).
+*   **Searchable columns (REQUIRED):** Every user-facing text column that should be found via the global search MUST chain `->searchable()` on `Column::make(...)`.
+*   **Relationship search (REQUIRED):** If any searchable column comes from a relation (or you display related data), you MUST declare `relationSearch()` mapping relation => searchable DB columns. Nested relations are supported. Without this, relation fields will NOT be searched.
+    ```php
+    public function relationSearch(): array
+    {
+        return [
+            'category' => [
+                'name',
+            ],
+            'chef' => [
+                'name',
+            ],
+            // nested example:
+            // 'kitchen' => [
+            //     'name',
+            //     'chef' => ['name'],
+            // ],
+        ];
+    }
+    ```
+*   **Relation fields:** Add display fields via closures in `fields()`, mark the column `->searchable()`, and keep `relationSearch()` in sync with the real DB columns on those relations.
+*   **Relation filters:** When filtering by a relation column, use `Filter::...()->filterRelation('relation', 'column')` AND keep that relation in `relationSearch()`.
+*   **Actions column:** Add `Column::action(__('general.actions'))` and implement `actions($row): array` with `Button::add(...)`. Prefer dispatching modal-open / domain events (edit/delete) instead of separate routes.
+*   **Include on pages:**
+    ```html
+    <livewire:user-table :key="'user-table'" />
+    ```
+*   **Refresh after CRUD:** From create/edit/delete components dispatch PowerGrid's refresh event using the exact `$tableName`:
+    ```php
+    $this->dispatch('pg:eventRefresh-usersTable');
+    ```
+    Do not invent generic `refresh-data` listeners for tables.
 
 ### Modals (`elegantly/livewire-modal`)
 *   **Create / Edit:** Always use **slideover** (right-side panel). Never redirect to separate create/edit routes.
@@ -222,7 +259,7 @@ Initialize Flowbite for interactive widgets (dropdown, tooltip, datepicker, etc.
 
 ## 8. Reference Examples
 
-**Table Example:**
+**Page with PowerGrid table:**
 ```html
 <div>
     <div class="space-y-6">
@@ -240,82 +277,116 @@ Initialize Flowbite for interactive widgets (dropdown, tooltip, datepicker, etc.
         </div>
 
         <div class="bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 p-4 sm:p-6">
-            <div class="relative mb-4">
-                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                    <x-lucide-search class="w-4 h-4 text-gray-500" />
-                </div>
-                <input
-                    type="search"
-                    wire:model.live.debounce.300ms="search"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                    placeholder="{{ __('general.search') }}..."
-                />
-            </div>
-
-            <div class="relative overflow-x-auto">
-                <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                        <tr>
-                            <th scope="col" class="px-6 py-3">{{ __('general.first_name') }}</th>
-                            <th scope="col" class="px-6 py-3 text-end">{{ __('general.actions') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($this->users as $user)
-                            <tr wire:key="user-{{ $user->id }}" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-                                <td class="px-6 py-4">{{ $user->first_name }}</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex justify-end gap-2">
-                                        <button
-                                            type="button"
-                                            data-tooltip-target="tooltip-edit-{{ $user->id }}"
-                                            wire:click="$dispatch('panels.administrator.user.edit.assign-data', { user: {{ $user->id }} })"
-                                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm p-2"
-                                        >
-                                            <x-lucide-pencil class="w-4 h-4" />
-                                        </button>
-                                        <div id="tooltip-edit-{{ $user->id }}" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
-                                            {{ __('general.edit') }}
-                                            <div class="tooltip-arrow" data-popper-arrow></div>
-                                        </div>
-
-                                        <button
-                                            type="button"
-                                            data-tooltip-target="tooltip-delete-{{ $user->id }}"
-                                            x-modal:open="{ modal: 'user.delete', props: { userId: {{ $user->id }} } }"
-                                            class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm p-2"
-                                        >
-                                            <x-lucide-trash-2 class="w-4 h-4" />
-                                        </button>
-                                        <div id="tooltip-delete-{{ $user->id }}" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
-                                            {{ __('general.delete') }}
-                                            <div class="tooltip-arrow" data-popper-arrow></div>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="mt-4">
-                {{ $this->users->links() }}
-            </div>
+            <livewire:user-table :key="'user-table'" />
         </div>
     </div>
 </div>
 ```
 
+**PowerGrid table component (`app/Livewire/UserTable.php`) — searchable + relationSearch:**
+```php
+<?php
+
+namespace App\Livewire;
+
+use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
+use PowerComponents\LivewirePowerGrid\Button;
+use PowerComponents\LivewirePowerGrid\Column;
+use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
+use PowerComponents\LivewirePowerGrid\PowerGridComponent;
+use PowerComponents\LivewirePowerGrid\PowerGridFields;
+
+final class UserTable extends PowerGridComponent
+{
+    public string $tableName = 'usersTable';
+
+    public function setUp(): array
+    {
+        return [
+            PowerGrid::header()->showSearchInput(),
+            PowerGrid::footer()
+                ->showPerPage(config('general.per_page'))
+                ->showRecordCount(),
+        ];
+    }
+
+    public function datasource(): Builder
+    {
+        return User::query()->with(['role']); // eager-load searchable relations
+    }
+
+    /**
+     * REQUIRED when searching related columns.
+     * Maps relation name => searchable DB columns on that relation.
+     */
+    public function relationSearch(): array
+    {
+        return [
+            'role' => [
+                'name',
+            ],
+        ];
+    }
+
+    public function fields(): PowerGridFields
+    {
+        return PowerGrid::fields()
+            ->add('id')
+            ->add('first_name')
+            ->add('email')
+            ->add('role_name', fn (User $user) => e($user->role?->name));
+    }
+
+    public function columns(): array
+    {
+        return [
+            Column::make(__('general.first_name'), 'first_name')
+                ->searchable()
+                ->sortable(),
+
+            Column::make(__('general.email'), 'email')
+                ->searchable()
+                ->sortable(),
+
+            // Related column: searchable() + matching relationSearch() entry
+            Column::make(__('general.role'), 'role_name')
+                ->searchable(),
+
+            Column::action(__('general.actions')),
+        ];
+    }
+
+    public function actions(User $row): array
+    {
+        return [
+            Button::add('edit')
+                ->slot('<x-lucide-pencil class="w-4 h-4" />')
+                ->class('text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm p-2')
+                ->dispatch('panels.administrator.user.edit.assign-data', ['user' => $row->id]),
+
+            Button::add('delete')
+                ->slot('<x-lucide-trash-2 class="w-4 h-4" />')
+                ->class('text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm p-2')
+                ->dispatch('modal-open', [
+                    'modal' => 'user.delete',
+                    'props' => ['userId' => $row->id],
+                ]),
+        ];
+    }
+}
+```
+
 ## 9. UI & CRUD Interaction Workflow
-*   **Create & Edit:** Always via `elegantly/livewire-modal` **slideover**. After success: `Toaster::success(...)`, `$this->dispatch('modal-close')`, and dispatch the page table refresh event.
-*   **Delete:** Always via centered confirmation modal. After success: toast + close modal + refresh event.
-*   **Event-Driven Table Refresh:** Dispatch a context-specific event, e.g. `$this->dispatch('panels.administrator.user.index.table');`. The listing page listens with `#[On('panels.administrator.user.index.table')]`. Do not use generic names like `refresh-data`.
+*   **Create & Edit:** Always via `elegantly/livewire-modal` **slideover**. After success: `Toaster::success(...)`, `$this->dispatch('modal-close')`, and refresh the PowerGrid table.
+*   **Delete:** Always via centered confirmation modal. After success: toast + close modal + refresh PowerGrid.
+*   **PowerGrid refresh:** Dispatch `pg:eventRefresh-{tableName}` matching the table's `$tableName` property, e.g. `$this->dispatch('pg:eventRefresh-usersTable');`. Do not use generic names like `refresh-data`.
 
 ## 10. Quick Package Cheatsheet
 | Concern | Package / Tool | API |
 |---|---|---|
 | UI kit | Flowbite | Tailwind classes + data attributes + `initFlowbite()` |
+| Tables | `power-components/livewire-powergrid` | `PowerGridComponent`, `Column::make()->searchable()`, `relationSearch()` |
 | Icons | `mallardduck/blade-lucide-icons` | `<x-lucide-{name} class="w-4 h-4" />` |
 | Modal / Slideover | `elegantly/livewire-modal` | `x-modal:open`, `modal-open` / `modal-close`, `<x-livewire-modal::slideover>` |
 | Toast | `masmerise/livewire-toaster` | `Toaster::success()`, `<x-toaster-hub />` |
