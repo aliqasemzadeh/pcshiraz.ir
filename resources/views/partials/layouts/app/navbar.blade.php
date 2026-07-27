@@ -1,4 +1,4 @@
-<nav class="fixed top-0 start-0 z-40 w-full border-b border-slate-200 bg-navbar dark:border-gray-700 dark:bg-gray-800">
+<nav class="fixed top-0 start-0 z-40 w-full bg-navbar shadow-sm dark:bg-gray-800 dark:shadow-none dark:border-b dark:border-gray-700">
     <div class="mx-auto flex max-w-screen-xl items-center gap-2 px-3 py-2">
         <a href="{{ route('home') }}" wire:navigate class="shrink-0">
             <span class="text-lg font-semibold whitespace-nowrap text-navbar-fg dark:text-white">{{ config('app.name') }}</span>

@@ -36,8 +36,9 @@
     --color-sidebar-hover: #0F172A;
     --color-sidebar-active: #0F172A;
     --color-navbar: #FFFFFF;
-    --color-navbar-fg: #334155;
-    --color-canvas: #F1F5F9;
+    --color-navbar-fg: #64748B;
+    --color-nav-border: #E2E8F0;
+    --color-canvas: #F8FAFC;
     --color-primary: #00BFFF;
     --color-accent: #FF007F;
 
