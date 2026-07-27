@@ -19,6 +19,7 @@
 </main>
 
 @include('partials.layouts.app.bottom-nav')
+@include('partials.layouts.app.mobile-category-modal')
 @include('partials.layouts.foot')
 </body>
 </html>

@@ -24,6 +24,10 @@
 @source '../../vendor/masmerise/livewire-toaster/resources/views/*.blade.php';
 @source '../../node_modules/flowbite/**/*.js';
 
+[x-cloak] {
+    display: none !important;
+}
+
 /* Custom theme */
 @theme {
     --color-pg-primary-50: oklch(0.985 0 0);

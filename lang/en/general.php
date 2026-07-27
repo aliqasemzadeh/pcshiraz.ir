@@ -44,4 +44,10 @@ return [
     'light' => 'Light',
     'dark' => 'Dark',
     'system' => 'System',
+    'close' => 'Close',
+    'no_brands' => 'No brands found for this category',
+    'view_all_in_category' => 'View all in this category',
+    'search_categories' => 'Search categories...',
+    'select_a_category' => 'Select a category',
+    'browse_categories' => 'Browse categories',
 ];

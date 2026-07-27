@@ -56,6 +56,11 @@ class Domain extends Model
         return $this->hasMany(Inventory::class);
     }
 
+    public function items(): HasMany
+    {
+        return $this->hasMany(Item::class);
+    }
+
     /**
      * Get the customers for the domain.
      *

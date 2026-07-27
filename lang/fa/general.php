@@ -44,4 +44,10 @@ return [
     'light' => 'روشن',
     'dark' => 'تاریک',
     'system' => 'سیستم',
+    'close' => 'بستن',
+    'no_brands' => 'برندی برای این دسته یافت نشد',
+    'view_all_in_category' => 'مشاهده همه در این دسته',
+    'search_categories' => 'جستجوی دسته‌ها...',
+    'select_a_category' => 'یک دسته را انتخاب کنید',
+    'browse_categories' => 'مرور دسته‌ها',
 ];
