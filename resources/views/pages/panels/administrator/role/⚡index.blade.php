@@ -1,19 +1,14 @@
 <?php
 
-use Livewire\Component;
 use Livewire\Attributes\Layout;
+use Livewire\Component;
 
-new #[Layout('layouts.panels.administrator')] class extends Component
+new #[Layout('layouts.panels')] class extends Component
 {
     //
 };
 ?>
 
-<x-slot name="title">
-    Roles
-</x-slot>
-
-
-<flux:main>
-    {{-- Because you are alive, everything is possible. - Thich Nhat Hanh --}}
-</flux:main>
+<div>
+    <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">{{ __('general.roles') }}</h1>
+</div>

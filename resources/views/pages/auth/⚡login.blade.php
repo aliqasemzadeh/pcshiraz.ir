@@ -1,37 +1,36 @@
 <?php
 
 use App\Livewire\Forms\AuthForm;
-use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Masmerise\Toaster\Toaster;
 use Spatie\OneTimePasswords\Actions\ConsumeOneTimePasswordAction;
 use Spatie\OneTimePasswords\Enums\ConsumeOneTimePasswordResult;
 
-new #[Layout('layouts::auth')] class extends Component
+new #[Layout('layouts.auth')] class extends Component
 {
     public AuthForm $form;
+
     public bool $otpSent = false;
 
-    public function sendOtp()
+    public function sendOtp(): void
     {
         $this->form->validateOnly('mobile');
 
         $user = $this->form->getUser();
 
         if ($user->oneTimePasswords()->where('expires_at', '>', now())->exists()) {
-            Flux::toast(__('main.otp_still_valid'), variant: 'warning');
-
+            Toaster::warning(__('general.otp_still_valid'));
             $this->otpSent = true;
 
             return;
         }
 
         $user->sendOneTimePassword();
-
         $this->otpSent = true;
 
-        Flux::toast(__('main.otp_sent'));
+        Toaster::success(__('general.otp_sent'));
     }
 
     public function login(ConsumeOneTimePasswordAction $consumeOneTimePasswordAction)
@@ -50,59 +49,110 @@ new #[Layout('layouts::auth')] class extends Component
             return redirect()->intended(config('one-time-passwords.redirect_successful_authentication_to'));
         }
 
-        $this->addError('form.code', __('main.invalid_otp'));
+        $this->addError('form.code', __('general.invalid_otp'));
     }
 
-    public function resetForm()
+    public function resetForm(): void
     {
         $this->otpSent = false;
         $this->form->code = '';
+        $this->resetErrorBag('form.code');
     }
 };
 ?>
 
 <div>
     <div class="mb-6 text-center">
-        <flux:heading size="xl">{{ __('main.login_or_register') }}</flux:heading>
+        <h1 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+            {{ __('general.login_or_register') }}
+        </h1>
     </div>
 
-    @if (!$otpSent)
+    @if (! $otpSent)
         <form wire:submit="sendOtp" class="space-y-6">
-            <flux:input
-                wire:model="form.mobile"
-                label="{{ __('main.mobile') }}"
-                placeholder="09123456789"
-                icon="smartphone"
-            />
+            <div>
+                <label for="mobile" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                    {{ __('general.mobile') }}
+                </label>
+                <div class="relative">
+                    <div class="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3">
+                        <x-lucide-smartphone class="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                    </div>
+                    <input
+                        id="mobile"
+                        type="tel"
+                        wire:model="form.mobile"
+                        placeholder="09123456789"
+                        class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 ps-10 text-sm text-gray-900 focus:border-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                        autocomplete="tel"
+                    >
+                </div>
+                @error('form.mobile')
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                @enderror
+            </div>
 
-            <flux:button type="submit" variant="primary" color="teal" class="w-full">
-                {{ __('main.send_otp') }}
-            </flux:button>
+            <button
+                type="submit"
+                class="w-full rounded-lg bg-teal-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 focus:outline-none dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800"
+            >
+                {{ __('general.send_otp') }}
+            </button>
         </form>
     @else
         <form wire:submit="login" class="space-y-6">
-            <div class="text-center space-y-4">
-                <flux:subheading>
-                    {{ __('main.enter_otp') }} {{ $form->mobile }}
-                </flux:subheading>
+            <div class="space-y-4 text-center">
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ __('general.enter_otp') }}
+                    <span class="font-medium text-gray-900 dark:text-white" dir="ltr">{{ $form->mobile }}</span>
+                </p>
 
-                <flux:otp wire:model="form.code" length="6" submit="auto" class="mx-auto" />
-                <flux:error name="form.code" />
+                <div>
+                    <label for="otp-code" class="sr-only">{{ __('general.otp_code') }}</label>
+                    <input
+                        id="otp-code"
+                        type="text"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        maxlength="6"
+                        autocomplete="one-time-code"
+                        wire:model="form.code"
+                        class="mx-auto block w-full max-w-xs rounded-lg border border-gray-300 bg-gray-50 p-3 text-center text-2xl tracking-[0.4em] text-gray-900 focus:border-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                        placeholder="------"
+                        dir="ltr"
+                    >
+                    @error('form.code')
+                        <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <div class="space-y-2">
-                <flux:button type="submit" variant="primary" color="teal" class="w-full">
-                    {{ __('main.verify_and_login') }}
-                </flux:button>
+                <button
+                    type="submit"
+                    class="w-full rounded-lg bg-teal-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 focus:outline-none dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800"
+                >
+                    {{ __('general.verify_and_login') }}
+                </button>
 
                 <div class="flex justify-between gap-2">
-                    <flux:button variant="ghost" size="sm" wire:click="resetForm" icon="pencil">
-                        {{ __('main.change_mobile') }}
-                    </flux:button>
+                    <button
+                        type="button"
+                        wire:click="resetForm"
+                        class="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                    >
+                        <x-lucide-pencil class="h-4 w-4" />
+                        {{ __('general.change_mobile') }}
+                    </button>
 
-                    <flux:button variant="ghost" size="sm" wire:click="sendOtp" icon="refresh-cw">
-                        {{ __('main.resend_otp') }}
-                    </flux:button>
+                    <button
+                        type="button"
+                        wire:click="sendOtp"
+                        class="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                    >
+                        <x-lucide-refresh-cw class="h-4 w-4" />
+                        {{ __('general.resend_otp') }}
+                    </button>
                 </div>
             </div>
         </form>
