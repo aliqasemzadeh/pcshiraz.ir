@@ -63,7 +63,7 @@ new #[Layout('layouts.auth')] class extends Component
 
 <div>
     <div class="mb-6 text-center">
-        <h1 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+        <h1 class="text-xl font-bold tracking-tight text-ink">
             {{ __('general.login_or_register') }}
         </h1>
     </div>

@@ -10,26 +10,26 @@ new #[Layout('layouts.app')] class extends Component
 ?>
 
 <div class="flex min-h-[60vh] flex-col">
-    <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">{{ __('general.profile') }}</h1>
+    <div class="rounded-xl border border-nav-border bg-surface p-6 shadow-sm sm:p-8">
+        <h1 class="text-2xl font-semibold text-ink">{{ __('general.profile') }}</h1>
 
         @auth
-            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400" dir="ltr">{{ auth()->user()->mobile }}</p>
+            <p class="mt-2 text-sm text-sidebar-fg" dir="ltr">{{ auth()->user()->mobile }}</p>
 
             <form method="POST" action="{{ route('logout') }}" class="mt-6">
                 @csrf
-                <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-red-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-800 focus:ring-4 focus:ring-red-300 focus:outline-none dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
+                <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-danger px-5 py-2.5 text-sm font-medium text-white hover:bg-danger/90 focus:ring-4 focus:ring-danger/30 focus:outline-none">
                     <x-lucide-log-out class="h-4 w-4" />
                     {{ __('general.logout') }}
                 </button>
             </form>
         @else
-            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ __('general.login_or_register') }}</p>
+            <p class="mt-2 text-sm text-sidebar-fg">{{ __('general.login_or_register') }}</p>
 
             <a
                 href="{{ route('login') }}"
                 wire:navigate
-                class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-strong focus:ring-4 focus:ring-brand/30 focus:outline-none dark:bg-brand dark:hover:bg-brand-strong dark:focus:ring-brand/40"
+                class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-strong focus:ring-4 focus:ring-brand/30 focus:outline-none"
             >
                 <x-lucide-log-in class="h-4 w-4" />
                 {{ __('general.login') }}
@@ -37,8 +37,8 @@ new #[Layout('layouts.app')] class extends Component
         @endauth
     </div>
 
-    <div class="mt-auto flex flex-col items-center gap-2 border-t border-gray-200 pt-6 dark:border-gray-700">
-        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ __('general.theme') }}</p>
+    <div class="mt-auto flex flex-col items-center gap-2 border-t border-nav-border pt-6">
+        <p class="text-xs font-medium text-sidebar-fg">{{ __('general.theme') }}</p>
         @include('partials.layouts.theme')
     </div>
 </div>
