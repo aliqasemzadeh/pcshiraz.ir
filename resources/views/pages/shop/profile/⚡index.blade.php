@@ -9,7 +9,7 @@ new #[Layout('layouts.app')] class extends Component
 };
 ?>
 
-<div class="flex min-h-[60vh] flex-col">
+<div class="flex min-h-[60vh] flex-col pt-16">
     <div class="rounded-xl border border-nav-border bg-surface p-6 shadow-sm sm:p-8">
         <h1 class="text-2xl font-semibold text-ink">{{ __('general.profile') }}</h1>
 

@@ -25,7 +25,7 @@ new #[Layout('layouts.app')] class extends Component
 <div class="relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2">
     {{-- Full-bleed hero --}}
     <section
-        class="relative overflow-hidden px-4 pb-16 pt-10 text-navbar-title sm:pb-20 sm:pt-14"
+        class="relative overflow-hidden px-4 pb-16 pt-20 text-navbar-title sm:pb-20 sm:pt-24"
         style="background:
             radial-gradient(ellipse 80% 60% at 100% 0%, rgb(0 204 205 / 0.35), transparent 55%),
             radial-gradient(ellipse 70% 50% at 0% 100%, rgb(66 58 142 / 0.9), transparent 50%),
