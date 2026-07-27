@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ __('general.direction') }}">
 @include('partials.layouts.head')
-<body class="min-h-screen bg-canvas antialiased dark:bg-gray-900">
+<body class="min-h-screen bg-canvas text-ink antialiased">
 <script>
     (function () {
         const theme = localStorage.getItem('color-theme') || 'system';
@@ -12,7 +12,7 @@
     })();
 </script>
 
-<nav class="fixed top-0 z-50 w-full border-b border-slate-200 bg-navbar dark:border-gray-700 dark:bg-gray-800">
+<nav class="fixed top-0 z-50 w-full border-b border-nav-border bg-navbar">
     <div class="px-3 py-3 lg:px-5 lg:ps-3">
         <div class="flex items-center justify-between">
             <div class="flex items-center justify-start rtl:justify-end">
@@ -22,19 +22,19 @@
                     data-drawer-placement="{{ __('general.direction') === 'rtl' ? 'right' : 'left' }}"
                     aria-controls="panel-sidebar"
                     type="button"
-                    class="inline-flex items-center justify-center rounded-lg p-2.5 text-sm text-navbar-fg hover:bg-slate-100 focus:ring-2 focus:ring-brand/30 focus:outline-none md:hidden dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                    class="inline-flex items-center justify-center rounded-lg p-2.5 text-sm text-navbar-fg hover:bg-sidebar-hover focus:ring-2 focus:ring-brand/30 focus:outline-none md:hidden"
                 >
                     <span class="sr-only">Open sidebar</span>
                     <x-lucide-menu class="h-6 w-6" />
                 </button>
                 <a href="{{ route('home') }}" wire:navigate class="ms-2 flex md:me-24">
-                    <span class="self-center text-xl font-semibold whitespace-nowrap text-navbar-fg dark:text-white">{{ config('app.name') }}</span>
+                    <span class="self-center text-xl font-semibold whitespace-nowrap text-ink">{{ config('app.name') }}</span>
                 </a>
             </div>
             <div class="flex items-center gap-3">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-navbar-fg hover:bg-slate-100 dark:text-gray-300 dark:hover:bg-gray-700">
+                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-navbar-fg hover:bg-sidebar-hover hover:text-ink">
                         <x-lucide-log-out class="h-4 w-4" />
                         {{ __('general.logout') }}
                     </button>
@@ -47,7 +47,7 @@
 <aside
     id="panel-sidebar"
     @class([
-        'fixed top-0 start-0 z-40 h-screen w-64 border-e border-white/10 bg-sidebar pt-14 transition-transform md:translate-x-0 dark:border-white/10 dark:bg-sidebar',
+        'fixed top-0 start-0 z-40 h-screen w-64 border-e border-nav-border bg-sidebar pt-14 transition-transform md:translate-x-0',
         'translate-x-full' => __('general.direction') === 'rtl',
         '-translate-x-full' => __('general.direction') !== 'rtl',
     ])
@@ -66,11 +66,11 @@
             @endif
         </ul>
 
-        <div class="mt-auto space-y-3 border-t border-white/10 pt-4">
+        <div class="mt-auto space-y-3 border-t border-nav-border pt-4">
             <p class="px-2 text-xs font-semibold tracking-wide text-sidebar-fg uppercase">{{ __('general.switch_panel') }}</p>
             @include('partials.layouts.panels')
             <div class="flex justify-center px-2 pb-2">
-                @include('partials.layouts.theme', ['onBrand' => true])
+                @include('partials.layouts.theme')
             </div>
         </div>
     </div>
