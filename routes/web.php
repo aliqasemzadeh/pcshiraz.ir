@@ -15,7 +15,7 @@ Route::post('/logout', function () {
     return redirect()->route('home');
 })->middleware('auth')->name('logout');
 
-Route::middleware('auth')->prefix('panels')->group(function () {
+//Route::middleware('auth')->prefix('panels')->group(function () {
     Route::prefix('administrator')->name('panels.administrator.')->group(function () {
         Route::livewire('/dashboard', 'pages::panels.administrator.dashboard.index')->name('dashboard.index');
         Route::livewire('/users', 'pages::panels.administrator.user.index')->name('user.index');
@@ -38,4 +38,4 @@ Route::middleware('auth')->prefix('panels')->group(function () {
     Route::prefix('organization')->name('panels.organization.')->group(function () {
         Route::livewire('/dashboard', 'pages::panels.organization.dashboard.index')->name('dashboard.index');
     });
-});
+//});

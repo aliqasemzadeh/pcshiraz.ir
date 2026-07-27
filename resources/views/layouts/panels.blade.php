@@ -19,9 +19,10 @@
                 <button
                     data-drawer-target="panel-sidebar"
                     data-drawer-toggle="panel-sidebar"
+                    data-drawer-placement="{{ __('general.direction') === 'rtl' ? 'right' : 'left' }}"
                     aria-controls="panel-sidebar"
                     type="button"
-                    class="inline-flex items-center rounded-lg p-2 text-sm text-gray-500 hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 focus:outline-none md:hidden dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                    class="inline-flex items-center justify-center rounded-lg p-2.5 text-sm text-gray-500 hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 focus:outline-none md:hidden dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
                 >
                     <span class="sr-only">Open sidebar</span>
                     <x-lucide-menu class="h-6 w-6" />
@@ -31,10 +32,9 @@
                 </a>
             </div>
             <div class="flex items-center gap-3">
-                @include('partials.layouts.theme')
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">
+                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">
                         <x-lucide-log-out class="h-4 w-4" />
                         {{ __('general.logout') }}
                     </button>
@@ -46,7 +46,11 @@
 
 <aside
     id="panel-sidebar"
-    class="fixed top-0 start-0 z-40 h-screen w-64 -translate-x-full border-e border-gray-200 bg-white pt-14 transition-transform md:translate-x-0 rtl:translate-x-full md:rtl:translate-x-0 dark:border-gray-700 dark:bg-gray-800"
+    @class([
+        'fixed top-0 start-0 z-40 h-screen w-64 border-e border-gray-200 bg-white pt-14 transition-transform md:translate-x-0 dark:border-gray-700 dark:bg-gray-800',
+        'translate-x-full' => __('general.direction') === 'rtl',
+        '-translate-x-full' => __('general.direction') !== 'rtl',
+    ])
     aria-label="Sidebar"
 >
     <div class="flex h-full flex-col overflow-y-auto bg-white px-3 py-4 dark:bg-gray-800">
@@ -65,6 +69,9 @@
         <div class="mt-auto space-y-3 border-t border-gray-200 pt-4 dark:border-gray-700">
             <p class="px-2 text-xs font-semibold tracking-wide text-gray-400 uppercase">{{ __('general.switch_panel') }}</p>
             @include('partials.layouts.panels')
+            <div class="flex justify-center px-2 pb-2">
+                @include('partials.layouts.theme')
+            </div>
         </div>
     </div>
 </aside>
