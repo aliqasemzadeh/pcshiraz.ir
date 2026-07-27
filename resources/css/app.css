@@ -28,21 +28,26 @@
     display: none !important;
 }
 
-/* Classic modern chrome + PowerGrid theme */
+/* Eggplant + rust orange + luminous blue chrome */
 @theme {
-    /* Semantic chrome: dark sidebar + white navbar */
-    --color-sidebar: #1E293B;
-    --color-sidebar-fg: #94A3B8;
-    --color-sidebar-hover: #0F172A;
-    --color-sidebar-active: #0F172A;
+    /* Semantic chrome (Light defaults) */
+    --color-canvas: #F4F6F8;
+    --color-surface: #FFFFFF;
+    --color-ink: #1B1022;
+    --color-sidebar: #FFFFFF;
+    --color-sidebar-fg: #828D99;
+    --color-sidebar-hover: #F4F6F8;
+    --color-sidebar-active: #F0FBFF;
     --color-navbar: #FFFFFF;
-    --color-navbar-fg: #64748B;
+    --color-navbar-fg: #828D99;
     --color-nav-border: #E2E8F0;
-    --color-canvas: #F8FAFC;
     --color-primary: #00BFFF;
-    --color-accent: #FF007F;
+    --color-accent: #D96108;
+    --color-accent-strong: #B85007;
+    --color-table-header: #053F5C;
+    --color-brand-glow: #00BFFF;
 
-    /* Flowbite brand tokens (Luminous Blue accents) */
+    /* Brand / Flowbite (Luminous Blue) */
     --color-brand-softer: #F0FBFF;
     --color-brand-soft: #E0F7FF;
     --color-brand: #00BFFF;
@@ -77,8 +82,9 @@
     --color-cyan-900: #005C7A;
     --color-cyan-950: #003D52;
 
-    --color-pink-500: #FF007F;
-    --color-pink-600: #E60072;
+    /* Accent scale (rust orange) */
+    --color-pink-500: #D96108;
+    --color-pink-600: #B85007;
 
     /* PowerGrid */
     --color-pg-primary-50: oklch(0.985 0 0);
@@ -92,4 +98,35 @@
     --color-pg-primary-800: oklch(0.269 0 0);
     --color-pg-primary-900: oklch(0.205 0 0);
     --color-pg-primary-950: oklch(0.145 0 0);
+}
+
+/* Dark overrides — same utilities (bg-canvas, bg-navbar, …) adapt automatically */
+.dark {
+    --color-canvas: #1B1022;
+    --color-surface: #281A33;
+    --color-ink: #E2E8F0;
+    --color-sidebar: #281A33;
+    --color-sidebar-fg: #94A3B8;
+    --color-sidebar-hover: #3B284A;
+    --color-sidebar-active: #3B284A;
+    --color-navbar: #281A33;
+    --color-navbar-fg: #94A3B8;
+    --color-nav-border: #3B284A;
+    --color-primary: #429EBD;
+    --color-brand: #429EBD;
+    --color-brand-medium: #5BB0CC;
+    --color-brand-strong: #357A94;
+    --color-brand-softer: #1B3040;
+    --color-brand-soft: #243D50;
+    --color-fg-brand: #429EBD;
+    --color-fg-brand-strong: #357A94;
+    --color-fg-brand-subtle: #7EC4D9;
+    --color-brand-glow: #00BFFF;
+    --color-accent: #D96108;
+    --color-accent-strong: #B85007;
+    --color-table-header: #053F5C;
+    --color-teal-600: #429EBD;
+    --color-teal-700: #357A94;
+    --color-cyan-600: #429EBD;
+    --color-cyan-700: #357A94;
 }
