@@ -8,6 +8,10 @@
             @include('partials.layouts.app.search')
         </div>
 
+        <div class="hidden shrink-0 sm:block">
+            @include('partials.layouts.theme')
+        </div>
+
         <a
             href="{{ route('home') }}"
             wire:navigate
