@@ -2,9 +2,13 @@
     <a
         href="{{ route('panels.administrator.dashboard.index') }}"
         wire:navigate
-        class="flex items-center rounded-lg p-2 text-white hover:bg-sidebar-hover {{ request()->routeIs('panels.administrator.dashboard.*') ? 'bg-sidebar-hover' : '' }}"
+        @class([
+            'flex items-center rounded-lg p-2 hover:bg-sidebar-hover hover:text-brand',
+            'bg-sidebar-active text-brand' => request()->routeIs('panels.administrator.dashboard.*'),
+            'text-sidebar-fg' => ! request()->routeIs('panels.administrator.dashboard.*'),
+        ])
     >
-        <x-lucide-layout-dashboard class="h-5 w-5 text-white" />
+        <x-lucide-layout-dashboard @class(['h-5 w-5', 'text-brand' => request()->routeIs('panels.administrator.dashboard.*'), 'text-sidebar-fg' => ! request()->routeIs('panels.administrator.dashboard.*')]) />
         <span class="ms-3">{{ __('general.dashboard') }}</span>
     </a>
 </li>
@@ -12,9 +16,13 @@
     <a
         href="{{ route('panels.administrator.user.index') }}"
         wire:navigate
-        class="flex items-center rounded-lg p-2 text-white hover:bg-sidebar-hover {{ request()->routeIs('panels.administrator.user.*') ? 'bg-sidebar-hover' : '' }}"
+        @class([
+            'flex items-center rounded-lg p-2 hover:bg-sidebar-hover hover:text-brand',
+            'bg-sidebar-active text-brand' => request()->routeIs('panels.administrator.user.*'),
+            'text-sidebar-fg' => ! request()->routeIs('panels.administrator.user.*'),
+        ])
     >
-        <x-lucide-users class="h-5 w-5 text-white" />
+        <x-lucide-users @class(['h-5 w-5', 'text-brand' => request()->routeIs('panels.administrator.user.*'), 'text-sidebar-fg' => ! request()->routeIs('panels.administrator.user.*')]) />
         <span class="ms-3">{{ __('general.users') }}</span>
     </a>
 </li>
@@ -22,9 +30,13 @@
     <a
         href="{{ route('panels.administrator.role.index') }}"
         wire:navigate
-        class="flex items-center rounded-lg p-2 text-white hover:bg-sidebar-hover {{ request()->routeIs('panels.administrator.role.*') ? 'bg-sidebar-hover' : '' }}"
+        @class([
+            'flex items-center rounded-lg p-2 hover:bg-sidebar-hover hover:text-brand',
+            'bg-sidebar-active text-brand' => request()->routeIs('panels.administrator.role.*'),
+            'text-sidebar-fg' => ! request()->routeIs('panels.administrator.role.*'),
+        ])
     >
-        <x-lucide-shield class="h-5 w-5 text-white" />
+        <x-lucide-shield @class(['h-5 w-5', 'text-brand' => request()->routeIs('panels.administrator.role.*'), 'text-sidebar-fg' => ! request()->routeIs('panels.administrator.role.*')]) />
         <span class="ms-3">{{ __('general.roles') }}</span>
     </a>
 </li>

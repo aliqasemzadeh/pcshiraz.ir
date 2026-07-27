@@ -28,25 +28,28 @@
     display: none !important;
 }
 
-/* Luminous Blue + PowerGrid theme */
+/* Classic modern chrome + PowerGrid theme */
 @theme {
-    /* Semantic chrome */
-    --color-sidebar: #00BFFF;
-    --color-sidebar-hover: #0099CC;
-    --color-navbar: #F8FAFC;
-    --color-navbar-fg: #0F172A;
-    --color-primary: #00E5FF;
+    /* Semantic chrome: dark sidebar + white navbar */
+    --color-sidebar: #1E293B;
+    --color-sidebar-fg: #94A3B8;
+    --color-sidebar-hover: #0F172A;
+    --color-sidebar-active: #0F172A;
+    --color-navbar: #FFFFFF;
+    --color-navbar-fg: #334155;
+    --color-canvas: #F1F5F9;
+    --color-primary: #00BFFF;
     --color-accent: #FF007F;
 
-    /* Flowbite brand tokens */
+    /* Flowbite brand tokens (Luminous Blue accents) */
     --color-brand-softer: #F0FBFF;
     --color-brand-soft: #E0F7FF;
     --color-brand: #00BFFF;
     --color-brand-medium: #33CCFF;
     --color-brand-strong: #0099CC;
     --color-fg-brand-subtle: #B3ECFF;
-    --color-fg-brand: #0099CC;
-    --color-fg-brand-strong: #007AA3;
+    --color-fg-brand: #00BFFF;
+    --color-fg-brand-strong: #0099CC;
 
     /* Remap teal → luminous cyan/blue so existing bg-teal-* CTAs match brand */
     --color-teal-50: #F0FBFF;

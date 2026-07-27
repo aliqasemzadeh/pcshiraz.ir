@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ __('general.direction') }}">
 @include('partials.layouts.head')
-<body class="min-h-screen bg-navbar antialiased dark:bg-gray-900">
+<body class="min-h-screen bg-canvas antialiased dark:bg-gray-900">
 <script>
     (function () {
         const theme = localStorage.getItem('color-theme') || 'system';
@@ -22,7 +22,7 @@
                     data-drawer-placement="{{ __('general.direction') === 'rtl' ? 'right' : 'left' }}"
                     aria-controls="panel-sidebar"
                     type="button"
-                    class="inline-flex items-center justify-center rounded-lg p-2.5 text-sm text-navbar-fg hover:bg-slate-200/70 focus:ring-2 focus:ring-brand/30 focus:outline-none md:hidden dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                    class="inline-flex items-center justify-center rounded-lg p-2.5 text-sm text-navbar-fg hover:bg-slate-100 focus:ring-2 focus:ring-brand/30 focus:outline-none md:hidden dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
                 >
                     <span class="sr-only">Open sidebar</span>
                     <x-lucide-menu class="h-6 w-6" />
@@ -34,7 +34,7 @@
             <div class="flex items-center gap-3">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-navbar-fg hover:bg-slate-200/70 dark:text-gray-300 dark:hover:bg-gray-700">
+                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-navbar-fg hover:bg-slate-100 dark:text-gray-300 dark:hover:bg-gray-700">
                         <x-lucide-log-out class="h-4 w-4" />
                         {{ __('general.logout') }}
                     </button>
@@ -47,13 +47,13 @@
 <aside
     id="panel-sidebar"
     @class([
-        'fixed top-0 start-0 z-40 h-screen w-64 border-e border-white/20 bg-sidebar pt-14 transition-transform md:translate-x-0 dark:border-white/10 dark:bg-sidebar-hover',
+        'fixed top-0 start-0 z-40 h-screen w-64 border-e border-white/10 bg-sidebar pt-14 transition-transform md:translate-x-0 dark:border-white/10 dark:bg-sidebar',
         'translate-x-full' => __('general.direction') === 'rtl',
         '-translate-x-full' => __('general.direction') !== 'rtl',
     ])
     aria-label="Sidebar"
 >
-    <div class="flex h-full flex-col overflow-y-auto bg-sidebar px-3 py-4 dark:bg-sidebar-hover">
+    <div class="flex h-full flex-col overflow-y-auto bg-sidebar px-3 py-4">
         <ul class="space-y-2 font-medium">
             @if (request()->routeIs('panels.administrator.*'))
                 @include('partials.layouts.navs.administrator')
@@ -66,8 +66,8 @@
             @endif
         </ul>
 
-        <div class="mt-auto space-y-3 border-t border-white/20 pt-4">
-            <p class="px-2 text-xs font-semibold tracking-wide text-white/80 uppercase">{{ __('general.switch_panel') }}</p>
+        <div class="mt-auto space-y-3 border-t border-white/10 pt-4">
+            <p class="px-2 text-xs font-semibold tracking-wide text-sidebar-fg uppercase">{{ __('general.switch_panel') }}</p>
             @include('partials.layouts.panels')
             <div class="flex justify-center px-2 pb-2">
                 @include('partials.layouts.theme', ['onBrand' => true])
