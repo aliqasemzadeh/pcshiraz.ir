@@ -17,5 +17,26 @@
             <x-lucide-shopping-cart class="h-5 w-5" />
             <span class="sr-only">{{ __('general.cart') }}</span>
         </a>
+
+        @auth
+            <a
+                href="{{ route('profile') }}"
+                wire:navigate
+                class="hidden shrink-0 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 md:inline-flex dark:text-gray-300 dark:hover:bg-gray-700"
+                title="{{ __('general.profile') }}"
+            >
+                <x-lucide-user class="h-5 w-5" />
+                <span>{{ __('general.profile') }}</span>
+            </a>
+        @else
+            <a
+                href="{{ route('login') }}"
+                wire:navigate
+                class="hidden shrink-0 items-center justify-center gap-2 rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 focus:outline-none md:inline-flex dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800"
+            >
+                <x-lucide-log-in class="h-4 w-4" />
+                {{ __('general.login') }}
+            </a>
+        @endauth
     </div>
 </nav>
