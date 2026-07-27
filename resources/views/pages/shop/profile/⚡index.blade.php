@@ -29,7 +29,7 @@ new #[Layout('layouts.app')] class extends Component
             <a
                 href="{{ route('login') }}"
                 wire:navigate
-                class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-teal-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 focus:outline-none dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800"
+                class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-strong focus:ring-4 focus:ring-brand/30 focus:outline-none dark:bg-brand dark:hover:bg-brand-strong dark:focus:ring-brand/40"
             >
                 <x-lucide-log-in class="h-4 w-4" />
                 {{ __('general.login') }}

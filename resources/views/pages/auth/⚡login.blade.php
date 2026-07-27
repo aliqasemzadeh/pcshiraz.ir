@@ -83,7 +83,7 @@ new #[Layout('layouts.auth')] class extends Component
                         type="tel"
                         wire:model="form.mobile"
                         placeholder="09123456789"
-                        class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 ps-10 text-sm text-gray-900 focus:border-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                        class="block w-full rounded-lg border border-slate-300 bg-white p-2.5 ps-10 text-sm text-navbar-fg focus:border-brand focus:ring-brand dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                         autocomplete="tel"
                     >
                 </div>
@@ -94,7 +94,7 @@ new #[Layout('layouts.auth')] class extends Component
 
             <button
                 type="submit"
-                class="w-full rounded-lg bg-teal-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 focus:outline-none dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800"
+                class="w-full rounded-lg bg-brand px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-brand-strong focus:ring-4 focus:ring-brand/30 focus:outline-none dark:bg-brand dark:hover:bg-brand-strong dark:focus:ring-brand/40"
             >
                 {{ __('general.send_otp') }}
             </button>
@@ -117,7 +117,7 @@ new #[Layout('layouts.auth')] class extends Component
                         maxlength="6"
                         autocomplete="one-time-code"
                         wire:model="form.code"
-                        class="mx-auto block w-full max-w-xs rounded-lg border border-gray-300 bg-gray-50 p-3 text-center text-2xl tracking-[0.4em] text-gray-900 focus:border-teal-500 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                        class="mx-auto block w-full max-w-xs rounded-lg border border-slate-300 bg-white p-3 text-center text-2xl tracking-[0.4em] text-navbar-fg focus:border-brand focus:ring-brand dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                         placeholder="------"
                         dir="ltr"
                     >
@@ -130,7 +130,7 @@ new #[Layout('layouts.auth')] class extends Component
             <div class="space-y-2">
                 <button
                     type="submit"
-                    class="w-full rounded-lg bg-teal-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 focus:outline-none dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800"
+                    class="w-full rounded-lg bg-brand px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-brand-strong focus:ring-4 focus:ring-brand/30 focus:outline-none dark:bg-brand dark:hover:bg-brand-strong dark:focus:ring-brand/40"
                 >
                     {{ __('general.verify_and_login') }}
                 </button>

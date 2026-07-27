@@ -2,12 +2,12 @@
 @import '../../vendor/power-components/livewire-powergrid/resources/css/tailwind4.css';
 @import "vazirmatn/Vazirmatn-font-face.css";
 
+@plugin "flowbite/plugin";
+
 @theme {
     --font-sans: Vazirmatn, Tahoma, 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
     'Segoe UI Symbol', 'Noto Color Emoji';
 }
-
-
 
 /** enable dark mode */
 @custom-variant dark (&:where(.dark, .dark *));
@@ -28,8 +28,55 @@
     display: none !important;
 }
 
-/* Custom theme */
+/* Luminous Blue + PowerGrid theme */
 @theme {
+    /* Semantic chrome */
+    --color-sidebar: #00BFFF;
+    --color-sidebar-hover: #0099CC;
+    --color-navbar: #F8FAFC;
+    --color-navbar-fg: #0F172A;
+    --color-primary: #00E5FF;
+    --color-accent: #FF007F;
+
+    /* Flowbite brand tokens */
+    --color-brand-softer: #F0FBFF;
+    --color-brand-soft: #E0F7FF;
+    --color-brand: #00BFFF;
+    --color-brand-medium: #33CCFF;
+    --color-brand-strong: #0099CC;
+    --color-fg-brand-subtle: #B3ECFF;
+    --color-fg-brand: #0099CC;
+    --color-fg-brand-strong: #007AA3;
+
+    /* Remap teal → luminous cyan/blue so existing bg-teal-* CTAs match brand */
+    --color-teal-50: #F0FBFF;
+    --color-teal-100: #E0F7FF;
+    --color-teal-200: #B3ECFF;
+    --color-teal-300: #80E0FF;
+    --color-teal-400: #33CCFF;
+    --color-teal-500: #00E5FF;
+    --color-teal-600: #00BFFF;
+    --color-teal-700: #0099CC;
+    --color-teal-800: #007AA3;
+    --color-teal-900: #005C7A;
+    --color-teal-950: #003D52;
+
+    --color-cyan-50: #F0FBFF;
+    --color-cyan-100: #E0F7FF;
+    --color-cyan-200: #B3ECFF;
+    --color-cyan-300: #80E0FF;
+    --color-cyan-400: #33CCFF;
+    --color-cyan-500: #00E5FF;
+    --color-cyan-600: #00BFFF;
+    --color-cyan-700: #0099CC;
+    --color-cyan-800: #007AA3;
+    --color-cyan-900: #005C7A;
+    --color-cyan-950: #003D52;
+
+    --color-pink-500: #FF007F;
+    --color-pink-600: #E60072;
+
+    /* PowerGrid */
     --color-pg-primary-50: oklch(0.985 0 0);
     --color-pg-primary-100: oklch(0.97 0 0);
     --color-pg-primary-200: oklch(0.922 0 0);
