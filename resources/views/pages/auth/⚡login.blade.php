@@ -71,19 +71,19 @@ new #[Layout('layouts.auth')] class extends Component
     @if (! $otpSent)
         <form wire:submit="sendOtp" class="space-y-6">
             <div>
-                <label for="mobile" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                <label for="mobile" class="mb-2 block text-sm font-medium text-ink">
                     {{ __('general.mobile') }}
                 </label>
                 <div class="relative">
                     <div class="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3">
-                        <x-lucide-smartphone class="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                        <x-lucide-smartphone class="h-4 w-4 text-navbar-fg" />
                     </div>
                     <input
                         id="mobile"
                         type="tel"
                         wire:model="form.mobile"
                         placeholder="09123456789"
-                        class="block w-full rounded-lg border border-slate-300 bg-white p-2.5 ps-10 text-sm text-navbar-fg focus:border-brand focus:ring-brand dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                        class="block w-full rounded-lg border border-nav-border bg-surface p-2.5 ps-10 text-sm text-ink placeholder:text-navbar-fg focus:border-brand focus:ring-brand"
                         autocomplete="tel"
                     >
                 </div>
@@ -94,7 +94,7 @@ new #[Layout('layouts.auth')] class extends Component
 
             <button
                 type="submit"
-                class="w-full rounded-lg bg-brand px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-brand-strong focus:ring-4 focus:ring-brand/30 focus:outline-none dark:bg-brand dark:hover:bg-brand-strong dark:focus:ring-brand/40"
+                class="w-full rounded-lg bg-accent px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-accent-strong focus:ring-4 focus:ring-accent/30 focus:outline-none"
             >
                 {{ __('general.send_otp') }}
             </button>
@@ -102,9 +102,9 @@ new #[Layout('layouts.auth')] class extends Component
     @else
         <form wire:submit="login" class="space-y-6">
             <div class="space-y-4 text-center">
-                <p class="text-sm text-gray-500 dark:text-gray-400">
+                <p class="text-sm text-navbar-fg">
                     {{ __('general.enter_otp') }}
-                    <span class="font-medium text-gray-900 dark:text-white" dir="ltr">{{ $form->mobile }}</span>
+                    <span class="font-medium text-ink" dir="ltr">{{ $form->mobile }}</span>
                 </p>
 
                 <div>
@@ -117,7 +117,7 @@ new #[Layout('layouts.auth')] class extends Component
                         maxlength="6"
                         autocomplete="one-time-code"
                         wire:model="form.code"
-                        class="mx-auto block w-full max-w-xs rounded-lg border border-slate-300 bg-white p-3 text-center text-2xl tracking-[0.4em] text-navbar-fg focus:border-brand focus:ring-brand dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                        class="mx-auto block w-full max-w-xs rounded-lg border border-nav-border bg-surface p-3 text-center text-2xl tracking-[0.4em] text-ink focus:border-brand focus:ring-brand"
                         placeholder="------"
                         dir="ltr"
                     >
@@ -130,7 +130,7 @@ new #[Layout('layouts.auth')] class extends Component
             <div class="space-y-2">
                 <button
                     type="submit"
-                    class="w-full rounded-lg bg-brand px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-brand-strong focus:ring-4 focus:ring-brand/30 focus:outline-none dark:bg-brand dark:hover:bg-brand-strong dark:focus:ring-brand/40"
+                    class="w-full rounded-lg bg-accent px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-accent-strong focus:ring-4 focus:ring-accent/30 focus:outline-none"
                 >
                     {{ __('general.verify_and_login') }}
                 </button>
