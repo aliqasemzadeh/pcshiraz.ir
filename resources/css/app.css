@@ -50,7 +50,7 @@
     --color-table-header: #423A8E;
     --color-brand-glow: #00CCCD;
 
-    /* Status (solid for icons/charts; badges: text-* + bg-*/10) */
+    /* Status: solid for icons/charts; badges use text-success bg-success/10 etc. */
     --color-success: #198754;
     --color-warning: #FFC107;
     --color-danger: #DC3545;

@@ -22,10 +22,10 @@ new #[Layout('layouts.app')] class extends Component
 };
 ?>
 
-<div class="relative -mx-4 -mt-4 md:-mx-4">
+<div class="relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2">
     {{-- Full-bleed hero --}}
     <section
-        class="relative overflow-hidden bg-accent px-4 pb-16 pt-10 text-navbar-title sm:pb-20 sm:pt-14"
+        class="relative overflow-hidden px-4 pb-16 pt-10 text-navbar-title sm:pb-20 sm:pt-14"
         style="background:
             radial-gradient(ellipse 80% 60% at 100% 0%, rgb(0 204 205 / 0.35), transparent 55%),
             radial-gradient(ellipse 70% 50% at 0% 100%, rgb(66 58 142 / 0.9), transparent 50%),
@@ -70,7 +70,7 @@ new #[Layout('layouts.app')] class extends Component
                 </button>
                 <button
                     type="button"
-                    @click="$dispatch('shop-mobile-category-open')"
+                    onclick="window.dispatchEvent(new CustomEvent('shop-mobile-category-open'))"
                     class="inline-flex items-center gap-2 rounded-lg border border-navbar-title/25 bg-navbar-title/10 px-5 py-2.5 text-sm font-medium text-navbar-title backdrop-blur-sm transition hover:bg-navbar-title/20 focus:ring-4 focus:ring-brand/20 focus:outline-none md:hidden"
                 >
                     <x-lucide-layout-grid class="h-4 w-4" />
