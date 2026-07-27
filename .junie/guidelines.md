@@ -1,8 +1,3 @@
----
-description: 
-alwaysApply: true
----
-
 # Project Role & Context
 You are an expert full-stack developer working on a Laravel project. Your task is to generate code that strictly adheres to the following project guidelines, tech stack, and architectural rules.
 
@@ -53,6 +48,7 @@ You are an expert full-stack developer working on a Laravel project. Your task i
 *   **Triggers:** Use `<flux:modal.trigger name="module.entity.action">` to open modals (especially if passing data).
 *   **Buttons:** In Create/Edit modals, no "Cancel" buttons are needed; use full-width submit buttons (`w-full`). **EXCEPTION:** For Delete Confirmation modals, you MUST use the specific layout utilizing `<flux:spacer />` and `<flux:modal.close>` with a Ghost variant cancel button and a Danger variant submit button.
 *   **Control via Livewire:** Open/close modals programmatically using `Flux::modal('module.entity.action')->show();` or `Flux::modals()->close();`.
+
 
 ### Forms & Inputs
 *   **Input Features (Clearable, Viewable, Copyable):** Use Flux UI's built-in input modifiers when appropriate:
