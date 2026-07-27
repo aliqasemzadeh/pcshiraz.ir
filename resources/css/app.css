@@ -28,72 +28,63 @@
     display: none !important;
 }
 
-/* Breeze — organizational purple + turquoise action */
+/* Eggplant + rust orange + luminous blue chrome */
 @theme {
     /* Semantic chrome (Light defaults) */
-    --color-canvas: #F4F5F8;
+    --color-canvas: #F4F6F8;
     --color-surface: #FFFFFF;
-    --color-ink: #2B2B36;
-    --color-sidebar: #EDECF6;
-    --color-sidebar-fg: #6B6880;
-    --color-sidebar-hover: #E0DFEC;
-    --color-sidebar-active: #DDD9F0;
-    --color-navbar: #1A1B25;
-    --color-navbar-fg: #A8A6B8;
-    --color-navbar-title: #EAE9F2;
-    --color-navbar-hover: #2A2938;
-    --color-navbar-border: #2F2E3D;
-    --color-nav-border: #E2E0EC;
-    --color-primary: #00CCCD;
-    --color-accent: #423A8E;
-    --color-accent-strong: #352E72;
-    --color-table-header: #423A8E;
-    --color-brand-glow: #00CCCD;
+    --color-ink: #1B1022;
+    --color-sidebar: #FFFFFF;
+    --color-sidebar-fg: #828D99;
+    --color-sidebar-hover: #F4F6F8;
+    --color-sidebar-active: #F0FBFF;
+    --color-navbar: #FFFFFF;
+    --color-navbar-fg: #828D99;
+    --color-nav-border: #E2E8F0;
+    --color-primary: #00BFFF;
+    --color-accent: #D96108;
+    --color-accent-strong: #B85007;
+    --color-table-header: #053F5C;
+    --color-brand-glow: #00BFFF;
 
-    /* Status: solid for icons/charts; badges use text-success bg-success/10 etc. */
-    --color-success: #198754;
-    --color-warning: #FFC107;
-    --color-danger: #DC3545;
-    --color-info: #0D6EFD;
+    /* Brand / Flowbite (Luminous Blue) */
+    --color-brand-softer: #F0FBFF;
+    --color-brand-soft: #E0F7FF;
+    --color-brand: #00BFFF;
+    --color-brand-medium: #33CCFF;
+    --color-brand-strong: #0099CC;
+    --color-fg-brand-subtle: #B3ECFF;
+    --color-fg-brand: #00BFFF;
+    --color-fg-brand-strong: #0099CC;
 
-    /* Brand / Flowbite (turquoise action) */
-    --color-brand-softer: #E6FAFA;
-    --color-brand-soft: #CCF5F5;
-    --color-brand: #00CCCD;
-    --color-brand-medium: #33D6D7;
-    --color-brand-strong: #00A3A4;
-    --color-fg-brand-subtle: #99EBEB;
-    --color-fg-brand: #00CCCD;
-    --color-fg-brand-strong: #00A3A4;
+    /* Remap teal → luminous cyan/blue so existing bg-teal-* CTAs match brand */
+    --color-teal-50: #F0FBFF;
+    --color-teal-100: #E0F7FF;
+    --color-teal-200: #B3ECFF;
+    --color-teal-300: #80E0FF;
+    --color-teal-400: #33CCFF;
+    --color-teal-500: #00E5FF;
+    --color-teal-600: #00BFFF;
+    --color-teal-700: #0099CC;
+    --color-teal-800: #007AA3;
+    --color-teal-900: #005C7A;
+    --color-teal-950: #003D52;
 
-    /* Remap teal → turquoise so existing bg-teal-* CTAs match brand */
-    --color-teal-50: #E6FAFA;
-    --color-teal-100: #CCF5F5;
-    --color-teal-200: #99EBEB;
-    --color-teal-300: #66E1E2;
-    --color-teal-400: #33D6D7;
-    --color-teal-500: #1AD1D2;
-    --color-teal-600: #00CCCD;
-    --color-teal-700: #00A3A4;
-    --color-teal-800: #007A7B;
-    --color-teal-900: #005252;
-    --color-teal-950: #003939;
+    --color-cyan-50: #F0FBFF;
+    --color-cyan-100: #E0F7FF;
+    --color-cyan-200: #B3ECFF;
+    --color-cyan-300: #80E0FF;
+    --color-cyan-400: #33CCFF;
+    --color-cyan-500: #00E5FF;
+    --color-cyan-600: #00BFFF;
+    --color-cyan-700: #0099CC;
+    --color-cyan-800: #007AA3;
+    --color-cyan-900: #005C7A;
+    --color-cyan-950: #003D52;
 
-    --color-cyan-50: #E6FAFA;
-    --color-cyan-100: #CCF5F5;
-    --color-cyan-200: #99EBEB;
-    --color-cyan-300: #66E1E2;
-    --color-cyan-400: #33D6D7;
-    --color-cyan-500: #1AD1D2;
-    --color-cyan-600: #00CCCD;
-    --color-cyan-700: #00A3A4;
-    --color-cyan-800: #007A7B;
-    --color-cyan-900: #005252;
-    --color-cyan-950: #003939;
-
-    /* Accent scale (organizational purple) */
-    --color-pink-500: #423A8E;
-    --color-pink-600: #352E72;
+    /* Accent scale (rust orange) */
+    --color-pink-500: #D96108;
+    --color-pink-600: #B85007;
 
     /* PowerGrid */
     --color-pg-primary-50: oklch(0.985 0 0);
@@ -111,38 +102,31 @@
 
 /* Dark overrides — same utilities (bg-canvas, bg-navbar, …) adapt automatically */
 .dark {
-    --color-canvas: #12111A;
-    --color-surface: #232032;
-    --color-ink: #EAE9F2;
-    --color-sidebar: #1C1A27;
-    --color-sidebar-fg: #9B98B0;
-    --color-sidebar-hover: #2A2738;
-    --color-sidebar-active: #423A8E;
-    --color-navbar: #1C1A27;
-    --color-navbar-fg: #9B98B0;
-    --color-navbar-title: #EAE9F2;
-    --color-navbar-hover: #2A2738;
-    --color-navbar-border: #2F2C3F;
-    --color-nav-border: #2F2C3F;
-    --color-primary: #00CCCD;
-    --color-brand: #00CCCD;
-    --color-brand-medium: #33D6D7;
-    --color-brand-strong: #00A3A4;
-    --color-brand-softer: #1A2A2C;
-    --color-brand-soft: #1F3538;
-    --color-fg-brand: #00CCCD;
-    --color-fg-brand-strong: #00A3A4;
-    --color-fg-brand-subtle: #66E1E2;
-    --color-brand-glow: #00CCCD;
-    --color-accent: #423A8E;
-    --color-accent-strong: #5349A8;
-    --color-table-header: #423A8E;
-    --color-teal-600: #00CCCD;
-    --color-teal-700: #00A3A4;
-    --color-cyan-600: #00CCCD;
-    --color-cyan-700: #00A3A4;
-    --color-success: #198754;
-    --color-warning: #FFC107;
-    --color-danger: #DC3545;
-    --color-info: #0D6EFD;
+    --color-canvas: #1B1022;
+    --color-surface: #281A33;
+    --color-ink: #E2E8F0;
+    --color-sidebar: #281A33;
+    --color-sidebar-fg: #94A3B8;
+    --color-sidebar-hover: #3B284A;
+    --color-sidebar-active: #3B284A;
+    --color-navbar: #281A33;
+    --color-navbar-fg: #94A3B8;
+    --color-nav-border: #3B284A;
+    --color-primary: #429EBD;
+    --color-brand: #429EBD;
+    --color-brand-medium: #5BB0CC;
+    --color-brand-strong: #357A94;
+    --color-brand-softer: #1B3040;
+    --color-brand-soft: #243D50;
+    --color-fg-brand: #429EBD;
+    --color-fg-brand-strong: #357A94;
+    --color-fg-brand-subtle: #7EC4D9;
+    --color-brand-glow: #00BFFF;
+    --color-accent: #D96108;
+    --color-accent-strong: #B85007;
+    --color-table-header: #053F5C;
+    --color-teal-600: #429EBD;
+    --color-teal-700: #357A94;
+    --color-cyan-600: #429EBD;
+    --color-cyan-700: #357A94;
 }

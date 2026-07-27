@@ -9,13 +9,13 @@
         }
     }"
     x-init="apply(theme)"
-    class="flex shrink-0 items-center gap-0.5 rounded-lg bg-navbar-hover p-0.5"
+    class="flex shrink-0 items-center gap-0.5 rounded-lg bg-canvas p-0.5"
 >
     <button
         type="button"
         @click="apply('light')"
         :class="theme === 'light' ? 'bg-surface text-ink shadow' : ''"
-        class="shrink-0 rounded-md p-1.5 text-navbar-fg hover:text-navbar-title"
+        class="shrink-0 rounded-md p-1.5 text-navbar-fg hover:text-ink"
         title="{{ __('general.light') }}"
     >
         <x-lucide-sun class="h-5 w-5 shrink-0" />
@@ -24,7 +24,7 @@
         type="button"
         @click="apply('dark')"
         :class="theme === 'dark' ? 'bg-surface text-ink shadow' : ''"
-        class="shrink-0 rounded-md p-1.5 text-navbar-fg hover:text-navbar-title"
+        class="shrink-0 rounded-md p-1.5 text-navbar-fg hover:text-ink"
         title="{{ __('general.dark') }}"
     >
         <x-lucide-moon class="h-5 w-5 shrink-0" />
@@ -33,7 +33,7 @@
         type="button"
         @click="apply('system')"
         :class="theme === 'system' ? 'bg-surface text-ink shadow' : ''"
-        class="shrink-0 rounded-md p-1.5 text-navbar-fg hover:text-navbar-title"
+        class="shrink-0 rounded-md p-1.5 text-navbar-fg hover:text-ink"
         title="{{ __('general.system') }}"
     >
         <x-lucide-monitor class="h-5 w-5 shrink-0" />

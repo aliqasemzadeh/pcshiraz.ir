@@ -63,7 +63,7 @@ new #[Layout('layouts.auth')] class extends Component
 
 <div>
     <div class="mb-6 text-center">
-        <h1 class="text-xl font-bold tracking-tight text-ink">
+        <h1 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
             {{ __('general.login_or_register') }}
         </h1>
     </div>
@@ -94,7 +94,7 @@ new #[Layout('layouts.auth')] class extends Component
 
             <button
                 type="submit"
-                class="w-full rounded-lg bg-brand px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-brand-strong focus:ring-4 focus:ring-brand/30 focus:outline-none"
+                class="w-full rounded-lg bg-accent px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-accent-strong focus:ring-4 focus:ring-accent/30 focus:outline-none"
             >
                 {{ __('general.send_otp') }}
             </button>
@@ -130,7 +130,7 @@ new #[Layout('layouts.auth')] class extends Component
             <div class="space-y-2">
                 <button
                     type="submit"
-                    class="w-full rounded-lg bg-brand px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-brand-strong focus:ring-4 focus:ring-brand/30 focus:outline-none"
+                    class="w-full rounded-lg bg-accent px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-accent-strong focus:ring-4 focus:ring-accent/30 focus:outline-none"
                 >
                     {{ __('general.verify_and_login') }}
                 </button>
@@ -139,7 +139,7 @@ new #[Layout('layouts.auth')] class extends Component
                     <button
                         type="button"
                         wire:click="resetForm"
-                        class="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-fg hover:bg-sidebar-hover hover:text-ink"
+                        class="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                     >
                         <x-lucide-pencil class="h-4 w-4" />
                         {{ __('general.change_mobile') }}
@@ -148,7 +148,7 @@ new #[Layout('layouts.auth')] class extends Component
                     <button
                         type="button"
                         wire:click="sendOtp"
-                        class="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-fg hover:bg-sidebar-hover hover:text-ink"
+                        class="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                     >
                         <x-lucide-refresh-cw class="h-4 w-4" />
                         {{ __('general.resend_otp') }}

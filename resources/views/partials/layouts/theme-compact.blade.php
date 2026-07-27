@@ -18,7 +18,7 @@
     <button
         type="button"
         @click="cycle()"
-        class="inline-flex shrink-0 items-center justify-center rounded-lg p-2.5 text-navbar-fg hover:bg-navbar-hover hover:text-navbar-title"
+        class="inline-flex shrink-0 items-center justify-center rounded-lg p-2.5 text-navbar-fg hover:bg-sidebar-hover hover:text-ink"
         :title="theme === 'light' ? '{{ __('general.light') }}' : (theme === 'dark' ? '{{ __('general.dark') }}' : '{{ __('general.system') }}')"
     >
         <span class="relative block h-5 w-5 shrink-0">

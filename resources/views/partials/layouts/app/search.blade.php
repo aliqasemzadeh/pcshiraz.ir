@@ -6,7 +6,7 @@
             <input
                 type="search"
                 id="shop-search-input"
-                class="box-border block h-10 w-full border border-transparent bg-surface px-3 text-sm text-ink placeholder:text-sidebar-fg focus:border-brand focus:ring-brand"
+                class="box-border block h-10 w-full border border-nav-border bg-surface px-3 text-sm text-ink placeholder:text-navbar-fg focus:border-brand focus:ring-brand"
                 placeholder="{{ __('general.search_products') }}"
             >
         </div>

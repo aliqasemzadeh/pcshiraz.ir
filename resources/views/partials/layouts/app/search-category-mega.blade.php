@@ -42,7 +42,7 @@
         id="shop-search-category-button"
         type="button"
         @click="open = !open"
-        class="box-border inline-flex h-10 shrink-0 items-center rounded-s-lg border border-e-0 border-transparent bg-surface px-2.5 text-sm font-medium text-ink hover:bg-brand-softer focus:ring-4 focus:ring-brand/20 focus:outline-none sm:px-3"
+        class="box-border inline-flex h-10 shrink-0 items-center rounded-s-lg border border-e-0 border-nav-border bg-canvas px-2.5 text-sm font-medium text-ink hover:bg-sidebar-hover focus:ring-4 focus:ring-brand/20 focus:outline-none sm:px-3"
         :aria-expanded="open.toString()"
         aria-haspopup="true"
     >
