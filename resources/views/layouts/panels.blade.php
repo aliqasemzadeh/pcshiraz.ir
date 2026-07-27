@@ -12,7 +12,7 @@
     })();
 </script>
 
-<nav class="fixed top-0 z-50 w-full border-b border-nav-border bg-navbar">
+<nav class="fixed top-0 z-40 w-full border-b border-nav-border bg-navbar md:ps-64">
     <div class="px-3 py-3 lg:px-5 lg:ps-3">
         <div class="flex items-center justify-between">
             <div class="flex items-center justify-start rtl:justify-end">
@@ -47,7 +47,7 @@
 <aside
     id="panel-sidebar"
     @class([
-        'fixed top-0 start-0 z-40 h-screen w-64 border-e border-nav-border bg-sidebar pt-14 transition-transform md:translate-x-0',
+        'fixed top-0 start-0 z-50 h-screen w-64 border-e border-nav-border bg-sidebar transition-transform md:translate-x-0',
         'translate-x-full' => __('general.direction') === 'rtl',
         '-translate-x-full' => __('general.direction') !== 'rtl',
     ])
