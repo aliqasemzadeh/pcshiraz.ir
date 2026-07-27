@@ -56,7 +56,7 @@
         ></div>
 
         <div
-            class="absolute inset-0 flex flex-col bg-white dark:bg-gray-900"
+            class="absolute inset-0 flex flex-col bg-surface"
             x-show="open"
             x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="translate-y-full"
@@ -65,45 +65,45 @@
             x-transition:leave-start="translate-y-0"
             x-transition:leave-end="translate-y-full"
         >
-            <div class="flex items-center gap-2 border-b border-gray-200 px-3 py-3 dark:border-gray-700">
+            <div class="flex items-center gap-2 border-b border-nav-border px-3 py-3">
                 <button
                     type="button"
-                    class="inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                    class="inline-flex h-10 w-10 items-center justify-center rounded-full text-navbar-fg hover:bg-sidebar-hover hover:text-ink"
                     @click="closeMenu()"
                     aria-label="{{ __('general.close') }}"
                 >
                     <x-lucide-x class="h-5 w-5" />
                 </button>
                 <div class="min-w-0 flex-1">
-                    <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('general.browse_categories') }}</p>
-                    <p class="truncate text-xs text-gray-500 dark:text-gray-400">{{ __('general.select_a_category') }}</p>
+                    <p class="text-sm font-semibold text-ink">{{ __('general.browse_categories') }}</p>
+                    <p class="truncate text-xs text-navbar-fg">{{ __('general.select_a_category') }}</p>
                 </div>
             </div>
 
-            <div class="border-b border-gray-200 px-3 py-2 dark:border-gray-700">
+            <div class="border-b border-nav-border px-3 py-2">
                 <div class="relative">
-                    <x-lucide-search class="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                    <x-lucide-search class="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-navbar-fg" />
                     <input
                         type="search"
                         x-model="query"
                         placeholder="{{ __('general.search_categories') }}"
-                        class="block w-full rounded-xl border border-slate-200 bg-white py-2.5 pe-3 ps-9 text-sm text-navbar-fg focus:border-brand focus:ring-brand dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                        class="block w-full rounded-xl border border-nav-border bg-surface py-2.5 pe-3 ps-9 text-sm text-ink focus:border-brand focus:ring-brand"
                     >
                 </div>
             </div>
 
             <div class="grid min-h-0 flex-1 grid-cols-12">
-                <div class="col-span-5 overflow-y-auto border-e border-gray-100 bg-gradient-to-b from-teal-50/80 to-white dark:border-gray-700 dark:from-gray-800 dark:to-gray-900">
+                <div class="col-span-5 overflow-y-auto border-e border-nav-border bg-canvas">
                     <template x-for="category in filteredCategories" :key="category.id">
                         <button
                             type="button"
                             @click="selectCategory(category)"
-                            class="flex w-full items-center gap-2 border-b border-teal-100/70 px-3 py-3 text-start dark:border-gray-700"
+                            class="flex w-full items-center gap-2 border-b border-nav-border px-3 py-3 text-start"
                             :class="activeId === category.id
-                                ? 'bg-white font-semibold text-teal-700 shadow-sm dark:bg-gray-900 dark:text-teal-400'
-                                : 'text-gray-700 hover:bg-white/70 dark:text-gray-200 dark:hover:bg-gray-800'"
+                                ? 'bg-surface font-semibold text-brand shadow-sm'
+                                : 'text-ink hover:bg-surface/70'"
                         >
-                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-teal-600/10 text-teal-700 dark:bg-teal-500/10 dark:text-teal-400">
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
                                 <x-lucide-layout-grid class="h-4 w-4" />
                             </span>
                             <span class="min-w-0 flex-1 truncate text-xs" x-text="category.title"></span>
@@ -111,17 +111,17 @@
                     </template>
                     <p
                         x-show="!filteredCategories.length"
-                        class="px-3 py-8 text-center text-xs text-gray-500 dark:text-gray-400"
+                        class="px-3 py-8 text-center text-xs text-navbar-fg"
                     >
                         {{ __('general.select_a_category') }}
                     </p>
                 </div>
 
-                <div class="col-span-7 flex min-h-0 flex-col bg-white dark:bg-gray-900">
-                    <div class="flex items-center justify-between gap-2 border-b border-gray-100 px-3 py-3 dark:border-gray-700">
+                <div class="col-span-7 flex min-h-0 flex-col bg-surface">
+                    <div class="flex items-center justify-between gap-2 border-b border-nav-border px-3 py-3">
                         <div class="min-w-0">
-                            <p class="truncate text-sm font-semibold text-gray-900 dark:text-white" x-text="activeCategory?.title || @js(__('general.select_a_category'))"></p>
-                            <p class="text-[11px] text-gray-500 dark:text-gray-400" x-text="activeCategory ? (activeCategory.brands.length + ' ' + @js(__('general.brands'))) : ''"></p>
+                            <p class="truncate text-sm font-semibold text-ink" x-text="activeCategory?.title || @js(__('general.select_a_category'))"></p>
+                            <p class="text-[11px] text-navbar-fg" x-text="activeCategory ? (activeCategory.brands.length + ' ' + @js(__('general.brands'))) : ''"></p>
                         </div>
                         <button
                             type="button"
@@ -140,7 +140,7 @@
                                     <button
                                         type="button"
                                         @click="goBrand(activeCategory, brand)"
-                                        class="rounded-xl border border-gray-200 bg-gray-50 px-3 py-3 text-start text-xs font-medium text-gray-800 transition hover:border-teal-300 hover:bg-teal-50 hover:text-teal-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:border-teal-600 dark:hover:bg-gray-700"
+                                        class="rounded-xl border border-nav-border bg-canvas px-3 py-3 text-start text-xs font-medium text-ink transition hover:border-brand hover:bg-brand-softer hover:text-brand-strong"
                                         x-text="brand.title"
                                     ></button>
                                 </template>
@@ -150,8 +150,8 @@
                             x-show="!activeCategory || !activeCategory.brands.length"
                             class="flex h-full flex-col items-center justify-center gap-2 px-4 text-center"
                         >
-                            <x-lucide-search class="h-8 w-8 text-gray-300 dark:text-gray-600" />
-                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('general.no_brands') }}</p>
+                            <x-lucide-search class="h-8 w-8 text-navbar-fg" />
+                            <p class="text-xs text-navbar-fg">{{ __('general.no_brands') }}</p>
                         </div>
                     </div>
                 </div>
