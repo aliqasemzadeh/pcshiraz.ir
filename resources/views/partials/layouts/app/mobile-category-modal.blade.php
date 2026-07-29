@@ -49,7 +49,7 @@
         aria-label="{{ __('general.browse_categories') }}"
     >
         <div
-            class="absolute inset-0 bg-gray-950/50 backdrop-blur-[2px]"
+            class="absolute inset-0 bg-black/50 backdrop-blur-[2px]"
             @click="closeMenu()"
             x-show="open"
             x-transition.opacity
@@ -68,7 +68,7 @@
             <div class="flex items-center gap-2 border-b border-nav-border px-3 py-3">
                 <button
                     type="button"
-                    class="inline-flex h-10 w-10 items-center justify-center rounded-full text-navbar-fg hover:bg-sidebar-hover hover:text-ink"
+                    class="inline-flex h-10 w-10 items-center justify-center rounded-full text-navbar-fg hover:bg-brand-softer hover:text-ink"
                     @click="closeMenu()"
                     aria-label="{{ __('general.close') }}"
                 >

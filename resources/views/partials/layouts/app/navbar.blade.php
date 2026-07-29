@@ -1,5 +1,5 @@
-<nav class="fixed top-0 start-0 z-40 w-full border-b border-nav-border bg-navbar shadow-sm">
-    <div class="mx-auto flex max-w-screen-xl items-center gap-2 px-3 py-2">
+<nav class="fixed top-0 start-0 z-40 h-16 w-full border-b border-nav-border bg-navbar shadow-sm">
+    <div class="mx-auto flex h-full max-w-screen-2xl items-center gap-2 px-3">
         <a href="{{ route('home') }}" wire:navigate class="shrink-0">
             <span class="text-lg font-semibold whitespace-nowrap text-ink">{{ config('app.name') }}</span>
         </a>
@@ -18,7 +18,7 @@
         <a
             href="{{ route('home') }}"
             wire:navigate
-            class="inline-flex shrink-0 items-center justify-center rounded-lg p-2.5 text-navbar-fg hover:bg-sidebar-hover hover:text-ink focus:ring-2 focus:ring-brand/30 focus:outline-none"
+            class="inline-flex shrink-0 items-center justify-center rounded-lg p-2.5 text-navbar-fg transition duration-200 hover:bg-brand-softer hover:text-brand focus:ring-2 focus:ring-brand/30 focus:outline-none"
             title="{{ __('general.cart') }}"
         >
             <x-lucide-shopping-cart class="h-5 w-5" />
@@ -29,7 +29,7 @@
             <a
                 href="{{ route('profile') }}"
                 wire:navigate
-                class="hidden shrink-0 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-navbar-fg hover:bg-sidebar-hover hover:text-ink md:inline-flex"
+                class="hidden shrink-0 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-navbar-fg transition duration-200 hover:bg-brand-softer hover:text-brand md:inline-flex"
                 title="{{ __('general.profile') }}"
             >
                 <x-lucide-user class="h-5 w-5" />
@@ -39,7 +39,7 @@
             <a
                 href="{{ route('login') }}"
                 wire:navigate
-                class="hidden shrink-0 items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-strong focus:ring-4 focus:ring-accent/30 focus:outline-none md:inline-flex"
+                class="hidden shrink-0 items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white transition duration-200 hover:bg-brand-strong focus:ring-4 focus:ring-brand/30 focus:outline-none md:inline-flex"
             >
                 <x-lucide-log-in class="h-5 w-5 shrink-0" />
                 {{ __('general.login') }}

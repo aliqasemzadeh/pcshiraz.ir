@@ -4,9 +4,9 @@
             href="{{ route('home') }}"
             wire:navigate
             @class([
-                'inline-flex flex-col items-center justify-center px-5 hover:bg-sidebar-hover',
-                'text-brand dark:bg-brand-glow/10 dark:text-brand-glow' => request()->routeIs('home'),
-                'text-navbar-fg' => ! request()->routeIs('home'),
+                'inline-flex flex-col items-center justify-center px-5 transition duration-200 hover:bg-brand-softer',
+                'text-brand' => request()->routeIs('home'),
+                'text-slate-500 dark:text-slate-400' => ! request()->routeIs('home'),
             ])
         >
             <x-lucide-house class="mb-1 h-5 w-5" />
@@ -15,12 +15,12 @@
         <button
             type="button"
             @click="$dispatch('shop-mobile-category-open')"
-            class="inline-flex flex-col items-center justify-center px-5 text-navbar-fg hover:bg-sidebar-hover"
+            class="inline-flex flex-col items-center justify-center px-5 text-slate-500 transition duration-200 hover:bg-brand-softer dark:text-slate-400"
         >
             <x-lucide-layout-grid class="mb-1 h-5 w-5" />
             <span class="text-xs">{{ __('general.categories') }}</span>
         </button>
-        <a href="{{ route('home') }}" wire:navigate class="inline-flex flex-col items-center justify-center px-5 text-navbar-fg hover:bg-sidebar-hover">
+        <a href="{{ route('home') }}" wire:navigate class="inline-flex flex-col items-center justify-center px-5 text-slate-500 transition duration-200 hover:bg-brand-softer dark:text-slate-400">
             <x-lucide-shopping-cart class="mb-1 h-5 w-5" />
             <span class="text-xs">{{ __('general.cart') }}</span>
         </a>
@@ -28,9 +28,9 @@
             href="{{ route('profile') }}"
             wire:navigate
             @class([
-                'inline-flex flex-col items-center justify-center px-5 hover:bg-sidebar-hover',
-                'text-brand dark:bg-brand-glow/10 dark:text-brand-glow' => request()->routeIs('profile'),
-                'text-navbar-fg' => ! request()->routeIs('profile'),
+                'inline-flex flex-col items-center justify-center px-5 transition duration-200 hover:bg-brand-softer',
+                'text-brand' => request()->routeIs('profile'),
+                'text-slate-500 dark:text-slate-400' => ! request()->routeIs('profile'),
             ])
         >
             <x-lucide-user class="mb-1 h-5 w-5" />

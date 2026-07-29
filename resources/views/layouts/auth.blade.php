@@ -20,7 +20,7 @@
             </a>
         </div>
 
-        <div class="rounded-lg border border-nav-border bg-surface p-6 shadow-sm sm:p-8">
+        <div class="rounded-2xl border border-nav-border bg-surface p-6 shadow-sm sm:p-8">
             {{ $slot }}
         </div>
 
