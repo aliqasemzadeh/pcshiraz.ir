@@ -37,7 +37,8 @@
     --color-ink: #334155;
     --color-sidebar: #0F172A;
     --color-sidebar-fg: #CBD5E1;
-    --color-sidebar-hover: #4F46E5;
+    --color-sidebar-fg-active: #FFFFFF;
+    --color-sidebar-hover: #1E293B;
     --color-sidebar-active: #4F46E5;
     --color-navbar: #FFFFFF;
     --color-navbar-fg: #334155;
@@ -94,7 +95,8 @@
     --color-ink: #E2E8F0;
     --color-sidebar: #020617;
     --color-sidebar-fg: #CBD5E1;
-    --color-sidebar-hover: #4F46E5;
+    --color-sidebar-fg-active: #FFFFFF;
+    --color-sidebar-hover: #1E293B;
     --color-sidebar-active: #4F46E5;
     --color-navbar: #0F172A;
     --color-navbar-fg: #E2E8F0;
