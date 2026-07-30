@@ -6,8 +6,12 @@ Multi-domain e-commerce platform for selling computer parts and related products
 
 | Layer | Technology |
 | --- | --- |
-| Backend | PHP 8.3+, Laravel 13 |
-| UI | Livewire 4 (single-file components), Flux UI, Tailwind CSS 4, Alpine.js |
+| Backend | PHP 8.4, Laravel 13 |
+| UI | Livewire 4 (single-file components), Flowbite, Tailwind CSS 4, Alpine.js |
+| Tables | Livewire PowerGrid v6 |
+| Modals | `elegantly/livewire-modal` (slideovers for create/edit) |
+| Toasts | `masmerise/livewire-toaster` |
+| Icons | Lucide via `mallardduck/blade-lucide-icons` |
 | Auth | Mobile OTP (`spatie/laravel-one-time-passwords`) |
 | Access control | Spatie Permission |
 | Catalog / media | Spatie Media Library, Tags, Sluggable |
@@ -28,15 +32,14 @@ Multi-domain e-commerce platform for selling computer parts and related products
   - Organization — organization / partner dashboard
 - **Catalog** — brands, categories, items, prices, inventory, media, tags
 - **Bilingual** — Persian (`fa`, RTL) and English (`en`) via `/lang`
-- **Toasts & modals** — Flux flyout modals, Livewire toaster feedback after actions
+- **Toasts & modals** — slideover create/edit, centered delete confirm, toaster feedback after actions
 
 ## Requirements
 
-- PHP 8.3+ (8.4 recommended)
+- PHP 8.4
 - Composer 2
 - Node.js 20+ and npm
 - MySQL 8+ (default) or another Laravel-supported database
-- Flux UI Pro credentials (private Composer repo: `https://composer.fluxui.dev`)
 
 ## Quick start
 
@@ -99,6 +102,7 @@ Login uses **mobile OTP** in the UI; seeded passwords support non-OTP flows if e
 ```
 app/
   Models/           # Domain, Item, Brand, Category, User, …
+  Livewire/         # PowerGrid *Table components (class-based)
   Livewire/Forms/   # Livewire form objects
   Services/Shop/    # Shop domain services
 resources/views/
@@ -106,9 +110,10 @@ resources/views/
     auth/
     shop/
     panels/administrator|sale|colleague|organization/
+  components/       # Shared / modal SFCs
   layouts/          # App layouts
 lang/
-  fa/ en/           # Translations (add UI strings here)
+  fa/ en/           # Translations (UI strings → general.php)
 routes/web.php      # Livewire page routes
 ```
 
@@ -121,24 +126,30 @@ Livewire pages are registered as `pages::…`, for example:
 
 ## Conventions
 
-- Prefer **single-file Livewire components** under `resources/views/pages`
-- Create / edit forms in **Flux flyout modals** (`<flux:modal flyout position="right">`)
-- Lists use **pagination** and searchable Flux tables
-- After Livewire actions, show feedback with **`Flux::toast(...)`**
-- New UI copy goes in **`lang/fa/…`** (and `lang/en/…` when needed)
+- Prefer **single-file Livewire components** under `resources/views/pages` (and modals under `components/`)
+- **PowerGrid tables** are the only class-based Livewire exception — place under `app/Livewire/` with a `*Table` suffix
+- Create / edit forms in **slideover modals** (`elegantly/livewire-modal`); delete uses a **centered** confirmation modal
+- Index lists use **PowerGrid** (header search + footer pagination) — do not hand-roll `<table>` CRUD lists
+- After Livewire actions, show feedback with **`Toaster::success(...)`** (`masmerise/livewire-toaster`)
+- New UI copy goes in **`lang/fa/general.php`** (and `lang/en/general.php` when needed)
+- Permissions live in **`lang/fa/permissions.php`** and **`lang/en/permissions.php`**
 - Dates shown to users use **Jalali** (`morilog/jalali`)
-- Icons: Lucide via Flux (`php artisan flux:icon {name}`)
-- Database selects with many options: Flux **backend-search** select
+- Icons: Lucide Blade components (`<x-lucide-pencil class="w-4 h-4" />`)
+- UI widgets (dropdown, tooltip, datepicker): **Flowbite** patterns + `initFlowbite()` when needed
 - Event names should be fully qualified (e.g. `panels.sale.catalog.item.edit.assign-data`)
+- Do **not** use Flux UI (`flux:*`, `Flux::toast`, `php artisan flux:icon`)
+
+Full coding rules: [`.junie/guidelines.md`](.junie/guidelines.md).
 
 ## Useful commands
 
 ```bash
-php artisan migrate --seed   # Reset schema + demo data (destructive if fresh)
-php artisan test             # PHPUnit
-vendor/bin/pint              # Code style
-npm run build                # Production assets
-php artisan flux:icon home   # Add a Lucide icon component
+php artisan migrate --seed      # Reset schema + demo data (destructive if fresh)
+php artisan test                # PHPUnit
+vendor/bin/pint                 # Code style
+npm run build                   # Production assets
+php artisan powergrid:create    # Scaffold a PowerGrid table component
+php artisan livewire:form       # Scaffold a Livewire form object
 ```
 
 ## Environment notes
