@@ -97,10 +97,22 @@ class CategoryMenuService
 
     protected function mediaUrl(Category|Brand $model): ?string
     {
-        $url = $model->getFirstMediaUrl('logo_image', 'thumb');
+        $media = $model->getFirstMedia('logo_image');
+
+        if ($media === null) {
+            return null;
+        }
+
+        if ($media->mime_type === 'image/svg+xml') {
+            $url = $media->getUrl();
+
+            return $url !== '' ? $url : null;
+        }
+
+        $url = $media->getUrl('thumb');
 
         if ($url === '') {
-            $url = $model->getFirstMediaUrl('logo_image');
+            $url = $media->getUrl();
         }
 
         return $url !== '' ? $url : null;

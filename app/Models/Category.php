@@ -52,12 +52,16 @@ class Category extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('logo_image')
-            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp', 'image/avif'])
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/svg+xml'])
             ->singleFile();
     }
 
     public function registerMediaConversions(?Media $media = null): void
     {
+        if ($media?->mime_type === 'image/svg+xml') {
+            return;
+        }
+
         $this->addMediaConversion('thumb')
             ->width(300)
             ->height(300)

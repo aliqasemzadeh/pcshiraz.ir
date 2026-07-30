@@ -11,13 +11,18 @@ use App\Models\Item;
 use App\Models\ItemPrice;
 use App\Models\User;
 use App\Services\Shop\CategoryMenuService;
+use App\Services\Shop\DemoMediaDownloader;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
 class DemoDataSeeder extends Seeder
 {
+    protected DemoMediaDownloader $media;
+
     public function run(): void
     {
+        $this->media = app(DemoMediaDownloader::class);
+
         $user = User::query()->firstOrCreate(
             ['mobile' => '09120000000'],
             [
@@ -35,13 +40,19 @@ class DemoDataSeeder extends Seeder
             ],
             [
                 'title' => 'پی سی شیراز',
-                'description' => 'فروشگاه دمو قطعات کامپیوتر',
+                'description' => 'فروشگاه دمو موبایل و لوازم جانبی',
             ]
         );
+
+        $domain->fill([
+            'title' => 'پی سی شیراز',
+            'description' => 'فروشگاه دمو موبایل و لوازم جانبی',
+        ])->save();
 
         $categories = $this->seedCategories($domain);
         $brands = $this->seedBrands($domain);
         $this->seedItems($domain, $categories, $brands);
+        $this->seedItemImages($domain);
 
         app(CategoryMenuService::class)->forget($domain);
     }
@@ -52,52 +63,43 @@ class DemoDataSeeder extends Seeder
     protected function seedCategories(Domain $domain): array
     {
         $titles = [
-            ['پردازنده', 'cpu'],
-            ['مادربرد', 'motherboard'],
-            ['کارت گرافیک', 'graphics-card'],
-            ['حافظه رم', 'ram'],
-            ['اس اس دی', 'ssd'],
-            ['هارد دیسک', 'hdd'],
-            ['منبع تغذیه', 'power-supply'],
-            ['کیس', 'case'],
-            ['خنک‌کننده پردازنده', 'cpu-cooler'],
-            ['فن کیس', 'case-fan'],
-            ['مانیتور', 'monitor'],
-            ['کیبورد', 'keyboard'],
-            ['ماوس', 'mouse'],
-            ['هدست گیمینگ', 'gaming-headset'],
-            ['اسپیکر', 'speaker'],
-            ['وب‌کم', 'webcam'],
+            ['موبایل', 'mobile'],
+            ['قطعات موبایل', 'mobile-parts'],
             ['لپ‌تاپ', 'laptop'],
-            ['مینی پی سی', 'mini-pc'],
-            ['نوت‌بوک گیمینگ', 'gaming-notebook'],
-            ['کارت صدا', 'sound-card'],
-            ['کارت شبکه', 'network-card'],
-            ['مودم و روتر', 'modem-router'],
-            ['سوییچ شبکه', 'network-switch'],
-            ['کابل شبکه', 'network-cable'],
-            ['کابل تصویر', 'display-cable'],
-            ['هاب USB', 'usb-hub'],
-            ['درایو نوری', 'optical-drive'],
-            ['پرینتر', 'printer'],
-            ['اسکنر', 'scanner'],
-            ['تبلت گرافیکی', 'drawing-tablet'],
-            ['صندلی گیمینگ', 'gaming-chair'],
-            ['میز کامپیوتر', 'desk'],
-            ['پد ماوس', 'mouse-pad'],
-            ['کیف لپ‌تاپ', 'laptop-bag'],
-            ['باتری لپ‌تاپ', 'laptop-battery'],
-            ['شارژر لپ‌تاپ', 'laptop-charger'],
-            ['نرم‌افزار و لایسنس', 'software-license'],
+            ['تبلت', 'tablet'],
+            ['شارژر موبایل', 'phone-charger'],
+            ['کیف و قاب', 'case-cover'],
+            ['هدفون و هندزفری', 'headphones'],
+            ['ساعت و مچ‌بند', 'smartwatch'],
+            ['کابل و تبدیل', 'cable-adapter'],
+            ['هاب', 'hub'],
+            ['اسپیکر', 'speaker'],
+            ['ذخیره‌سازی اطلاعات', 'storage'],
             ['کنسول بازی', 'game-console'],
-            ['دسته بازی', 'gamepad'],
-            ['لوازم جانبی استریم', 'streaming-gear'],
+            ['پاوربانک', 'power-bank'],
+            ['نگهدارنده‌ی موبایل', 'phone-holder'],
+            ['کیبورد و موس', 'keyboard-mouse'],
+            ['مانیتور', 'monitor'],
+            ['محافظ و مبدل برق', 'power-protector'],
+            ['گجت خانگی', 'home-gadget'],
+            ['لوازم خانگی', 'home-appliance'],
+            ['گلس', 'glass-protector'],
+            ['تجهیزات کامپیوتر', 'computer-gear'],
+            ['مودم و شبکه', 'modem-network'],
+            ['خانه هوشمند', 'smart-home'],
+            ['دوربین تحت شبکه', 'network-camera'],
+            ['کامپیوتر', 'computer'],
+            ['اندروید باکس', 'android-box'],
+            ['لوازم جانبی موبایل', 'mobile-accessories'],
+            ['تگ هوشمند', 'smart-tag'],
+            ['سایر محصولات', 'other'],
         ];
 
         $categories = [];
+        $assetsDir = database_path('seeders/assets/categories');
 
         foreach ($titles as $index => [$title, $slug]) {
-            $categories[] = Category::query()->updateOrCreate(
+            $category = Category::query()->updateOrCreate(
                 [
                     'domain_id' => $domain->id,
                     'slug' => $slug,
@@ -108,9 +110,28 @@ class DemoDataSeeder extends Seeder
                     'sort_order' => $index + 1,
                 ]
             );
+
+            $this->attachCategoryLogo($category, $assetsDir, $slug);
+            $categories[] = $category;
         }
 
         return $categories;
+    }
+
+    protected function attachCategoryLogo(Category $category, string $assetsDir, string $slug): void
+    {
+        $webp = $assetsDir.DIRECTORY_SEPARATOR.$slug.'.webp';
+        $svg = $assetsDir.DIRECTORY_SEPARATOR.$slug.'.svg';
+
+        if (is_file($webp)) {
+            $this->media->attachFromPath($category, $webp, 'logo_image', $slug.'.webp');
+
+            return;
+        }
+
+        if (is_file($svg)) {
+            $this->media->attachFromPath($category, $svg, 'logo_image', $slug.'.svg');
+        }
     }
 
     /**
@@ -118,66 +139,69 @@ class DemoDataSeeder extends Seeder
      */
     protected function seedBrands(Domain $domain): array
     {
+        // domain used for clearbit logo download: brand domain => title
         $titles = [
-            'Intel',
-            'AMD',
-            'NVIDIA',
-            'ASUS',
-            'MSI',
-            'Gigabyte',
-            'ASRock',
-            'Corsair',
-            'G.Skill',
-            'Kingston',
-            'Samsung',
-            'Western Digital',
-            'Seagate',
-            'Crucial',
-            'TeamGroup',
-            'Patriot',
-            'Cooler Master',
-            'DeepCool',
-            'NZXT',
-            'Lian Li',
-            'Fractal Design',
-            'be quiet!',
-            'Thermaltake',
-            'Seasonic',
-            'EVGA',
-            'Zotac',
-            'Palit',
-            'Sapphire',
-            'PowerColor',
-            'XFX',
-            'Logitech',
-            'Razer',
-            'SteelSeries',
-            'HyperX',
-            'BenQ',
-            'LG',
-            'Dell',
-            'HP',
-            'Acer',
-            'Lenovo',
-            'Apple',
-            'TP-Link',
-            'D-Link',
-            'Mikrotik',
-            'Epson',
-            'Canon',
-            'Brother',
-            'Wacom',
-            'Sony',
-            'Microsoft',
+            ['Samsung', 'samsung.com'],
+            ['Apple', 'apple.com'],
+            ['Xiaomi', 'mi.com'],
+            ['Huawei', 'huawei.com'],
+            ['Nokia', 'nokia.com'],
+            ['Honor', 'honor.com'],
+            ['Realme', 'realme.com'],
+            ['OPPO', 'oppo.com'],
+            ['vivo', 'vivo.com'],
+            ['OnePlus', 'oneplus.com'],
+            ['Nothing', 'nothing.tech'],
+            ['Google', 'google.com'],
+            ['ASUS', 'asus.com'],
+            ['Lenovo', 'lenovo.com'],
+            ['HP', 'hp.com'],
+            ['Dell', 'dell.com'],
+            ['Acer', 'acer.com'],
+            ['MSI', 'msi.com'],
+            ['Microsoft', 'microsoft.com'],
+            ['Sony', 'sony.com'],
+            ['LG', 'lg.com'],
+            ['JBL', 'jbl.com'],
+            ['Anker', 'anker.com'],
+            ['Baseus', 'baseus.com'],
+            ['Ugreen', 'ugreen.com'],
+            ['Belkin', 'belkin.com'],
+            ['Logitech', 'logitech.com'],
+            ['Razer', 'razer.com'],
+            ['SteelSeries', 'steelseries.com'],
+            ['Kingston', 'kingston.com'],
+            ['Sandisk', 'sandisk.com'],
+            ['Western Digital', 'westerndigital.com'],
+            ['TP-Link', 'tp-link.com'],
+            ['D-Link', 'dlink.com'],
+            ['Xiaomi Accessories', 'mi.com'],
+            ['Spigen', 'spigen.com'],
+            ['Nillkin', 'nillkin.com'],
+            ['Green Lion', 'greenlion.com'],
+            ['Havit', 'havit.hk'],
+            ['Tsco', 'tsco.ir'],
+            ['Earldom', 'earldom.net'],
+            ['Remax', 'remax.com'],
+            ['Yesido', 'yesido.com'],
+            ['Borofone', 'borofone.com'],
+            ['Hoco', 'hoco.hk'],
+            ['Katun', 'katun.com'],
+            ['Nintendo', 'nintendo.com'],
+            ['PlayStation', 'playstation.com'],
+            ['Xbox', 'xbox.com'],
+            ['Marshall', 'marshallheadphones.com'],
         ];
 
         $brands = [];
 
-        foreach ($titles as $index => $title) {
-            $brands[] = Brand::query()->updateOrCreate(
+        foreach ($titles as $index => [$title, $logoDomain]) {
+            $slug = Str::slug($title) ?: 'brand-'.($index + 1);
+
+            $brand = Brand::query()->updateOrCreate(
                 [
                     'domain_id' => $domain->id,
-                    'slug' => Str::slug($title) ?: 'brand-'.($index + 1),
+                    'slug' => $slug,
                 ],
                 [
                     'title' => $title,
@@ -185,6 +209,16 @@ class DemoDataSeeder extends Seeder
                     'sort_order' => $index + 1,
                 ]
             );
+
+            $logoUrl = 'https://logo.clearbit.com/'.$logoDomain.'?size=128';
+            $attached = $this->media->attachFromUrl($brand, $logoUrl, 'logo_image', $slug.'.png');
+
+            if (! $attached && $brand->getFirstMedia('logo_image') === null) {
+                $placeholder = 'https://placehold.co/128x128/png?text='.urlencode(mb_substr($title, 0, 2));
+                $this->media->attachFromUrl($brand, $placeholder, 'logo_image', $slug.'.png');
+            }
+
+            $brands[] = $brand;
         }
 
         return $brands;
@@ -200,6 +234,9 @@ class DemoDataSeeder extends Seeder
             return;
         }
 
+        $brandsBySlug = collect($brands)->keyBy('slug');
+        $categoryBrandMap = $this->categoryBrandSlugs();
+
         $existingCount = Item::query()->where('domain_id', $domain->id)->count();
 
         if ($existingCount >= 500) {
@@ -210,13 +247,22 @@ class DemoDataSeeder extends Seeder
         $toCreate = $target - $existingCount;
         $now = now();
         $items = [];
-        $prices = [];
 
-        // Ensure every category gets a rich set of brands via dedicated items first.
-        foreach ($categories as $categoryIndex => $category) {
-            $brandSlice = $this->brandsForCategory($brands, $categoryIndex, 12);
+        foreach ($categories as $category) {
+            $brandSlugs = $categoryBrandMap[$category->slug] ?? [];
+            $relatedBrands = [];
 
-            foreach ($brandSlice as $brandOffset => $brand) {
+            foreach ($brandSlugs as $brandSlug) {
+                if ($brandsBySlug->has($brandSlug)) {
+                    $relatedBrands[] = $brandsBySlug->get($brandSlug);
+                }
+            }
+
+            if ($relatedBrands === []) {
+                $relatedBrands = $this->brandsForCategory($brands, array_search($category, $categories, true) ?: 0, 10);
+            }
+
+            foreach ($relatedBrands as $brandOffset => $brand) {
                 $slug = sprintf('demo-%d-%d-%d', $domain->id, $category->id, $brand->id);
 
                 if (Item::query()->where('slug', $slug)->exists()) {
@@ -291,8 +337,10 @@ class DemoDataSeeder extends Seeder
             ->whereDoesntHave('itemPrices')
             ->get(['id']);
 
+        $prices = [];
+
         foreach ($createdItems as $item) {
-            $price = random_int(1_500_000, 85_000_000) / 1;
+            $price = random_int(1_500_000, 85_000_000);
 
             $prices[] = [
                 'item_id' => $item->id,
@@ -311,6 +359,67 @@ class DemoDataSeeder extends Seeder
         foreach (array_chunk($prices, 100) as $chunk) {
             ItemPrice::query()->insert($chunk);
         }
+    }
+
+    protected function seedItemImages(Domain $domain): void
+    {
+        $items = Item::query()
+            ->where('domain_id', $domain->id)
+            ->whereDoesntHave('media', fn ($q) => $q->where('collection_name', 'product_image'))
+            ->limit(120)
+            ->get();
+
+        foreach ($items as $index => $item) {
+            $seed = ($item->id % 70) + 1;
+            $url = "https://picsum.photos/seed/pcshiraz-{$seed}/600/600.webp";
+
+            $this->media->attachFromUrl($item, $url, 'product_image', "product-{$item->id}.webp");
+
+            if (($index + 1) % 20 === 0) {
+                usleep(100_000);
+            }
+        }
+    }
+
+    /**
+     * Map each category slug to related brand slugs (mega-menu subsets).
+     *
+     * @return array<string, list<string>>
+     */
+    protected function categoryBrandSlugs(): array
+    {
+        return [
+            'mobile' => ['samsung', 'apple', 'xiaomi', 'huawei', 'nokia', 'honor', 'realme', 'oppo', 'vivo', 'oneplus', 'nothing', 'google'],
+            'mobile-parts' => ['samsung', 'apple', 'xiaomi', 'huawei', 'nokia', 'honor'],
+            'laptop' => ['asus', 'lenovo', 'hp', 'dell', 'acer', 'msi', 'apple', 'microsoft', 'huawei'],
+            'tablet' => ['samsung', 'apple', 'xiaomi', 'huawei', 'lenovo', 'microsoft'],
+            'phone-charger' => ['anker', 'baseus', 'ugreen', 'hoco', 'remax', 'earldom', 'yesido', 'green-lion'],
+            'case-cover' => ['spigen', 'nillkin', 'green-lion', 'tsco', 'hoco', 'yesido'],
+            'headphones' => ['jbl', 'sony', 'apple', 'samsung', 'anker', 'marshall', 'havit', 'remax'],
+            'smartwatch' => ['apple', 'samsung', 'xiaomi', 'huawei', 'honor', 'nothing'],
+            'cable-adapter' => ['baseus', 'ugreen', 'anker', 'belkin', 'hoco', 'remax', 'earldom', 'borofone'],
+            'hub' => ['ugreen', 'baseus', 'anker', 'belkin', 'tp-link'],
+            'speaker' => ['jbl', 'sony', 'marshall', 'havit', 'xiaomi', 'anker'],
+            'storage' => ['kingston', 'sandisk', 'western-digital', 'samsung', 'xiaomi'],
+            'game-console' => ['sony', 'microsoft', 'nintendo', 'playstation', 'xbox'],
+            'power-bank' => ['anker', 'baseus', 'xiaomi', 'green-lion', 'hoco', 'remax', 'tsco'],
+            'phone-holder' => ['baseus', 'yesido', 'hoco', 'earldom', 'green-lion', 'tsco'],
+            'keyboard-mouse' => ['logitech', 'razer', 'steelseries', 'microsoft', 'havit', 'tsco'],
+            'monitor' => ['lg', 'samsung', 'msi', 'asus', 'dell', 'benq' => 'lg'],
+            'power-protector' => ['tp-link', 'tsco', 'green-lion', 'ugreen'],
+            'home-gadget' => ['xiaomi', 'huawei', 'samsung', 'anker', 'baseus'],
+            'home-appliance' => ['samsung', 'lg', 'xiaomi', 'huawei'],
+            'glass-protector' => ['spigen', 'nillkin', 'green-lion', 'hoco', 'tsco'],
+            'computer-gear' => ['logitech', 'razer', 'steelseries', 'kingston', 'asus', 'msi'],
+            'modem-network' => ['tp-link', 'd-link', 'xiaomi', 'huawei', 'asus'],
+            'smart-home' => ['xiaomi', 'google', 'apple', 'tp-link', 'huawei'],
+            'network-camera' => ['tp-link', 'xiaomi', 'hikvision' => 'tp-link', 'd-link'],
+            'computer' => ['asus', 'lenovo', 'hp', 'dell', 'msi', 'acer'],
+            'android-box' => ['xiaomi', 'tv-box' => 'xiaomi', 'google', 'nvidia' => 'asus'],
+            'mobile-accessories' => ['baseus', 'hoco', 'remax', 'yesido', 'earldom', 'borofone', 'green-lion', 'tsco', 'spigen'],
+            'smart-tag' => ['apple', 'samsung', 'xiaomi', 'baseus'],
+            'other' => ['samsung', 'xiaomi', 'anker', 'baseus', 'tsco', 'hoco'],
+        ];
     }
 
     /**
