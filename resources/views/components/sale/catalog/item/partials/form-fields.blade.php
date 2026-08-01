@@ -1,12 +1,7 @@
-@php
-    /** @var \Livewire\Component $this */
-@endphp
-
 <div>
     <x-fwb.select
         wire:model="form.brand_id"
         :label="__('general.brand')"
-        :placeholder="__('general.select_brand')"
         :options="$brands"
     />
     @error('form.brand_id')
@@ -18,7 +13,6 @@
     <x-fwb.select
         wire:model="form.category_id"
         :label="__('general.category')"
-        :placeholder="__('general.select_category')"
         :options="$categories"
     />
     @error('form.category_id')
@@ -30,7 +24,6 @@
     <x-fwb.select
         wire:model="form.item_type"
         :label="__('general.item_type')"
-        :placeholder="__('general.select_item_type')"
         :options="$itemTypes"
     />
     @error('form.item_type')
@@ -42,7 +35,6 @@
     <x-fwb.select
         wire:model="form.group_id"
         :label="__('general.group')"
-        :placeholder="__('general.no_group')"
         :options="$groups"
     />
     @error('form.group_id')
@@ -168,7 +160,7 @@
     @enderror
 </div>
 
-<div class="space-y-2">
+<div class="space-y-3">
     <label class="block text-sm font-medium text-heading">{{ __('general.tags') }}</label>
 
     @if (count($form->tags) > 0)
@@ -178,7 +170,7 @@
                     {{ $tag }}
                     <button
                         type="button"
-                        wire:click="removeTag({{ Js::from($tag) }})"
+                        wire:click="removeTag(@js($tag))"
                         class="text-fg-danger-strong hover:opacity-80"
                     >
                         ×
@@ -186,18 +178,6 @@
                 </span>
             @endforeach
         </div>
-    @endif
-
-    @if (count($existingTags) > 0)
-        <x-fwb.select
-            wire:model="selectedExistingTag"
-            :label="__('general.select_group') === __('general.select_group') ? __('general.tags') : __('general.tags')"
-            :placeholder="__('general.tags')"
-            :options="$existingTags"
-        />
-        <x-ui.button type="button" color="light" outline :loading="false" wire:click="addExistingTag" class="w-full">
-            {{ __('general.add_tag') }}
-        </x-ui.button>
     @endif
 
     <div class="flex gap-2">
@@ -209,12 +189,30 @@
                 wire:keydown.enter.prevent="addTag"
             />
         </div>
-        <div class="flex items-end">
+        <div class="pt-7">
             <x-ui.button type="button" color="cyan" :loading="false" wire:click="addTag">
                 {{ __('general.add_tag') }}
             </x-ui.button>
         </div>
     </div>
+
+    @if (count($existingTags) > 0)
+        <div class="flex gap-2">
+            <div class="flex-1">
+                <x-fwb.select
+                    wire:model="selectedExistingTag"
+                    :label="__('general.tags')"
+                    :options="$existingTags"
+                />
+            </div>
+            <div class="pt-7">
+                <x-ui.button type="button" color="light" outline :loading="false" wire:click="addExistingTag">
+                    {{ __('general.add_tag') }}
+                </x-ui.button>
+            </div>
+        </div>
+    @endif
+
     @error('form.tags')
         <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
     @enderror
