@@ -24,12 +24,12 @@
         goCategory(category) {
             this.selectedLabel = category.title;
             this.open = false;
-            window.location.href = @js($homeUrl) + '?category=' + encodeURIComponent(category.slug);
+            window.location.href = '/category/' + encodeURIComponent(category.slug);
         },
         goBrand(category, brand) {
             this.selectedLabel = brand.title;
             this.open = false;
-            window.location.href = @js($homeUrl) + '?category=' + encodeURIComponent(category.slug) + '&brand=' + encodeURIComponent(brand.slug);
+            window.location.href = '/category/' + encodeURIComponent(category.slug) + '/' + encodeURIComponent(brand.slug);
         },
         initial(title) {
             return (title || '?').trim().charAt(0).toUpperCase();

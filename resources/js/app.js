@@ -1,7 +1,10 @@
 import 'flowbite';
 import { initFlowbite } from 'flowbite';
+import smoothscroll from 'smoothscroll-polyfill';
 import './../../vendor/power-components/livewire-powergrid/dist/powergrid';
 import '../../vendor/masmerise/livewire-toaster/resources/js';
+
+smoothscroll.polyfill();
 
 const bootFlowbite = () => initFlowbite();
 

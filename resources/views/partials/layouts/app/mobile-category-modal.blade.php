@@ -30,11 +30,11 @@
         },
         goCategory(category) {
             this.closeMenu();
-            window.location.href = @js($homeUrl) + '?category=' + encodeURIComponent(category.slug);
+            window.location.href = '/category/' + encodeURIComponent(category.slug);
         },
         goBrand(category, brand) {
             this.closeMenu();
-            window.location.href = @js($homeUrl) + '?category=' + encodeURIComponent(category.slug) + '&brand=' + encodeURIComponent(brand.slug);
+            window.location.href = '/category/' + encodeURIComponent(category.slug) + '/' + encodeURIComponent(brand.slug);
         }
     }"
     @shop-mobile-category-open.window="openMenu()"
