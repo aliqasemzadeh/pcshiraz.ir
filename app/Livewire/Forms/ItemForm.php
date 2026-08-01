@@ -304,7 +304,7 @@ class ItemForm extends Form
     protected function normalizeNullableFields(): void
     {
         foreach (['brand_id', 'category_id', 'group_id', 'weight', 'length', 'width', 'height'] as $field) {
-            if ($this->{$field} === '' || $this->{$field} === 0 && $field === 'group_id') {
+            if ($this->{$field} === '') {
                 $this->{$field} = null;
             }
         }

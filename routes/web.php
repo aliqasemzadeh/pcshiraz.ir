@@ -31,6 +31,7 @@ Route::post('/logout', function () {
         Route::livewire('/catalog/brands', 'pages::panels.sale.catalog.brand.index')->name('catalog.brand.index');
         Route::livewire('/catalog/categories', 'pages::panels.sale.catalog.category.index')->name('catalog.category.index');
         Route::livewire('/catalog/items', 'pages::panels.sale.catalog.item.index')->name('catalog.item.index');
+        Route::livewire('/catalog/items/{item}/prices', 'pages::panels.sale.catalog.item.price.index')->name('catalog.item.price.index');
     });
 
     Route::prefix('colleague')->name('panels.colleague.')->group(function () {
