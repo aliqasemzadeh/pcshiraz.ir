@@ -10,5 +10,9 @@ return [
         'brand_create' => 'ایجاد برند',
         'brand_edit' => 'ویرایش برند',
         'brand_delete' => 'حذف برند',
+        'item_view' => 'مشاهده کالاها',
+        'item_create' => 'ایجاد کالا',
+        'item_edit' => 'ویرایش کالا',
+        'item_delete' => 'حذف کالا',
     ],
 ];

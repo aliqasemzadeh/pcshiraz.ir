@@ -28,15 +28,17 @@ final class DomainTable extends PowerGridComponent
     public function datasource(): Builder
     {
         return Domain::query()
-            ->with('user')
-            ->orderByDesc('id');
+            ->leftJoin('users', 'users.id', '=', 'domains.user_id')
+            ->select('domains.*')
+            ->addSelect('users.mobile as user_mobile')
+            ->orderByDesc('domains.id');
     }
 
     public function fields(): PowerGridFields
     {
         return PowerGrid::fields()
             ->add('id')
-            ->add('user_mobile', fn (Domain $domain) => $domain->user?->mobile ?? '—')
+            ->add('user_mobile')
             ->add('title')
             ->add('domain')
             ->add('description')
@@ -52,7 +54,7 @@ final class DomainTable extends PowerGridComponent
     public function columns(): array
     {
         return [
-            Column::make(__('general.mobile'), 'user_mobile')
+            Column::make(__('general.mobile'), 'user_mobile', 'users.mobile')
                 ->searchable()
                 ->sortable(),
 
@@ -68,7 +70,7 @@ final class DomainTable extends PowerGridComponent
                 ->searchable()
                 ->sortable(),
 
-            Column::make(__('general.created_at'), 'created_at_formatted', 'created_at')
+            Column::make(__('general.created_at'), 'created_at_formatted', 'domains.created_at')
                 ->sortable(),
 
             Column::action(__('general.actions')),

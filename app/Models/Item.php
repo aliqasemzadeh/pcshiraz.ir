@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Enums\PriceTypeEnum;
 use App\Enums\ItemTypeEnum;
+use App\Enums\PriceTypeEnum;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -37,7 +37,7 @@ use Spatie\Tags\HasTags;
 ])]
 class Item extends Model implements HasMedia
 {
-    use InteractsWithMedia, HasTags, SoftDeletes;
+    use HasTags, InteractsWithMedia, SoftDeletes;
 
     protected function casts(): array
     {
@@ -46,6 +46,23 @@ class Item extends Model implements HasMedia
             'is_main' => 'boolean',
             'meta' => 'array',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(function (Item $item): void {
+            if ($item->group_id === null) {
+                $item->forceFill(['group_id' => $item->id])->saveQuietly();
+            }
+
+            if ($item->is_main && $item->group_id !== null) {
+                static::query()
+                    ->where('group_id', $item->group_id)
+                    ->where('id', '!=', $item->id)
+                    ->where('is_main', true)
+                    ->update(['is_main' => false]);
+            }
+        });
     }
 
     public function domain(): BelongsTo
@@ -66,6 +83,11 @@ class Item extends Model implements HasMedia
     public function itemPrices(): HasMany
     {
         return $this->hasMany(ItemPrice::class);
+    }
+
+    public function groupVariants(): HasMany
+    {
+        return $this->hasMany(self::class, 'group_id', 'group_id');
     }
 
     public function latestPriceByType(PriceTypeEnum $type): HasOne

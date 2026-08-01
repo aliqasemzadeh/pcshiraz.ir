@@ -10,5 +10,9 @@ return [
         'brand_create' => 'Create brand',
         'brand_edit' => 'Edit brand',
         'brand_delete' => 'Delete brand',
+        'item_view' => 'View items',
+        'item_create' => 'Create item',
+        'item_edit' => 'Edit item',
+        'item_delete' => 'Delete item',
     ],
 ];
