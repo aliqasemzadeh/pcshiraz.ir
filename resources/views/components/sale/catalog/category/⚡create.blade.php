@@ -2,7 +2,6 @@
 
 use App\Livewire\Forms\CategoryForm;
 use App\Services\Shop\CategoryMenuService;
-use App\Support\CurrentDomain;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Masmerise\Toaster\Toaster;
@@ -15,16 +14,8 @@ new class extends Component
 
     public function save(CategoryMenuService $categoryMenuService): void
     {
-        $domain = CurrentDomain::get();
-
-        if ($domain === null) {
-            Toaster::error(__('general.error'));
-
-            return;
-        }
-
-        $this->form->store($domain);
-        $categoryMenuService->forget($domain);
+        $this->form->store();
+        $categoryMenuService->forget();
 
         Toaster::success(__('general.saved'));
         $this->dispatch('modal-close');
@@ -87,6 +78,16 @@ new class extends Component
                     min="0"
                 />
                 @error('form.sort_order')
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <x-fwb.checkbox
+                    wire:model="form.show_on_home"
+                    :label="__('app.show_on_home')"
+                />
+                @error('form.show_on_home')
                     <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
                 @enderror
             </div>
