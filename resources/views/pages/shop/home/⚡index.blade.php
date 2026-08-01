@@ -18,16 +18,16 @@ new #[Layout('layouts.app')] class extends Component
     public function tags(): array
     {
         return Cache::remember(CatalogCache::HOME_TAGS, CatalogCache::TTL, function () {
-            $tagIds = Item::query()
-                ->active()
-                ->with('tags')
-                ->get()
-                ->pluck('tags')
-                ->flatten()
-                ->pluck('id')
-                ->unique()
-                ->take(24)
-                ->values();
+            $tagIds = \Illuminate\Support\Facades\DB::table('taggables')
+                ->join('items', function ($join) {
+                    $join->on('items.id', '=', 'taggables.taggable_id')
+                        ->where('taggables.taggable_type', (new Item)->getMorphClass())
+                        ->where('items.is_active', true)
+                        ->whereNull('items.deleted_at');
+                })
+                ->distinct()
+                ->limit(24)
+                ->pluck('taggables.tag_id');
 
             return Tag::query()
                 ->whereIn('id', $tagIds)

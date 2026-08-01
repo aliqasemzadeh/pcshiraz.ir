@@ -21,6 +21,14 @@ class AuthForm extends Form
             return $this->user;
         }
 
-        return $this->user = User::firstOrCreate(['mobile' => $this->mobile]);
+        $user = User::withTrashed()->firstOrCreate(
+            ['mobile' => $this->mobile],
+        );
+
+        if ($user->trashed()) {
+            $user->restore();
+        }
+
+        return $this->user = $user;
     }
 }
