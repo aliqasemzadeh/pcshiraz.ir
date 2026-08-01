@@ -53,6 +53,8 @@ return [
     'actions' => 'عملیات',
     'save' => 'ذخیره',
     'cancel' => 'انصراف',
+    'working' => 'در حال انجام...',
+    'uploading' => 'در حال آپلود...',
     'edit' => 'ویرایش',
     'delete' => 'حذف',
     'create_category' => 'ایجاد دسته',
