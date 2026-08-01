@@ -7,11 +7,11 @@
 @endphp
 
 @if ($categories->isNotEmpty())
-    <x-shop.carousel :title="__('app.popular_categories')" :label="__('app.popular_categories')">
+    <x-shop.carousel :title="__('app.popular_categories')" :label="__('app.popular_categories')" :skip="4">
         @foreach ($categories as $category)
             <li
                 x-bind="disableNextAndPreviousButtons"
-                class="w-1/3 shrink-0 snap-start sm:w-1/4 md:w-1/5 lg:w-1/6"
+                class="w-24 shrink-0 snap-start sm:w-28"
                 role="option"
             >
                 <x-shop.item-category
