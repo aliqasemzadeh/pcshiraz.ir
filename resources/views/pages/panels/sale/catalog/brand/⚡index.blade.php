@@ -21,14 +21,17 @@ new #[Layout('layouts.panels')] class extends Component
         <div class="flex items-center justify-between gap-3">
             <h1 class="text-2xl font-semibold text-heading">{{ __('general.brands') }}</h1>
 
-            <button
+            <x-ui.button
                 type="button"
+                color="green"
+                :loading="false"
                 x-modal:open="{ modal: 'sale.catalog.brand.create' }"
-                class="inline-flex items-center gap-2 rounded-lg bg-teal-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-teal-800 focus:outline-none focus:ring-4 focus:ring-teal-300 dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800"
             >
-                <x-lucide-plus class="h-4 w-4" />
+                <x-slot:icon>
+                    <x-lucide-plus class="h-4 w-4 me-2" />
+                </x-slot:icon>
                 {{ __('general.create_brand') }}
-            </button>
+            </x-ui.button>
         </div>
 
         <x-fwb.card>

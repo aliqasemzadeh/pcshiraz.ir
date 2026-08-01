@@ -421,6 +421,10 @@ final class UserTable extends PowerGridComponent
 | Concern | Package / Tool | API |
 |---|---|---|
 | UI kit | Flowbite + `themesberg/flowbite-laravel-components` (aliqasemzadeh VCS) | `<x-fwb.*>`, data attributes + `initFlowbite()` |
+| Forms | `x-fwb.input` / `textarea` / `select` / `checkbox` / `toggle` / … | [Forms docs](https://github.com/themesberg/flowbite-laravel-components#forms) |
+| Action buttons | `<x-ui.button>` (wraps `x-fwb.button`) | loading label + disables siblings until done |
+| File upload | `<x-ui.file-input>` (wraps `x-fwb.file-input`) | Livewire progress bar + `$store.ui.busy` |
+| Tooltips | `<x-fwb.tooltip>` + `triggerSlot` | never hand-roll `data-tooltip-target` for triggers |
 | Tables | `power-components/livewire-powergrid` + `App\Support\PowerGrid\FlowbiteTheme` | `PowerGridComponent`, `Column::make()->searchable()`, `relationSearch()`, `actionsFromView()` + `components.powergrid.row-actions` |
 | Icons | `mallardduck/blade-lucide-icons` | `<x-lucide-{name} class="w-4 h-4" />` (in Blade views / actionsFromView) |
 | Modal / Slideover | `elegantly/livewire-modal` (+ published `start`/`end`) | `position="{{ __('general.direction') === 'rtl' ? 'end' : 'start' }}"`, `x-modal:open`, `modal-open` / `modal-close` |
