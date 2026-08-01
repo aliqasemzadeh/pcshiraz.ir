@@ -53,7 +53,7 @@ new #[Lazy] class extends Component
 ?>
 
 @placeholder
-    <div class="space-y-4" wire:key="home-category-{{ $categoryId }}-placeholder">
+    <div class="space-y-4">
         <div class="h-7 w-48 animate-pulse rounded bg-gray-100 dark:bg-gray-800"></div>
         <div class="h-64 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-800"></div>
     </div>

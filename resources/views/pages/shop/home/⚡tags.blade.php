@@ -46,7 +46,7 @@ new #[Lazy] class extends Component
 ?>
 
 @placeholder
-    <div class="h-28 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-800" wire:key="home-tags-placeholder"></div>
+    <div class="h-28 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-800"></div>
 @endplaceholder
 
 <div>

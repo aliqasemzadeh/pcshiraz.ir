@@ -1,7 +1,6 @@
 <?php
 
 use App\Livewire\Forms\UserForm;
-use App\Models\User;
 use Livewire\Component;
 use Masmerise\Toaster\Toaster;
 
@@ -9,22 +8,14 @@ new class extends Component
 {
     public UserForm $form;
 
-    public int $userId;
-
-    public function mount(int $userId): void
-    {
-        $this->userId = $userId;
-        $this->form->setUser(User::query()->findOrFail($userId));
-    }
-
     public function save(): void
     {
-        $user = User::query()->findOrFail($this->userId);
-        $this->form->update($user);
+        $this->form->store();
 
         Toaster::success(__('general.saved'));
         $this->dispatch('modal-close');
         $this->dispatch('pg:eventRefresh-administratorUsersTable');
+        $this->form->reset();
     }
 };
 ?>
@@ -35,7 +26,7 @@ new class extends Component
         class="w-full max-w-md overflow-auto bg-white p-5 dark:bg-gray-800"
     >
         <h2 class="mb-4 text-xl font-semibold text-heading">
-            {{ __('general.edit_user') }}
+            {{ __('general.create_user') }}
         </h2>
 
         <form wire:submit="save" class="space-y-4">
