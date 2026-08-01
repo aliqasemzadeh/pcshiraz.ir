@@ -248,6 +248,7 @@ Ensure Tailwind content / `@source` includes (PowerGrid is already wired in `res
 *   **Models / props** (see Flowbite: https://flowbite.com/docs/components/buttons/):
     *   `variant`: `solid` (default), `outline`, `gradient`, `gradient-shadow`, `duotone`
     *   `pill`: fully rounded (`rounded-full`)
+    *   `size`: `icon` (square icon-only), `xs`, `sm`, `md`, `lg`, `xl`
     *   `color` (solid): `blue`/`brand`, `secondary`, `tertiary`, `green`/`success`, `red`/`danger`, `yellow`/`warning`, `dark`, `ghost`, `light`, `purple`, `cyan`, `teal`, `lime`, `pink`, `orange`
     *   `duotone` (when `variant="duotone"`): `purple-blue`, `cyan-blue`, `green-blue`, `purple-pink`, `pink-orange`, `teal-lime`, `red-yellow`
     *   Legacy `:outline="true"` maps to `variant="outline"`.
@@ -265,7 +266,7 @@ Ensure Tailwind content / `@source` includes (PowerGrid is already wired in `res
     ```html
     <x-fwb.tooltip :id="'tooltip-edit-'.$user->id" placement="top">
         <x-slot:triggerSlot>
-            <x-ui.button type="button" size="xs" color="blue" wire:click="...">
+            <x-ui.button type="button" size="icon" color="blue" wire:click="...">
                 <x-lucide-pencil class="w-4 h-4" />
             </x-ui.button>
         </x-slot:triggerSlot>
@@ -422,6 +423,7 @@ final class UserTable extends PowerGridComponent
 | Concern | Package / Tool | API |
 |---|---|---|
 | UI kit | Flowbite + `themesberg/flowbite-laravel-components` (aliqasemzadeh VCS) | `<x-fwb.*>`, data attributes + `initFlowbite()` |
+| Action buttons | `<x-ui.button>` (Flowbite solid/outline/gradient/duotone/pill) | loading label + disables siblings until done; adjacent buttons use distinct colors |
 | Tables | `power-components/livewire-powergrid` + `App\Support\PowerGrid\FlowbiteTheme` | `PowerGridComponent`, `Column::make()->searchable()`, `relationSearch()`, `actionsFromView()` + `components.powergrid.row-actions` |
 | Icons | `mallardduck/blade-lucide-icons` | `<x-lucide-{name} class="w-4 h-4" />` (in Blade views / actionsFromView) |
 | Modal / Slideover | `elegantly/livewire-modal` (+ published `start`/`end`) | `position="{{ __('general.direction') === 'rtl' ? 'end' : 'start' }}"`, `x-modal:open`, `modal-open` / `modal-close` |

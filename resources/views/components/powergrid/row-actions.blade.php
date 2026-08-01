@@ -18,10 +18,9 @@
         <x-slot:triggerSlot>
             <x-ui.button
                 type="button"
-                size="xs"
+                size="icon"
                 color="blue"
                 :loading="false"
-                class="p-2"
                 wire:click="$dispatch('modal-open', { modal: @js($editModal), props: { {{ $idProp }}: {{ $rowId }} } })"
             >
                 <x-lucide-pencil class="h-4 w-4" />
@@ -35,10 +34,9 @@
         <x-slot:triggerSlot>
             <x-ui.button
                 type="button"
-                size="xs"
+                size="icon"
                 color="red"
                 :loading="false"
-                class="p-2"
                 wire:click="$dispatch('modal-open', { modal: @js($deleteModal), props: { {{ $idProp }}: {{ $rowId }} } })"
             >
                 <x-lucide-trash-2 class="h-4 w-4" />

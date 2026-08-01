@@ -40,6 +40,7 @@
     }
 
     $sizeClasses = match ($size) {
+        'icon' => 'p-2 text-sm',
         'xs' => 'px-3 py-1.5 text-xs',
         'sm' => 'px-3 py-2 text-sm',
         'lg' => 'px-5 py-3 text-base',

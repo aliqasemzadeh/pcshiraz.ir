@@ -265,6 +265,7 @@ Ensure Tailwind content / `@source` includes (PowerGrid is already wired in `res
 *   **Models / props** (see Flowbite: https://flowbite.com/docs/components/buttons/):
     *   `variant`: `solid` (default), `outline`, `gradient`, `gradient-shadow`, `duotone`
     *   `pill`: fully rounded (`rounded-full`)
+    *   `size`: `icon` (square icon-only), `xs`, `sm`, `md`, `lg`, `xl`
     *   `color` (solid): `blue`/`brand`, `secondary`, `tertiary`, `green`/`success`, `red`/`danger`, `yellow`/`warning`, `dark`, `ghost`, `light`, `purple`, `cyan`, `teal`, `lime`, `pink`, `orange`
     *   `duotone` (when `variant="duotone"`): `purple-blue`, `cyan-blue`, `green-blue`, `purple-pink`, `pink-orange`, `teal-lime`, `red-yellow`
     *   Legacy `:outline="true"` maps to `variant="outline"`.
@@ -282,7 +283,7 @@ Ensure Tailwind content / `@source` includes (PowerGrid is already wired in `res
     ```html
     <x-fwb.tooltip :id="'tooltip-edit-'.$user->id" placement="top">
         <x-slot:triggerSlot>
-            <x-ui.button type="button" size="xs" color="blue" wire:click="...">
+            <x-ui.button type="button" size="icon" color="blue" wire:click="...">
                 <x-lucide-pencil class="w-4 h-4" />
             </x-ui.button>
         </x-slot:triggerSlot>
@@ -436,7 +437,7 @@ final class UserTable extends PowerGridComponent
 |---|---|---|
 | UI kit | Flowbite + `themesberg/flowbite-laravel-components` (aliqasemzadeh VCS) | `<x-fwb.*>`, data attributes + `initFlowbite()` |
 | Forms | `x-fwb.input` / `textarea` / `select` / `checkbox` / `toggle` / … | [Forms docs](https://github.com/themesberg/flowbite-laravel-components#forms) |
-| Action buttons | `<x-ui.button>` (wraps `x-fwb.button`) | loading label + disables siblings until done |
+| Action buttons | `<x-ui.button>` (Flowbite solid/outline/gradient/duotone/pill) | loading label + disables siblings until done; adjacent buttons use distinct colors |
 | File upload | `<x-ui.file-input>` (wraps `x-fwb.file-input`) | Livewire progress bar + `$store.ui.busy` |
 | Tooltips | `<x-fwb.tooltip>` + `triggerSlot` | never hand-roll `data-tooltip-target` for triggers |
 | Tables | `power-components/livewire-powergrid` + `App\Support\PowerGrid\FlowbiteTheme` | `PowerGridComponent`, `Column::make()->searchable()`, `relationSearch()`, `actionsFromView()` + `components.powergrid.row-actions` |
