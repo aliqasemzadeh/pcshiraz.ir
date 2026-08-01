@@ -25,7 +25,8 @@
         "spatie/laravel-permission": "^8.1",
         "spatie/laravel-settings": "^3.9",
         "spatie/laravel-sluggable": "^4.0",
-        "spatie/laravel-tags": "^4.12"
+        "spatie/laravel-tags": "^4.12",
+        "themesberg/flowbite-laravel-components": "dev-main"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -100,9 +101,15 @@
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
-    "repositories": [{
-        "name": "flux-pro",
-        "type": "composer",
-        "url": "https://composer.fluxui.dev"
-    }]
+    "repositories": [
+        {
+            "name": "flux-pro",
+            "type": "composer",
+            "url": "https://composer.fluxui.dev"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/aliqasemzadeh/flowbite-laravel-components"
+        }
+    ]
 }

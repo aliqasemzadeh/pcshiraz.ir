@@ -7,10 +7,10 @@ Multi-domain e-commerce platform for selling computer parts and related products
 | Layer | Technology |
 | --- | --- |
 | Backend | PHP 8.4, Laravel 13 |
-| UI | Livewire 4 (single-file components), Flowbite, Tailwind CSS 4, Alpine.js |
+| UI | Livewire 4 (single-file components), Flowbite Blade (`x-fwb.*`), Tailwind CSS 4, Alpine.js |
 | Tables | Livewire PowerGrid v6 |
 | Modals | `elegantly/livewire-modal` (slideovers for create/edit) |
-| Toasts | `masmerise/livewire-toaster` |
+| Toasts | `masmerise/livewire-toaster` (Flowbite-styled hub) |
 | Icons | Lucide via `mallardduck/blade-lucide-icons` |
 | Auth | Mobile OTP (`spatie/laravel-one-time-passwords`) |
 | Access control | Spatie Permission |

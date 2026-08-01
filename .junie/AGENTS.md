@@ -11,10 +11,11 @@ You are an expert full-stack developer working on a Laravel project. Your task i
 *   **Frontend:** TailwindCSS, AlpineJS (for UI interactions), Flowbite JS (for interactive UI like dropdown, tooltip, datepicker)
 *   **Livewire:** Version 4 (Do NOT use Volt; use standard `Livewire\Component`)
 *   **UI Library:** Flowbite (https://flowbite.com/) — full LLM docs: https://raw.githubusercontent.com/themesberg/flowbite/refs/heads/main/llms-full.txt
-*   **Icons:** Lucide via `mallardduck/blade-lucide-icons` (https://lucide.dev/icons). Use Blade components: `<x-lucide-pencil class="w-4 h-4" />`. Icon names use kebab-case matching Lucide (e.g. `pencil`, `trash-2`, `plus`, `search`, `chevron-down`).
+*   **Blade UI components:** `themesberg/flowbite-laravel-components` (installed from [aliqasemzadeh fork](https://github.com/aliqasemzadeh/flowbite-laravel-components) via Composer VCS for Laravel 13). Use `<x-fwb.*>` for presentational UI.
+*   **Icons:** Lucide via `mallardduck/blade-lucide-icons` (https://lucide.dev/icons). Use Blade components: `<x-lucide-pencil class="w-4 h-4" />`. Icon names use kebab-case matching Lucide (e.g. `pencil`, `trash-2`, `plus`, `search`, `chevron-down`). Prefer Lucide in the `icon` slot of `x-fwb.*` over `fwb-icon`.
 *   **Tables:** `power-components/livewire-powergrid` v6 (https://github.com/Power-Components/livewire-powergrid) — demo/reference: https://github.com/Power-Components/powergrid-demo and https://demo.livewire-powergrid.com. Docs: https://livewire-powergrid.com
-*   **Modals:** `elegantly/livewire-modal` (https://elegantly.dev/livewire-modal) — NOT Flowbite modals/drawers for CRUD forms.
-*   **Toasts:** `masmerise/livewire-toaster` — use `Masmerise\Toaster\Toaster` facade.
+*   **Modals:** `elegantly/livewire-modal` (https://elegantly.dev/livewire-modal) — NOT Flowbite modals/drawers / `x-fwb.modal` / `x-fwb.drawer` for CRUD forms.
+*   **Toasts:** `masmerise/livewire-toaster` — use `Masmerise\Toaster\Toaster` facade. Hub views are re-skinned to match Flowbite toast. Do not call `<x-fwb.toast>` from Livewire actions.
 *   **Do NOT use FluxUI** (`flux:*` components, `Flux::toast`, `Flux::modal`, `php artisan flux:icon`).
 *   **Do NOT hand-roll HTML `<table>` lists** for CRUD indexes — always use PowerGrid.
 
@@ -64,14 +65,18 @@ import '../../vendor/masmerise/livewire-toaster/resources/js';
 Ensure Tailwind content / `@source` includes (PowerGrid is already wired in `resources/css/app.css`):
 *   PowerGrid Tailwind 4 CSS import + `@source` for `app/Livewire/*Table.php`, vendor views, and `Tailwind.php` theme
 *   `./vendor/elegantly/livewire-modal/resources/views/**/*.blade.php`
-*   `./vendor/masmerise/livewire-toaster/resources/views/*.blade.php`
-*   Flowbite paths as required by the Flowbite Laravel/Tailwind setup
+*   Published toaster views under `resources/views/vendor/toaster/` (and/or vendor toaster views)
+*   `./vendor/themesberg/flowbite-laravel-components/resources/views/**/*.blade.php`
+*   `./vendor/themesberg/flowbite-laravel-components/src/**/*.php`
+*   Flowbite theme: `@import 'flowbite/src/themes/default';` + `@plugin "flowbite/plugin"`
 
 Initialize Flowbite for interactive widgets (dropdown, tooltip, datepicker, etc.) after Livewire navigations when needed (`initFlowbite()`).
 
 ## 6. Flowbite Component Rules & UI Innovation
 *   **Innovative UI/UX:** Build modern, clean UIs with Flowbite patterns + Tailwind utility classes (smart empty states, loading transitions, clean alignment, modern spacing).
-*   Prefer Flowbite HTML/class patterns from https://flowbite.com/ and the llms-full.txt guide. Do not invent a parallel component API.
+*   Prefer `<x-fwb.*>` Blade components for static/presentational UI (`alert`, `badge`, `card`, `button`, `accordion`, `tabs`, `breadcrumb`, `input`, etc.). Fall back to Flowbite HTML/class patterns from https://flowbite.com/ and the llms-full.txt guide when a component does not fit.
+*   **Do NOT use** `x-fwb.modal` / `x-fwb.drawer` for CRUD (keep `elegantly/livewire-modal`), `x-fwb.table` for CRUD lists (keep PowerGrid), or `x-fwb.layouts.*` (keep `layouts.app` / `layouts.panels` / `layouts.auth`).
+*   `default_color` is `indigo` in `config/flowbite-blade.php` — match the brand palette unless intentionally overriding.
 
 ### Layout & Pages
 *   **Page Titles:** Use `<x-slot name="title">Page Title - {{ config('app.name') }}</x-slot>`.
@@ -385,10 +390,10 @@ final class UserTable extends PowerGridComponent
 ## 10. Quick Package Cheatsheet
 | Concern | Package / Tool | API |
 |---|---|---|
-| UI kit | Flowbite | Tailwind classes + data attributes + `initFlowbite()` |
+| UI kit | Flowbite + `themesberg/flowbite-laravel-components` (aliqasemzadeh VCS) | `<x-fwb.*>`, data attributes + `initFlowbite()` |
 | Tables | `power-components/livewire-powergrid` | `PowerGridComponent`, `Column::make()->searchable()`, `relationSearch()` |
 | Icons | `mallardduck/blade-lucide-icons` | `<x-lucide-{name} class="w-4 h-4" />` |
 | Modal / Slideover | `elegantly/livewire-modal` | `x-modal:open`, `modal-open` / `modal-close`, `<x-livewire-modal::slideover>` |
-| Toast | `masmerise/livewire-toaster` | `Toaster::success()`, `<x-toaster-hub />` |
+| Toast | `masmerise/livewire-toaster` (Flowbite-styled hub) | `Toaster::success()`, `<x-toaster-hub />` |
 | Dates | `morilog/jalali` | Jalali formatting/parsing everywhere |
 | Permissions | `spatie/laravel-permission` v6 | `/lang/{fa,en}/permissions.php` |

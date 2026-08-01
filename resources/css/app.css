@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'flowbite/src/themes/default';
 @import '../../vendor/power-components/livewire-powergrid/resources/css/tailwind4.css';
 @import "vazirmatn/Vazirmatn-font-face.css";
 
@@ -22,6 +23,8 @@
 @source '../../vendor/power-components/livewire-powergrid/resources/views/**/*.php';
 @source '../../vendor/elegantly/livewire-modal/resources/views/**/*.blade.php';
 @source '../../vendor/masmerise/livewire-toaster/resources/views/*.blade.php';
+@source '../../vendor/themesberg/flowbite-laravel-components/resources/views/**/*.blade.php';
+@source '../../vendor/themesberg/flowbite-laravel-components/src/**/*.php';
 @source '../../node_modules/flowbite/**/*.js';
 
 [x-cloak] {
