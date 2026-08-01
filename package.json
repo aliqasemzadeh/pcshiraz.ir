@@ -15,6 +15,7 @@
     },
     "dependencies": {
         "flowbite": "^4.0.2",
+        "smoothscroll-polyfill": "^0.4.4",
         "vazirmatn": "^33.0.3"
     }
 }

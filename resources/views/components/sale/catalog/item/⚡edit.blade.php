@@ -6,7 +6,6 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Item;
 use App\Services\Shop\CategoryMenuService;
-use App\Support\CurrentDomain;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -29,10 +28,7 @@ new class extends Component
     {
         $this->itemId = $itemId;
 
-        $domainId = CurrentDomain::get()?->id;
-
         $item = Item::query()
-            ->when($domainId, fn ($query) => $query->where('domain_id', $domainId))
             ->with(['media', 'tags'])
             ->findOrFail($itemId);
 
@@ -65,24 +61,14 @@ new class extends Component
 
     public function save(CategoryMenuService $categoryMenuService): void
     {
-        $domain = CurrentDomain::get();
-
-        if ($domain === null) {
-            Toaster::error(__('general.error'));
-
-            return;
-        }
-
-        $item = Item::query()
-            ->where('domain_id', $domain->id)
-            ->findOrFail($this->itemId);
+        $item = Item::query()->findOrFail($this->itemId);
 
         if ($this->form->group_id === null || $this->form->group_id === 0 || $this->form->group_id === '') {
             $this->form->group_id = $item->group_id;
         }
 
         $this->form->update($item);
-        $categoryMenuService->forget($domain);
+        $categoryMenuService->forget();
 
         Toaster::success(__('general.saved'));
         $this->dispatch('modal-close');
@@ -105,16 +91,7 @@ new class extends Component
     #[Computed]
     public function brands(): array
     {
-        $domainId = CurrentDomain::get()?->id;
-
-        $options = ['' => __('general.select_brand')];
-
-        if ($domainId === null) {
-            return $options;
-        }
-
-        return $options + Brand::query()
-            ->where('domain_id', $domainId)
+        return ['' => __('general.select_brand')] + Brand::query()
             ->orderBy('title')
             ->pluck('title', 'id')
             ->all();
@@ -123,16 +100,7 @@ new class extends Component
     #[Computed]
     public function categories(): array
     {
-        $domainId = CurrentDomain::get()?->id;
-
-        $options = ['' => __('general.select_category')];
-
-        if ($domainId === null) {
-            return $options;
-        }
-
-        return $options + Category::query()
-            ->where('domain_id', $domainId)
+        return ['' => __('general.select_category')] + Category::query()
             ->orderBy('title')
             ->pluck('title', 'id')
             ->all();
@@ -147,16 +115,9 @@ new class extends Component
     #[Computed]
     public function groups(): array
     {
-        $domainId = CurrentDomain::get()?->id;
-
         $options = ['' => __('general.no_group')];
 
-        if ($domainId === null) {
-            return $options;
-        }
-
         $mains = Item::query()
-            ->where('domain_id', $domainId)
             ->whereNotNull('group_id')
             ->where('is_main', true)
             ->orderBy('title')
