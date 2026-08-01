@@ -27,11 +27,12 @@ class CatalogCache
 
     public static function categoryFilters(int $categoryId): string
     {
-        return "shop.category.{$categoryId}.filters";
+        return "shop.category.{$categoryId}.filters.v2";
     }
 
     public static function forgetCategory(int $categoryId): void
     {
         Cache::forget(self::categoryFilters($categoryId));
+        Cache::forget("shop.category.{$categoryId}.filters");
     }
 }

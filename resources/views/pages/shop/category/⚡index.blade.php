@@ -62,7 +62,14 @@ new #[Layout('layouts.app')] class extends Component
                 ->whereIn('id', (clone $base)->select('brand_id')->distinct())
                 ->orderBy('sort_order')
                 ->orderBy('title')
-                ->get(['id', 'title', 'slug']);
+                ->get(['id', 'title', 'slug'])
+                ->map(fn (Brand $brand) => [
+                    'id' => $brand->id,
+                    'title' => $brand->title,
+                    'slug' => $brand->slug,
+                ])
+                ->values()
+                ->all();
 
             $colors = (clone $base)
                 ->whereNotNull('color_name')
@@ -138,8 +145,8 @@ new #[Layout('layouts.app')] class extends Component
                 <div class="max-h-64 space-y-2 overflow-y-auto">
                     @foreach ($this->filterOptions['brands'] as $brand)
                         <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
-                            <input type="checkbox" wire:model.live="brands" value="{{ $brand->id }}" class="rounded border-gray-300 text-brand focus:ring-brand" />
-                            <span>{{ $brand->title }}</span>
+                            <input type="checkbox" wire:model.live="brands" value="{{ $brand['id'] }}" class="rounded border-gray-300 text-brand focus:ring-brand" />
+                            <span>{{ $brand['title'] }}</span>
                         </label>
                     @endforeach
                 </div>
