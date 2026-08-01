@@ -3,7 +3,6 @@
 namespace App\Livewire\Sale\Catalog;
 
 use App\Models\Category;
-use App\Support\CurrentDomain;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\View\View;
 use Morilog\Jalali\Jalalian;
@@ -28,11 +27,7 @@ final class CategoryTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        $domainId = CurrentDomain::get()?->id;
-
         return Category::query()
-            ->when($domainId, fn (Builder $query) => $query->where('domain_id', $domainId))
-            ->when(! $domainId, fn (Builder $query) => $query->whereRaw('1 = 0'))
             ->with('media')
             ->orderBy('sort_order')
             ->orderBy('title');
@@ -67,6 +62,11 @@ final class CategoryTable extends PowerGridComponent
             ->add('slug')
             ->add('seo_title')
             ->add('sort_order')
+            ->add('show_on_home_label', function (Category $category) {
+                return $category->show_on_home
+                    ? '<span class="text-fg-success-strong">'.e(__('general.yes')).'</span>'
+                    : '<span class="text-body">'.e(__('general.no')).'</span>';
+            })
             ->add('created_at_formatted', function (Category $category) {
                 if ($category->created_at === null) {
                     return '—';
@@ -95,6 +95,9 @@ final class CategoryTable extends PowerGridComponent
                 ->sortable(),
 
             Column::make(__('general.sort_order'), 'sort_order')
+                ->sortable(),
+
+            Column::make(__('app.show_on_home'), 'show_on_home_label', 'show_on_home')
                 ->sortable(),
 
             Column::make(__('general.created_at'), 'created_at_formatted', 'created_at')

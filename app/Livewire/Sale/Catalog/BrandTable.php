@@ -3,7 +3,6 @@
 namespace App\Livewire\Sale\Catalog;
 
 use App\Models\Brand;
-use App\Support\CurrentDomain;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\View\View;
 use Morilog\Jalali\Jalalian;
@@ -28,11 +27,7 @@ final class BrandTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        $domainId = CurrentDomain::get()?->id;
-
         return Brand::query()
-            ->when($domainId, fn (Builder $query) => $query->where('domain_id', $domainId))
-            ->when(! $domainId, fn (Builder $query) => $query->whereRaw('1 = 0'))
             ->with('media')
             ->orderBy('sort_order')
             ->orderBy('title');

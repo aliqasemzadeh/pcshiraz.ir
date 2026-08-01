@@ -35,6 +35,7 @@ final class UserTable extends PowerGridComponent
         return PowerGrid::fields()
             ->add('id')
             ->add('mobile')
+            ->add('full_name', fn (User $user) => $user->full_name !== '' ? $user->full_name : '—')
             ->add('created_at_formatted', function (User $user) {
                 if ($user->created_at === null) {
                     return '—';
@@ -50,6 +51,9 @@ final class UserTable extends PowerGridComponent
             Column::make(__('general.mobile'), 'mobile')
                 ->searchable()
                 ->sortable(),
+
+            Column::make(__('general.first_name').' / '.__('general.last_name'), 'full_name')
+                ->searchable(),
 
             Column::make(__('general.created_at'), 'created_at_formatted', 'created_at')
                 ->sortable(),
