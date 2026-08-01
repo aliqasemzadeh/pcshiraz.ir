@@ -27,7 +27,7 @@
         :dropzone="$dropzone"
         :id="$id"
         :attributes="$attributes->merge([
-            'x-bind:disabled' => '$store.ui.busy && !uploading',
+            'x-bind:disabled' => 'Boolean($store.ui?.busy) && !uploading',
         ])"
     />
 

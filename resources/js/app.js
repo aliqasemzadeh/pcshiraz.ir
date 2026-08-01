@@ -29,6 +29,27 @@ document.addEventListener('alpine:init', () => {
     });
 });
 
+document.addEventListener('livewire:init', () => {
+    if (!Alpine.store('ui')) {
+        Alpine.store('ui', {
+            busy: false,
+            busyCount: 0,
+            start() {
+                this.busyCount++;
+                this.busy = true;
+            },
+            end() {
+                this.busyCount = Math.max(0, this.busyCount - 1);
+                this.busy = this.busyCount > 0;
+            },
+            reset() {
+                this.busyCount = 0;
+                this.busy = false;
+            },
+        });
+    }
+});
+
 document.addEventListener('livewire:navigated', () => {
     if (window.Alpine?.store('ui')) {
         Alpine.store('ui').reset();
