@@ -189,16 +189,21 @@ Ensure Tailwind content / `@source` includes (PowerGrid is already wired in `res
         position="{{ __('general.direction') === 'rtl' ? 'end' : 'start' }}"
         class="w-full max-w-md overflow-auto bg-white p-5 dark:bg-gray-800"
     >
-        <h2 class="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
+        <h2 class="mb-4 text-xl font-semibold text-heading">
             {{ __('general.create_user') }}
         </h2>
 
         <form wire:submit="save" class="space-y-4">
-            {{-- fields --}}
+            <div>
+                <x-fwb.input wire:model="form.name" :label="__('general.name')" type="text" />
+                @error('form.name')
+                    <p class="mt-2 text-sm text-fg-danger-strong">{{ $message }}</p>
+                @enderror
+            </div>
 
-            <button type="submit" class="w-full text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-teal-600 dark:hover:bg-teal-700 focus:outline-none dark:focus:ring-teal-800">
+            <x-ui.button type="submit" color="green" target="save" class="w-full">
                 {{ __('general.save') }}
-            </button>
+            </x-ui.button>
         </form>
     </x-livewire-modal::slideover>
 </x-livewire-modal::stack>
@@ -211,71 +216,70 @@ Ensure Tailwind content / `@source` includes (PowerGrid is already wired in `res
         position="center"
         class="w-full max-w-md overflow-auto rounded-lg bg-white p-5 dark:bg-gray-800"
     >
-        <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
+        <h3 class="mb-2 text-lg font-semibold text-heading">
             {{ __('general.delete_confirmation') }}
         </h3>
-        <p class="mb-6 text-sm text-gray-500 dark:text-gray-400">
+        <p class="mb-6 text-sm text-body">
             {{ __('general.delete_warning_message') }}
             <br>
             {{ __('general.action_cannot_be_reversed') }}
         </p>
         <div class="flex justify-end gap-2">
-            <button type="button" x-modal:close class="py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:ring-4 focus:ring-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+            <x-ui.button type="button" color="light" outline :loading="false" x-modal:close>
                 {{ __('general.cancel') }}
-            </button>
-            <button type="button" wire:click="delete" class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none dark:focus:ring-red-800">
+            </x-ui.button>
+            <x-ui.button type="button" color="red" target="delete" wire:click="delete">
                 {{ __('general.delete') }}
-            </button>
+            </x-ui.button>
         </div>
     </x-livewire-modal::modal>
 </x-livewire-modal::stack>
 ```
 
-### Forms & Inputs (Flowbite)
-*   Use Flowbite form control classes (`bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5`).
-*   Always show labels and `@error` / Livewire error messages under fields.
-*   **Numbers:** `<input type="number" ...>`.
-*   **Selects:** Prefer searchable selects (Flowbite dropdown+search pattern or Select2-like Flowbite examples). For DB-driven options, load via Livewire computed properties / backend search.
-*   **Multi-select:** Use Flowbite multi-select / checkbox dropdown patterns.
-*   **Dates:** Use Flowbite Datepicker (`datepicker` data attributes) with Jalali display via `morilog/jalali` on the backend/format layer. All dates must be Jalali.
-*   **Booleans / switches:** Use Flowbite toggle switch markup with `wire:model` (not `.live` unless requested).
-*   **File uploads:** Use Flowbite file input styles. Inside slideovers/modals keep uploads compact/inline.
+### Forms & Inputs (`x-fwb.*` — REQUIRED)
+*   **ALWAYS** use Flowbite Blade form components from `themesberg/flowbite-laravel-components` (see [Forms](https://github.com/themesberg/flowbite-laravel-components#forms)):
+    *   `<x-fwb.input>` — text, email, number, password, etc.
+    *   `<x-fwb.textarea>`
+    *   `<x-fwb.select>`
+    *   `<x-fwb.checkbox>` / `<x-fwb.radio>`
+    *   `<x-fwb.toggle>` — booleans / switches
+    *   `<x-fwb.range>`
+    *   `<x-fwb.floating-label>` — when floating labels are needed
+    *   **File uploads:** `<x-ui.file-input>` (wraps `<x-fwb.file-input>` + Livewire upload progress bar). Do **not** use bare `<x-fwb.file-input>` for Livewire uploads.
+*   Do **not** hand-roll raw `<input>` / `<select>` / `<textarea>` with Flowbite utility classes when an `x-fwb.*` form component exists.
+*   Always show labels (via component `:label`) and `@error` / Livewire error messages under fields.
+*   **Numbers:** `<x-fwb.input type="number" ...>`.
+*   **Selects:** Prefer `<x-fwb.select searchable>` when available; for DB-driven options use Livewire computed / backend search.
+*   **Dates:** Flowbite Datepicker (`datepicker` data attributes) + Jalali via `morilog/jalali`. All dates must be Jalali.
+*   **File upload progress (REQUIRED):** `<x-ui.file-input wire:model="form.logo" :label="__('general.logo')" />` shows `<x-fwb>`-styled progress during `livewire-upload-*` events and locks other `<x-ui.button>`s via Alpine `$store.ui.busy`.
 
 ### Buttons & Actions
-*   Use Flowbite button class sets. Map actions to colors:
-    *   Save / Create / Import → teal or green (`bg-teal-700` / `bg-green-700`)
-    *   Edit → blue (`bg-blue-700`)
-    *   Delete → red (`bg-red-700`)
-    *   Neutral / secondary → gray/light alternative button classes
-*   **One page action:** single button.
-*   **Multiple page actions:** Flowbite dropdown menu to avoid mobile overflow.
-*   **Row actions:** icon-only small buttons with Lucide icons + Flowbite tooltip. For PowerGrid tables use `actionsFromView()` + `components.powergrid.row-actions` (`<x-fwb.tooltip>`). For non-PowerGrid Blade lists (rare), use `data-tooltip-target` + tooltip div:
+*   **REQUIRED action button:** Always use `<x-ui.button>` (wraps `<x-fwb.button>`). It shows spinner + `__('general.working')` while the Livewire request runs, and `wire:loading.attr="disabled"` so sibling buttons cannot be clicked until the request finishes. During file upload, `$store.ui.busy` also disables all `<x-ui.button>`s.
+*   Pass `target="methodName"` to scope the loading label (e.g. `target="save"`, `target="delete"`).
+*   Secondary / cancel buttons that must not show the working label: `:loading="false"` (they still disable while busy).
+*   Color mapping via `color` prop on `<x-ui.button>` / `<x-fwb.button>`:
+    *   Save / Create / Import → `color="green"`
+    *   Edit / primary brand → default / `color="blue"` (brand)
+    *   Delete → `color="red"`
+    *   Neutral / cancel → `color="light"` + `outline`
+*   **One page action:** single `<x-ui.button>`.
+*   **Multiple page actions:** `<x-fwb.dropdown>` to avoid mobile overflow.
+*   **Tooltips (REQUIRED):** Always use `<x-fwb.tooltip>` with `<x-slot:triggerSlot>`. Do **not** hand-roll `data-tooltip-target` markup when wrapping interactive triggers.
     ```html
-    <button
-        type="button"
-        data-tooltip-target="tooltip-edit-{{ $user->id }}"
-        wire:click="$dispatch('panels.administrator.user.edit.assign-data', { user: {{ $user->id }} })"
-        class="inline-flex items-center justify-center p-2 text-white bg-brand border border-transparent rounded-base shadow-xs hover:bg-brand-strong focus:outline-none focus:ring-4 focus:ring-brand-medium"
-    >
-        <x-lucide-pencil class="w-4 h-4" />
-        <span class="sr-only">{{ __('general.edit') }}</span>
-    </button>
-    <div id="tooltip-edit-{{ $user->id }}" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-dark rounded-lg shadow-sm opacity-0 tooltip">
+    <x-fwb.tooltip :id="'tooltip-edit-'.$user->id" placement="top">
+        <x-slot:triggerSlot>
+            <x-ui.button type="button" size="xs" wire:click="...">
+                <x-lucide-pencil class="w-4 h-4" />
+            </x-ui.button>
+        </x-slot:triggerSlot>
         {{ __('general.edit') }}
-        <div class="tooltip-arrow" data-popper-arrow></div>
-    </div>
+    </x-fwb.tooltip>
     ```
-*   In forms/modals only use full-width primary save buttons.
+*   **Row actions (PowerGrid):** `actionsFromView()` + `components.powergrid.row-actions` (`<x-fwb.tooltip>` + Lucide icon buttons).
+*   In forms/modals only use full-width primary save buttons (`class="w-full"` on `<x-ui.button>`).
 
 ### Data Display
-*   Use Flowbite Alert / Callout-style boxes to display record summaries (permissions, roles, users) inside modals:
-    ```html
-    <div class="flex items-center p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
-        <x-lucide-info class="shrink-0 w-4 h-4 me-2" />
-        <div>...</div>
-    </div>
-    ```
-
+*   Prefer `<x-fwb.alert>` for record summaries inside modals; Lucide icons in the default/icon slot when needed.
 ## 7. Localization & Permissions (STRICT RULES)
 *   **General Translations:** ALL UI texts, actions, and general words MUST be translated using ONLY the `general.php` file (e.g., `{{ __('general.create_user') }}` or `{{ __('general.save') }}`). Do NOT use other files for standard interface texts.
 *   **Permissions List:** Use Spatie Laravel Permission v6. The COMPLETE list of permissions MUST be stored strictly inside `/lang/fa/permissions.php` and `/lang/en/permissions.php`.
@@ -299,21 +303,24 @@ Ensure Tailwind content / `@source` includes (PowerGrid is already wired in `res
 <div>
     <div class="space-y-6">
         <div class="flex items-center justify-between">
-            <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">{{ __('general.users') }}</h1>
+            <h1 class="text-2xl font-semibold text-heading">{{ __('general.users') }}</h1>
 
-            <button
+            <x-ui.button
                 type="button"
+                color="green"
+                :loading="false"
                 x-modal:open="{ modal: 'user.create' }"
-                class="inline-flex items-center gap-2 text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-teal-600 dark:hover:bg-teal-700 focus:outline-none dark:focus:ring-teal-800"
             >
-                <x-lucide-plus class="w-4 h-4" />
+                <x-slot:icon>
+                    <x-lucide-plus class="w-4 h-4 me-2" />
+                </x-slot:icon>
                 {{ __('general.create_user') }}
-            </button>
+            </x-ui.button>
         </div>
 
-        <div class="bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 p-4 sm:p-6">
+        <x-fwb.card>
             <livewire:user-table :key="'user-table'" />
-        </div>
+        </x-fwb.card>
     </div>
 </div>
 ```
