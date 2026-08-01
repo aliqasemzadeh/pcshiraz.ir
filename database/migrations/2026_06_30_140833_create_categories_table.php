@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('domain_id')->constrained()->cascadeOnDelete();
             $table->string('title');
             $table->string('seo_title')->nullable();
             $table->string('slug');
