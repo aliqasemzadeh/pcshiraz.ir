@@ -53,6 +53,8 @@ return [
     'actions' => 'Actions',
     'save' => 'Save',
     'cancel' => 'Cancel',
+    'working' => 'Working...',
+    'uploading' => 'Uploading...',
     'edit' => 'Edit',
     'delete' => 'Delete',
     'create_category' => 'Create category',
