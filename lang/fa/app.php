@@ -5,6 +5,7 @@ return [
     'is_purchasable' => 'قابل خرید',
     'is_active' => 'فعال در فروشگاه',
     'show_on_home' => 'نمایش در صفحه اول',
+    'sort_by' => 'مرتب‌سازی',
     'sort_price_asc' => 'ارزان‌ترین',
     'sort_price_desc' => 'گران‌ترین',
     'filter_brand' => 'فیلتر برند',

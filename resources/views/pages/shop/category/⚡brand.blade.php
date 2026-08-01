@@ -103,7 +103,7 @@ new #[Layout('layouts.app')] class extends Component
 ?>
 
 <div class="space-y-6">
-    <div class="flex flex-wrap items-end justify-between gap-3">
+    <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
                 {{ $category->title }}
@@ -115,53 +115,26 @@ new #[Layout('layouts.app')] class extends Component
             </a>
         </div>
 
-        <div class="min-w-48">
-            <x-fwb.select
-                wire:model.live="sort"
-                :label="__('app.cash_price')"
-                :options="[
-                    'price_asc' => __('app.sort_price_asc'),
-                    'price_desc' => __('app.sort_price_desc'),
-                ]"
-            />
-        </div>
+        <x-shop.catalog-filters
+            :id="'category-brand-'.$category->id.'-'.$brand->id"
+            :sort="$sort"
+            :colors="$this->colorOptions"
+            :selected-colors="$colors"
+        />
     </div>
 
-    <div class="grid gap-6 lg:grid-cols-[240px_1fr]">
-        <aside class="space-y-6 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-            @if (count($this->colorOptions) > 0)
-                <div>
-                    <h2 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white">{{ __('app.filter_color') }}</h2>
-                    <div class="max-h-64 space-y-2 overflow-y-auto">
-                        @foreach ($this->colorOptions as $color)
-                            <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
-                                <input type="checkbox" wire:model.live="colors" value="{{ $color['name'] }}" class="rounded border-gray-300 text-brand focus:ring-brand" />
-                                @if ($color['code'])
-                                    <span class="inline-block h-3.5 w-3.5 rounded-full border border-gray-300" style="background-color: {{ $color['code'] }}"></span>
-                                @endif
-                                <span>{{ $color['name'] }}</span>
-                            </label>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
-        </aside>
-
-        <div>
-            @if ($this->items->isEmpty())
-                <div class="rounded-lg border border-dashed border-gray-300 p-8 text-center text-gray-500 dark:border-gray-600">
-                    {{ __('app.no_products') }}
-                </div>
-            @else
-                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-                    @foreach ($this->items as $item)
-                        <x-shop.item-card :item="$item" :show-brand="false" />
-                    @endforeach
-                </div>
-                <div class="mt-6">
-                    {{ $this->items->links() }}
-                </div>
-            @endif
+    @if ($this->items->isEmpty())
+        <div class="rounded-lg border border-dashed border-gray-300 p-8 text-center text-gray-500 dark:border-gray-600">
+            {{ __('app.no_products') }}
         </div>
-    </div>
+    @else
+        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+            @foreach ($this->items as $item)
+                <x-shop.item-card :item="$item" :show-brand="false" />
+            @endforeach
+        </div>
+        <div class="mt-6">
+            {{ $this->items->links() }}
+        </div>
+    @endif
 </div>

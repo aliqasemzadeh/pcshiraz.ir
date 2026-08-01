@@ -5,6 +5,7 @@ return [
     'is_purchasable' => 'Purchasable',
     'is_active' => 'Active in shop',
     'show_on_home' => 'Show on homepage',
+    'sort_by' => 'Sort by',
     'sort_price_asc' => 'Lowest price',
     'sort_price_desc' => 'Highest price',
     'filter_brand' => 'Filter brand',
