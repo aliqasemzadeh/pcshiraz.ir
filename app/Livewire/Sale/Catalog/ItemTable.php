@@ -3,7 +3,6 @@
 namespace App\Livewire\Sale\Catalog;
 
 use App\Models\Item;
-use App\Support\CurrentDomain;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\View\View;
 use Morilog\Jalali\Jalalian;
@@ -28,12 +27,8 @@ final class ItemTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        $domainId = CurrentDomain::get()?->id;
-
         return Item::query()
-            ->when($domainId, fn (Builder $query) => $query->where('domain_id', $domainId))
-            ->when(! $domainId, fn (Builder $query) => $query->whereRaw('1 = 0'))
-            ->with(['brand', 'category', 'media', 'tags'])
+            ->with(['brand', 'category', 'media', 'tags', 'activeCashPrice'])
             ->orderByDesc('id');
     }
 
@@ -91,6 +86,16 @@ final class ItemTable extends PowerGridComponent
                     ? '<span class="text-fg-success-strong">'.e(__('general.yes')).'</span>'
                     : '<span class="text-body">'.e(__('general.no')).'</span>';
             })
+            ->add('is_active_label', function (Item $item) {
+                return $item->is_active
+                    ? '<span class="text-fg-success-strong">'.e(__('general.yes')).'</span>'
+                    : '<span class="text-body">'.e(__('general.no')).'</span>';
+            })
+            ->add('is_purchasable_label', function (Item $item) {
+                return $item->is_purchasable
+                    ? '<span class="text-fg-success-strong">'.e(__('general.yes')).'</span>'
+                    : '<span class="text-body">'.e(__('general.no')).'</span>';
+            })
             ->add('item_type_label', function (Item $item) {
                 return $item->item_type?->label() ?? '—';
             })
@@ -122,6 +127,12 @@ final class ItemTable extends PowerGridComponent
                 ->visibleInExport(false),
 
             Column::make(__('general.is_main'), 'is_main_label', 'is_main')
+                ->sortable(),
+
+            Column::make(__('app.is_active'), 'is_active_label', 'is_active')
+                ->sortable(),
+
+            Column::make(__('app.is_purchasable'), 'is_purchasable_label', 'is_purchasable')
                 ->sortable(),
 
             Column::make(__('general.item_type'), 'item_type_label', 'item_type')
