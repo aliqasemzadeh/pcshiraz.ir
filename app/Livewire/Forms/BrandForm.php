@@ -3,8 +3,6 @@
 namespace App\Livewire\Forms;
 
 use App\Models\Brand;
-use App\Models\Domain;
-use App\Support\CurrentDomain;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -54,8 +52,6 @@ class BrandForm extends Form
      */
     public function rules(): array
     {
-        $domainId = $this->brand?->domain_id ?? $this->currentDomainId();
-
         return [
             'title' => ['required', 'string', 'max:255'],
             'slug' => [
@@ -63,7 +59,7 @@ class BrandForm extends Form
                 'string',
                 'max:255',
                 Rule::unique('brands', 'slug')
-                    ->where(fn ($query) => $query->where('domain_id', $domainId)->whereNull('deleted_at'))
+                    ->whereNull('deleted_at')
                     ->ignore($this->brand?->id),
             ],
             'seo_title' => ['nullable', 'string', 'max:255'],
@@ -91,13 +87,12 @@ class BrandForm extends Form
         ];
     }
 
-    public function store(Domain $domain): Brand
+    public function store(): Brand
     {
         $this->prepareSlug();
         $this->validate();
 
         $brand = Brand::query()->create([
-            'domain_id' => $domain->id,
             'title' => $this->title,
             'slug' => $this->slug,
             'seo_title' => $this->seo_title,
@@ -138,10 +133,5 @@ class BrandForm extends Form
             ->toMediaCollection('logo_image');
 
         $this->logo = null;
-    }
-
-    protected function currentDomainId(): ?int
-    {
-        return CurrentDomain::get()?->id;
     }
 }

@@ -3,9 +3,8 @@
 namespace App\Livewire\Forms;
 
 use App\Enums\ItemTypeEnum;
-use App\Models\Domain;
 use App\Models\Item;
-use App\Support\CurrentDomain;
+use App\Services\Shop\CatalogCache;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -25,6 +24,10 @@ class ItemForm extends Form
     public int|string|null $group_id = null;
 
     public bool $is_main = true;
+
+    public bool $is_active = true;
+
+    public bool $is_purchasable = true;
 
     public string $title = '';
 
@@ -67,6 +70,8 @@ class ItemForm extends Form
             : (string) $item->item_type;
         $this->group_id = $item->group_id;
         $this->is_main = (bool) $item->is_main;
+        $this->is_active = (bool) $item->is_active;
+        $this->is_purchasable = (bool) $item->is_purchasable;
         $this->title = $item->title;
         $this->slug = $item->slug;
         $this->description = $item->description;
@@ -152,32 +157,26 @@ class ItemForm extends Form
      */
     public function rules(): array
     {
-        $domainId = $this->item?->domain_id ?? $this->currentDomainId();
-
         return [
             'brand_id' => [
                 'required',
                 'integer',
-                Rule::exists('brands', 'id')->where(fn ($query) => $query
-                    ->where('domain_id', $domainId)
-                    ->whereNull('deleted_at')),
+                Rule::exists('brands', 'id')->whereNull('deleted_at'),
             ],
             'category_id' => [
                 'required',
                 'integer',
-                Rule::exists('categories', 'id')->where(fn ($query) => $query
-                    ->where('domain_id', $domainId)
-                    ->whereNull('deleted_at')),
+                Rule::exists('categories', 'id')->whereNull('deleted_at'),
             ],
             'item_type' => ['required', Rule::enum(ItemTypeEnum::class)],
             'group_id' => [
                 'nullable',
                 'integer',
-                Rule::exists('items', 'group_id')->where(fn ($query) => $query
-                    ->where('domain_id', $domainId)
-                    ->whereNull('deleted_at')),
+                Rule::exists('items', 'group_id')->whereNull('deleted_at'),
             ],
             'is_main' => ['boolean'],
+            'is_active' => ['boolean'],
+            'is_purchasable' => ['boolean'],
             'title' => ['required', 'string', 'max:255'],
             'slug' => [
                 'required',
@@ -219,6 +218,8 @@ class ItemForm extends Form
             'item_type' => __('general.item_type'),
             'group_id' => __('general.group'),
             'is_main' => __('general.is_main'),
+            'is_active' => __('app.is_active'),
+            'is_purchasable' => __('app.is_purchasable'),
             'title' => __('general.title'),
             'slug' => __('general.slug'),
             'description' => __('general.description'),
@@ -235,19 +236,20 @@ class ItemForm extends Form
         ];
     }
 
-    public function store(Domain $domain): Item
+    public function store(): Item
     {
         $this->normalizeNullableFields();
         $this->prepareSlug();
         $this->validate();
 
         $item = Item::query()->create([
-            'domain_id' => $domain->id,
             'brand_id' => $this->brand_id,
             'category_id' => $this->category_id,
             'item_type' => $this->item_type,
             'group_id' => $this->group_id,
             'is_main' => $this->is_main,
+            'is_active' => $this->is_active,
+            'is_purchasable' => $this->is_purchasable,
             'title' => $this->title,
             'slug' => $this->slug,
             'description' => $this->description,
@@ -263,6 +265,7 @@ class ItemForm extends Form
 
         $this->syncTags($item);
         $this->attachImage($item);
+        CatalogCache::forgetAll();
 
         return $item->refresh();
     }
@@ -280,6 +283,8 @@ class ItemForm extends Form
             'item_type' => $this->item_type,
             'group_id' => $this->group_id ?: $item->group_id,
             'is_main' => $this->is_main,
+            'is_active' => $this->is_active,
+            'is_purchasable' => $this->is_purchasable,
             'title' => $this->title,
             'slug' => $this->slug,
             'description' => $this->description,
@@ -295,6 +300,7 @@ class ItemForm extends Form
 
         $this->syncTags($item);
         $this->attachImage($item);
+        CatalogCache::forgetAll();
 
         return $item->refresh();
     }
@@ -349,10 +355,5 @@ class ItemForm extends Form
         }
 
         $this->remote_image_url = null;
-    }
-
-    protected function currentDomainId(): ?int
-    {
-        return CurrentDomain::get()?->id;
     }
 }

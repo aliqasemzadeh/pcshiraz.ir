@@ -3,8 +3,6 @@
 namespace App\Livewire\Forms;
 
 use App\Models\Category;
-use App\Models\Domain;
-use App\Support\CurrentDomain;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -22,6 +20,8 @@ class CategoryForm extends Form
 
     public int $sort_order = 0;
 
+    public bool $show_on_home = false;
+
     public TemporaryUploadedFile|string|null $logo = null;
 
     public function setCategory(Category $category): void
@@ -31,6 +31,7 @@ class CategoryForm extends Form
         $this->slug = $category->slug;
         $this->seo_title = $category->seo_title;
         $this->sort_order = $category->sort_order;
+        $this->show_on_home = (bool) $category->show_on_home;
         $this->logo = null;
     }
 
@@ -54,8 +55,6 @@ class CategoryForm extends Form
      */
     public function rules(): array
     {
-        $domainId = $this->category?->domain_id ?? $this->currentDomainId();
-
         return [
             'title' => ['required', 'string', 'max:255'],
             'slug' => [
@@ -63,11 +62,12 @@ class CategoryForm extends Form
                 'string',
                 'max:255',
                 Rule::unique('categories', 'slug')
-                    ->where(fn ($query) => $query->where('domain_id', $domainId)->whereNull('deleted_at'))
+                    ->whereNull('deleted_at')
                     ->ignore($this->category?->id),
             ],
             'seo_title' => ['nullable', 'string', 'max:255'],
             'sort_order' => ['required', 'integer', 'min:0'],
+            'show_on_home' => ['boolean'],
             'logo' => [
                 'nullable',
                 'file',
@@ -87,21 +87,22 @@ class CategoryForm extends Form
             'slug' => __('general.slug'),
             'seo_title' => __('general.seo_title'),
             'sort_order' => __('general.sort_order'),
+            'show_on_home' => __('app.show_on_home'),
             'logo' => __('general.logo'),
         ];
     }
 
-    public function store(Domain $domain): Category
+    public function store(): Category
     {
         $this->prepareSlug();
         $this->validate();
 
         $category = Category::query()->create([
-            'domain_id' => $domain->id,
             'title' => $this->title,
             'slug' => $this->slug,
             'seo_title' => $this->seo_title,
             'sort_order' => $this->sort_order,
+            'show_on_home' => $this->show_on_home,
         ]);
 
         $this->attachLogo($category);
@@ -120,6 +121,7 @@ class CategoryForm extends Form
             'slug' => $this->slug,
             'seo_title' => $this->seo_title,
             'sort_order' => $this->sort_order,
+            'show_on_home' => $this->show_on_home,
         ]);
 
         $this->attachLogo($category);
@@ -138,10 +140,5 @@ class CategoryForm extends Form
             ->toMediaCollection('logo_image');
 
         $this->logo = null;
-    }
-
-    protected function currentDomainId(): ?int
-    {
-        return CurrentDomain::get()?->id;
     }
 }
