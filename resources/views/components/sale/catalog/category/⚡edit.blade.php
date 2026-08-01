@@ -81,7 +81,10 @@ new class extends Component
 ?>
 
 <x-livewire-modal::stack>
-    <x-livewire-modal::slideover class="w-full max-w-md overflow-auto bg-white p-5 dark:bg-gray-800">
+    <x-livewire-modal::slideover
+        position="{{ __('general.direction') === 'rtl' ? 'end' : 'start' }}"
+        class="w-full max-w-md overflow-auto bg-white p-5 dark:bg-gray-800"
+    >
         <h2 class="mb-4 text-xl font-semibold text-heading">
             {{ __('general.edit_category') }}
         </h2>
