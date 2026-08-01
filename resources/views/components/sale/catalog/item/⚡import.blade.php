@@ -30,6 +30,8 @@ new class extends Component
             'imported' => $data,
         ]);
         $this->reset('url');
+
+        Toaster::success(__('general.saved'));
     }
 };
 ?>

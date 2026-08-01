@@ -59,6 +59,18 @@ class ItemPriceForm extends Form
 
     public function store(Item $item): ItemPrice
     {
+        if ($this->sales_cap === '' || $this->sales_cap === null) {
+            $this->sales_cap = null;
+        }
+
+        if ($this->price === '') {
+            $this->price = '0';
+        }
+
+        if ($this->sale_price === '') {
+            $this->sale_price = $this->price;
+        }
+
         $this->validate();
 
         return ItemPrice::query()->create([

@@ -37,6 +37,14 @@ final class ItemTable extends PowerGridComponent
             ->orderByDesc('id');
     }
 
+    public function relationSearch(): array
+    {
+        return [
+            'brand' => ['title'],
+            'category' => ['title'],
+        ];
+    }
+
     public function fields(): PowerGridFields
     {
         return PowerGrid::fields()
@@ -77,6 +85,7 @@ final class ItemTable extends PowerGridComponent
                     e($name),
                 );
             })
+            ->add('color_name')
             ->add('is_main_label', function (Item $item) {
                 return $item->is_main
                     ? '<span class="text-fg-success-strong">'.e(__('general.yes')).'</span>'
@@ -104,15 +113,11 @@ final class ItemTable extends PowerGridComponent
                 ->searchable()
                 ->sortable(),
 
-            Column::make(__('general.category'), 'category_title')
-                ->searchable()
-                ->sortable(),
+            Column::make(__('general.category'), 'category_title'),
 
-            Column::make(__('general.brand'), 'brand_title')
-                ->searchable()
-                ->sortable(),
+            Column::make(__('general.brand'), 'brand_title'),
 
-            Column::make(__('general.color'), 'color')
+            Column::make(__('general.color'), 'color', 'color_name')
                 ->searchable()
                 ->visibleInExport(false),
 
