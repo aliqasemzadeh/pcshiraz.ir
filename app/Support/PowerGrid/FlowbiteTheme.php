@@ -5,8 +5,8 @@ namespace App\Support\PowerGrid;
 use PowerComponents\LivewirePowerGrid\Themes\Tailwind;
 
 /**
- * PowerGrid theme aligned with Flowbite Blade Data Display tables
- * (x-fwb.table / .head / .row / .cell) — striped + hoverable by default.
+ * PowerGrid theme aligned with Flowbite products/caption table sample:
+ * thead secondary-medium, uniform primary-soft rows, card as outer frame.
  *
  * @see https://github.com/themesberg/flowbite-laravel-components#data-display
  * @see vendor/themesberg/flowbite-laravel-components/src/View/Components/Table
@@ -20,30 +20,31 @@ class FlowbiteTheme extends Tailwind
         return [
             'layout' => [
                 'base' => 'align-middle inline-block min-w-full w-full',
-                'div' => 'relative overflow-x-auto rounded-base',
+                // Outer frame (border/shadow/bg) comes from <x-fwb.card> — avoid double chrome
+                'div' => 'relative overflow-x-auto',
                 'table' => 'w-full text-sm text-left rtl:text-right text-body',
                 'container' => 'w-full',
                 'actions' => 'flex items-center gap-2',
             ],
 
             'header' => [
-                'thead' => 'text-sm text-body bg-neutral-secondary-soft border-b border-default',
+                'thead' => 'text-sm text-body bg-neutral-secondary-medium border-b border-t border-default-medium',
                 'tr' => '',
-                'th' => 'px-6 py-3 font-medium text-heading whitespace-nowrap',
-                'thAction' => 'px-6 py-3 font-medium text-heading whitespace-nowrap',
+                'th' => 'px-6 py-3 font-medium whitespace-nowrap',
+                'thAction' => 'px-6 py-3 font-medium whitespace-nowrap',
             ],
 
             'body' => [
                 'tbody' => '',
                 'tbodyEmpty' => '',
-                // Matches x-fwb.table.row with striped + hoverable
-                'tr' => 'border-b border-default odd:bg-neutral-primary even:bg-neutral-secondary-soft hover:bg-neutral-secondary-medium',
+                // Uniform rows (Flowbite products table — not striped)
+                'tr' => 'bg-neutral-primary-soft border-b border-default',
                 'td' => 'px-6 py-4 whitespace-nowrap text-body',
                 'tdEmpty' => 'px-6 py-4 whitespace-nowrap text-body',
                 'tdSummarize' => 'px-6 py-4 whitespace-nowrap text-sm text-body text-right space-y-2',
-                'trSummarize' => 'border-b border-default bg-neutral-primary',
+                'trSummarize' => 'bg-neutral-primary-soft border-b border-default',
                 'tdFilters' => '',
-                'trFilters' => 'border-b border-default bg-neutral-secondary-soft',
+                'trFilters' => 'bg-neutral-primary-soft border-b border-default',
                 'tdActionsContainer' => 'flex items-center gap-2',
             ],
         ];
@@ -54,8 +55,8 @@ class FlowbiteTheme extends Tailwind
         return [
             'view' => $this->root().'.footer',
             'select' => 'block w-auto rounded-base border border-default-medium bg-neutral-secondary-soft p-2.5 text-sm text-heading focus:border-brand focus:ring-brand-medium dark:bg-neutral-secondary-soft',
-            'footer' => 'border-t border-default bg-neutral-primary',
-            'footer_with_pagination' => 'md:flex md:flex-row w-full items-center py-3 bg-neutral-primary overflow-x-auto px-2 relative',
+            'footer' => 'border-t border-default-medium bg-neutral-primary-soft',
+            'footer_with_pagination' => 'md:flex md:flex-row w-full items-center py-3 bg-neutral-primary-soft overflow-x-auto px-2 relative',
         ];
     }
 

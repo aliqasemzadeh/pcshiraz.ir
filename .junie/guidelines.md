@@ -79,12 +79,17 @@ Ensure Tailwind content / `@source` includes (PowerGrid is already wired in `res
 ### Layout & Pages
 *   **Page Titles:** Use `<x-slot name="title">Page Title - {{ config('app.name') }}</x-slot>`.
 *   **Breadcrumbs:** Prefer `<x-fwb.breadcrumb>` / `<x-fwb.breadcrumb.item>`. Fall back to Flowbite breadcrumb markup (`nav` + `ol`) when needed.
-*   **Cards:** Optionally wrap the PowerGrid include in a Flowbite card container for page layout consistency. Do NOT build a separate manual search box above PowerGrid — use PowerGrid header search.
+*   **Cards (REQUIRED for PowerGrid indexes):** Always wrap the PowerGrid include in `<x-fwb.card>` — the card provides the Flowbite table outer frame (`bg-neutral-primary-soft border border-default rounded-base shadow-xs`). Do NOT put a second border/shadow on the PowerGrid wrapper. Do NOT build a separate manual search box above PowerGrid — use PowerGrid header search.
 
 ### Tables & Lists (`livewire-powergrid`)
 *   **Mandatory:** All index/list tables MUST use PowerGrid. Never build custom Blade `<table>` CRUD lists. Do **not** use `x-fwb.table` for CRUD indexes — PowerGrid is the list engine; visual style comes from `FlowbiteTheme`.
-*   **Theme (REQUIRED):** Config must use `App\Support\PowerGrid\FlowbiteTheme` (`config/livewire-powergrid.php`). Classes mirror Flowbite Blade Data Display (`x-fwb.table` / `.row` / `.cell`) — see https://github.com/themesberg/flowbite-laravel-components#data-display. Do **not** switch back to stock `Tailwind`/`DaisyUI`/`Bootstrap5` for CRUD tables. Do **not** override row/header background classes per table unless there is an explicit product exception.
-*   **Striped + hover (REQUIRED):** Built into `FlowbiteTheme` (`odd:bg-neutral-primary even:bg-neutral-secondary-soft hover:bg-neutral-secondary-medium`) — same as `<x-fwb.table striped hoverable>`. Every PowerGrid table gets this automatically.
+*   **Theme (REQUIRED):** Config must use `App\Support\PowerGrid\FlowbiteTheme` (`config/livewire-powergrid.php`). Visual target is the Flowbite products/caption table (Data Display) — see https://github.com/themesberg/flowbite-laravel-components#data-display. Do **not** switch back to stock `Tailwind`/`DaisyUI`/`Bootstrap5` for CRUD tables. Do **not** override row/header background classes per table unless there is an explicit product exception.
+*   **Row / header look (REQUIRED):** Built into `FlowbiteTheme` to match the Flowbite products table sample:
+    *   `thead`: `bg-neutral-secondary-medium border-b border-t border-default-medium`
+    *   `tr`: uniform `bg-neutral-primary-soft border-b border-default` (not striped)
+    *   `th` / `td`: `px-6 py-3` / `px-6 py-4`
+    *   Outer frame via `<x-fwb.card>` (not duplicated on PowerGrid `layout.div`)
+    Caption is page title / breadcrumb outside the table — do not invent PowerGrid captions unless product asks.
 *   **Create:** `php artisan powergrid:create` → class under `app/Livewire/` extending `PowerGridComponent`.
 *   **Docs / patterns:** Follow https://livewire-powergrid.com and the official demo https://github.com/Power-Components/powergrid-demo (e.g. Search With Relationship).
 *   **Unique table name:** Always set `public string $tableName = 'usersTable';` (CamelCase, unique per page). Required for refresh events.
