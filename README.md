@@ -130,12 +130,13 @@ Livewire pages are registered as `pages::…`, for example:
 - **PowerGrid tables** are the only class-based Livewire exception — place under `app/Livewire/` with a `*Table` suffix
 - Create / edit forms in **slideover modals** (`elegantly/livewire-modal`); delete uses a **centered** confirmation modal
 - Index lists use **PowerGrid** (header search + footer pagination) — do not hand-roll `<table>` CRUD lists
-- After Livewire actions, show feedback with **`Toaster::success(...)`** (`masmerise/livewire-toaster`)
+- After Livewire actions, show feedback with **`Toaster::success(...)`** (`masmerise/livewire-toaster`, Flowbite-styled hub)
+- Prefer **`<x-fwb.*>`** for presentational UI; keep PowerGrid / livewire-modal / existing layouts for CRUD shell
 - New UI copy goes in **`lang/fa/general.php`** (and `lang/en/general.php` when needed)
 - Permissions live in **`lang/fa/permissions.php`** and **`lang/en/permissions.php`**
 - Dates shown to users use **Jalali** (`morilog/jalali`)
 - Icons: Lucide Blade components (`<x-lucide-pencil class="w-4 h-4" />`)
-- UI widgets (dropdown, tooltip, datepicker): **Flowbite** patterns + `initFlowbite()` when needed
+- UI widgets (dropdown, tooltip, datepicker): **Flowbite** + `initFlowbite()`; prefer `x-fwb.*` where available
 - Event names should be fully qualified (e.g. `panels.sale.catalog.item.edit.assign-data`)
 - Do **not** use Flux UI (`flux:*`, `Flux::toast`, `php artisan flux:icon`)
 
