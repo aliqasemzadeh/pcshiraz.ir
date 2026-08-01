@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\PriceTypeEnum;
+use App\Services\Shop\CatalogCache;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -39,6 +40,9 @@ class ItemPrice extends Model
                     ->update(['is_active' => false]);
             }
         });
+
+        static::saved(fn () => CatalogCache::forgetAll());
+        static::deleted(fn () => CatalogCache::forgetAll());
     }
 
     protected function casts(): array

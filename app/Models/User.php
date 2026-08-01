@@ -7,22 +7,28 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\OneTimePasswords\Models\Concerns\HasOneTimePasswords;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['mobile', 'email', 'password'])]
+#[Fillable([
+    'mobile',
+    'first_name',
+    'last_name',
+    'national_code',
+    'birth_date',
+    'email',
+    'password',
+])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasOneTimePasswords, HasRoles, Notifiable;
+    use HasFactory, HasOneTimePasswords, HasRoles, Notifiable, SoftDeletes;
 
     /**
-     * Get the attributes that should be cast.
-     *
      * @return array<string, string>
      */
     protected function casts(): array
@@ -30,26 +36,12 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'birth_date' => 'date',
         ];
     }
 
-    /**
-     * Get the domains for the user.
-     *
-     * @return HasMany<Domain, $this>
-     */
-    public function domains(): HasMany
+    public function getFullNameAttribute(): string
     {
-        return $this->hasMany(Domain::class);
-    }
-
-    /**
-     * Get the customers for the user.
-     *
-     * @return HasMany<Customer, $this>
-     */
-    public function customers(): HasMany
-    {
-        return $this->hasMany(Customer::class);
+        return trim(($this->first_name ?? '').' '.($this->last_name ?? ''));
     }
 }
