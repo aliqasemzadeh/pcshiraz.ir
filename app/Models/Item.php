@@ -82,12 +82,12 @@ class Item extends Model implements HasMedia
 
     public function scopeActive(Builder $query): Builder
     {
-        return $query->where('is_active', true);
+        return $query->where($query->getModel()->getTable().'.is_active', true);
     }
 
     public function scopePurchasable(Builder $query): Builder
     {
-        return $query->where('is_purchasable', true);
+        return $query->where($query->getModel()->getTable().'.is_purchasable', true);
     }
 
     public function brand(): BelongsTo
