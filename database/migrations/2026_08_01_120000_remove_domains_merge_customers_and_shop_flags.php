@@ -82,17 +82,7 @@ return new class extends Migration
             return;
         }
 
-        Schema::table($table, function (Blueprint $blueprint) use ($table) {
-            try {
-                $blueprint->dropForeign([$table.'_domain_id_foreign']);
-            } catch (\Throwable) {
-                try {
-                    $blueprint->dropForeign(['domain_id']);
-                } catch (\Throwable) {
-                    // Already dropped.
-                }
-            }
-        });
+        $this->dropForeignKeyQuietly($table, $table.'_domain_id_foreign');
 
         Schema::table($table, function (Blueprint $blueprint) {
             $blueprint->dropColumn('domain_id');
@@ -119,27 +109,25 @@ return new class extends Migration
             }
         }
 
-        Schema::table('items', function (Blueprint $blueprint) {
-            try {
-                $blueprint->dropForeign(['items_domain_id_foreign']);
-            } catch (\Throwable) {
-                try {
-                    $blueprint->dropForeign(['domain_id']);
-                } catch (\Throwable) {
-                    // Already dropped.
-                }
-            }
-        });
+        $this->dropForeignKeyQuietly('items', 'items_domain_id_foreign');
 
         Schema::table('items', function (Blueprint $table) {
             $table->dropColumn('domain_id');
         });
 
-        Schema::table('items', function (Blueprint $table) {
-            $table->index(['category_id', 'is_main'], 'items_union_main_idx');
-            $table->index(['category_id', 'group_id'], 'items_union_no_group_idx');
-            $table->index(['category_id', 'title'], 'items_search_by_category_idx');
-        });
+        foreach ([
+            'items_union_main_idx' => ['category_id', 'is_main'],
+            'items_union_no_group_idx' => ['category_id', 'group_id'],
+            'items_search_by_category_idx' => ['category_id', 'title'],
+        ] as $name => $columns) {
+            try {
+                Schema::table('items', function (Blueprint $table) use ($name, $columns) {
+                    $table->index($columns, $name);
+                });
+            } catch (\Throwable) {
+                // Index may already exist.
+            }
+        }
     }
 
     protected function normalizeSlugTableAndDropDomain(string $table): void
@@ -170,26 +158,15 @@ return new class extends Migration
                 }
             }
 
-            // Drop FK first (MySQL may share the unique index with the FK).
-            Schema::table($table, function (Blueprint $blueprint) use ($table) {
-                try {
-                    $blueprint->dropForeign([$table.'_domain_id_foreign']);
-                } catch (\Throwable) {
-                    try {
-                        $blueprint->dropForeign(['domain_id']);
-                    } catch (\Throwable) {
-                        // Already dropped.
-                    }
-                }
-            });
+            $this->dropForeignKeyQuietly($table, $table.'_domain_id_foreign');
 
-            Schema::table($table, function (Blueprint $blueprint) {
-                try {
+            try {
+                Schema::table($table, function (Blueprint $blueprint) {
                     $blueprint->dropUnique(['domain_id', 'slug']);
-                } catch (\Throwable) {
-                    // Already dropped.
-                }
-            });
+                });
+            } catch (\Throwable) {
+                // Already dropped.
+            }
 
             if (Schema::hasColumn($table, 'domain_id')) {
                 Schema::table($table, function (Blueprint $blueprint) {
@@ -204,6 +181,17 @@ return new class extends Migration
             });
         } catch (\Throwable) {
             // Unique may already exist.
+        }
+    }
+
+    protected function dropForeignKeyQuietly(string $table, string $foreignName): void
+    {
+        try {
+            Schema::table($table, function (Blueprint $blueprint) use ($foreignName) {
+                $blueprint->dropForeign($foreignName);
+            });
+        } catch (\Throwable) {
+            // Already dropped or differently named.
         }
     }
 
