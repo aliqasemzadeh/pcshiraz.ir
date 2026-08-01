@@ -2,7 +2,6 @@
 
 use App\Models\Brand;
 use App\Services\Shop\CategoryMenuService;
-use App\Support\CurrentDomain;
 use Livewire\Component;
 use Masmerise\Toaster\Toaster;
 
@@ -16,31 +15,17 @@ new class extends Component
     {
         $this->brandId = $brandId;
 
-        $domainId = CurrentDomain::get()?->id;
-
-        $brand = Brand::query()
-            ->when($domainId, fn ($query) => $query->where('domain_id', $domainId))
-            ->findOrFail($brandId);
+        $brand = Brand::query()->findOrFail($brandId);
 
         $this->brandTitle = $brand->title;
     }
 
     public function delete(CategoryMenuService $categoryMenuService): void
     {
-        $domain = CurrentDomain::get();
-
-        if ($domain === null) {
-            Toaster::error(__('general.error'));
-
-            return;
-        }
-
-        $brand = Brand::query()
-            ->where('domain_id', $domain->id)
-            ->findOrFail($this->brandId);
+        $brand = Brand::query()->findOrFail($this->brandId);
 
         $brand->delete();
-        $categoryMenuService->forget($domain);
+        $categoryMenuService->forget();
 
         Toaster::success(__('general.deleted'));
         $this->dispatch('modal-close');

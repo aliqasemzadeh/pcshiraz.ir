@@ -3,7 +3,6 @@
 use App\Livewire\Forms\BrandForm;
 use App\Models\Brand;
 use App\Services\Shop\CategoryMenuService;
-use App\Support\CurrentDomain;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Masmerise\Toaster\Toaster;
@@ -22,10 +21,7 @@ new class extends Component
     {
         $this->brandId = $brandId;
 
-        $domainId = CurrentDomain::get()?->id;
-
         $brand = Brand::query()
-            ->when($domainId, fn ($query) => $query->where('domain_id', $domainId))
             ->with('media')
             ->findOrFail($brandId);
 
@@ -35,20 +31,10 @@ new class extends Component
 
     public function save(CategoryMenuService $categoryMenuService): void
     {
-        $domain = CurrentDomain::get();
-
-        if ($domain === null) {
-            Toaster::error(__('general.error'));
-
-            return;
-        }
-
-        $brand = Brand::query()
-            ->where('domain_id', $domain->id)
-            ->findOrFail($this->brandId);
+        $brand = Brand::query()->findOrFail($this->brandId);
 
         $this->form->update($brand);
-        $categoryMenuService->forget($domain);
+        $categoryMenuService->forget();
 
         Toaster::success(__('general.saved'));
         $this->dispatch('modal-close');

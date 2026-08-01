@@ -2,7 +2,6 @@
 
 use App\Livewire\Forms\BrandForm;
 use App\Services\Shop\CategoryMenuService;
-use App\Support\CurrentDomain;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Masmerise\Toaster\Toaster;
@@ -15,16 +14,8 @@ new class extends Component
 
     public function save(CategoryMenuService $categoryMenuService): void
     {
-        $domain = CurrentDomain::get();
-
-        if ($domain === null) {
-            Toaster::error(__('general.error'));
-
-            return;
-        }
-
-        $this->form->store($domain);
-        $categoryMenuService->forget($domain);
+        $this->form->store();
+        $categoryMenuService->forget();
 
         Toaster::success(__('general.saved'));
         $this->dispatch('modal-close');
