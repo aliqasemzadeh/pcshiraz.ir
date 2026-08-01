@@ -35,9 +35,10 @@ new class extends Component
     public function save(): void
     {
         $user = User::query()->findOrFail($this->userId);
+        $selectedIds = array_map('intval', $this->selectedPermissionIds);
 
         $permissionNames = Permission::query()
-            ->whereIn('id', $this->selectedPermissionIds)
+            ->whereIn('id', $selectedIds)
             ->pluck('name')
             ->all();
 
@@ -71,6 +72,7 @@ new class extends Component
                             : $permission->name.' ('.$permission->guard_name.')';
                     @endphp
                     <x-fwb.checkbox
+                        :id="'user-permission-'.$permission->id"
                         wire:model="selectedPermissionIds"
                         :value="$permission->id"
                         :label="$label"

@@ -35,9 +35,10 @@ new class extends Component
     public function save(): void
     {
         $user = User::query()->findOrFail($this->userId);
+        $selectedIds = array_map('intval', $this->selectedRoleIds);
 
         $roleNames = Role::query()
-            ->whereIn('id', $this->selectedRoleIds)
+            ->whereIn('id', $selectedIds)
             ->pluck('name')
             ->all();
 
@@ -64,6 +65,7 @@ new class extends Component
             <div class="max-h-[60vh] space-y-2 overflow-y-auto rounded-lg border border-default p-3">
                 @forelse ($this->roles as $role)
                     <x-fwb.checkbox
+                        :id="'user-role-'.$role->id"
                         wire:model="selectedRoleIds"
                         :value="$role->id"
                         :label="$role->name.' ('.$role->guard_name.')'"

@@ -35,7 +35,7 @@ new class extends Component
     public function save(): void
     {
         $role = Role::query()->findOrFail($this->roleId);
-        $currentIds = $role->users()->pluck('id')->map(fn ($id) => (int) $id)->all();
+        $currentIds = $role->users()->pluck('users.id')->map(fn ($id) => (int) $id)->all();
         $selectedIds = array_map('intval', $this->selectedUserIds);
 
         $toAttach = array_diff($selectedIds, $currentIds);
@@ -81,6 +81,7 @@ new class extends Component
                             : $user->mobile;
                     @endphp
                     <x-fwb.checkbox
+                        :id="'role-user-'.$user->id"
                         wire:model="selectedUserIds"
                         :value="$user->id"
                         :label="$label"
