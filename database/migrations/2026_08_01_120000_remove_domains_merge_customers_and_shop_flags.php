@@ -82,8 +82,63 @@ return new class extends Migration
             return;
         }
 
+        Schema::table($table, function (Blueprint $blueprint) use ($table) {
+            try {
+                $blueprint->dropForeign([$table.'_domain_id_foreign']);
+            } catch (\Throwable) {
+                try {
+                    $blueprint->dropForeign(['domain_id']);
+                } catch (\Throwable) {
+                    // Already dropped.
+                }
+            }
+        });
+
         Schema::table($table, function (Blueprint $blueprint) {
-            $blueprint->dropConstrainedForeignId('domain_id');
+            $blueprint->dropColumn('domain_id');
+        });
+    }
+
+    protected function dropDomainIdFromItems(): void
+    {
+        if (! Schema::hasTable('items') || ! Schema::hasColumn('items', 'domain_id')) {
+            return;
+        }
+
+        foreach ([
+            'items_union_main_idx',
+            'items_union_no_group_idx',
+            'items_search_by_category_idx',
+        ] as $index) {
+            try {
+                Schema::table('items', function (Blueprint $table) use ($index) {
+                    $table->dropIndex($index);
+                });
+            } catch (\Throwable) {
+                // Index may not exist.
+            }
+        }
+
+        Schema::table('items', function (Blueprint $blueprint) {
+            try {
+                $blueprint->dropForeign(['items_domain_id_foreign']);
+            } catch (\Throwable) {
+                try {
+                    $blueprint->dropForeign(['domain_id']);
+                } catch (\Throwable) {
+                    // Already dropped.
+                }
+            }
+        });
+
+        Schema::table('items', function (Blueprint $table) {
+            $table->dropColumn('domain_id');
+        });
+
+        Schema::table('items', function (Blueprint $table) {
+            $table->index(['category_id', 'is_main'], 'items_union_main_idx');
+            $table->index(['category_id', 'group_id'], 'items_union_no_group_idx');
+            $table->index(['category_id', 'title'], 'items_search_by_category_idx');
         });
     }
 
@@ -114,10 +169,6 @@ return new class extends Migration
                     ]);
                 }
             }
-
-            Schema::table($table, function (Blueprint $blueprint) {
-                $blueprint->dropForeign([$blueprint->getTable() === 'brands' || true ? 'domain_id' : 'domain_id']);
-            });
 
             // Drop FK first (MySQL may share the unique index with the FK).
             Schema::table($table, function (Blueprint $blueprint) use ($table) {
@@ -151,40 +202,9 @@ return new class extends Migration
             Schema::table($table, function (Blueprint $blueprint) {
                 $blueprint->unique('slug');
             });
-        } catch (Throwable) {
+        } catch (\Throwable) {
             // Unique may already exist.
         }
-    }
-
-    protected function dropDomainIdFromItems(): void
-    {
-        if (! Schema::hasTable('items') || ! Schema::hasColumn('items', 'domain_id')) {
-            return;
-        }
-
-        foreach ([
-            'items_union_main_idx',
-            'items_union_no_group_idx',
-            'items_search_by_category_idx',
-        ] as $index) {
-            try {
-                Schema::table('items', function (Blueprint $table) use ($index) {
-                    $table->dropIndex($index);
-                });
-            } catch (Throwable) {
-                // Index may not exist.
-            }
-        }
-
-        Schema::table('items', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('domain_id');
-        });
-
-        Schema::table('items', function (Blueprint $table) {
-            $table->index(['category_id', 'is_main'], 'items_union_main_idx');
-            $table->index(['category_id', 'group_id'], 'items_union_no_group_idx');
-            $table->index(['category_id', 'title'], 'items_search_by_category_idx');
-        });
     }
 
     protected function dropSubscriptionifyTables(): void
