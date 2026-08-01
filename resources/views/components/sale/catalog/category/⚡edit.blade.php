@@ -148,7 +148,7 @@ new class extends Component
             @endif
 
             <div>
-                <x-fwb.file-input
+                <x-ui.file-input
                     wire:model="form.logo"
                     :label="__('general.logo')"
                     accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
@@ -158,12 +158,9 @@ new class extends Component
                 @enderror
             </div>
 
-            <button
-                type="submit"
-                class="w-full rounded-lg bg-teal-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-teal-800 focus:outline-none focus:ring-4 focus:ring-teal-300 dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800"
-            >
+            <x-ui.button type="submit" color="green" target="save" class="w-full">
                 {{ __('general.save') }}
-            </button>
+            </x-ui.button>
         </form>
     </x-livewire-modal::slideover>
 </x-livewire-modal::stack>
