@@ -85,13 +85,13 @@ final class RoleTable extends PowerGridComponent
                     'modal' => 'administrator.role.permissions',
                     'icon' => 'key-round',
                     'label' => __('general.assign_permissions'),
-                    'color' => 'indigo',
+                    'color' => 'orange',
                 ],
                 [
                     'modal' => 'administrator.role.users',
                     'icon' => 'users',
                     'label' => __('general.assign_users'),
-                    'color' => 'teal',
+                    'color' => 'cyan',
                 ],
             ],
         ]);

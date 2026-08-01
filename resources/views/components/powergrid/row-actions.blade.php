@@ -24,7 +24,7 @@
                     size="icon"
                     :color="$extra['color'] ?? 'zinc'"
                     :loading="false"
-                    wire:click="$dispatch('modal-open', { modal: @js($extra['modal']), props: { {{ $idProp }}: {{ $rowId }} } })"
+                    x-on:click="Livewire.dispatch('modal-open', { modal: @js($extra['modal']), props: { {{ $idProp }}: {{ $rowId }} } })"
                 >
                     @switch($extra['icon'] ?? 'circle')
                         @case('shield')
@@ -53,7 +53,7 @@
                 size="icon"
                 color="blue"
                 :loading="false"
-                wire:click="$dispatch('modal-open', { modal: @js($editModal), props: { {{ $idProp }}: {{ $rowId }} } })"
+                x-on:click="Livewire.dispatch('modal-open', { modal: @js($editModal), props: { {{ $idProp }}: {{ $rowId }} } })"
             >
                 <x-lucide-pencil class="h-4 w-4" />
                 <span class="sr-only">{{ __('general.edit') }}</span>
@@ -69,7 +69,7 @@
                 size="icon"
                 color="red"
                 :loading="false"
-                wire:click="$dispatch('modal-open', { modal: @js($deleteModal), props: { {{ $idProp }}: {{ $rowId }} } })"
+                x-on:click="Livewire.dispatch('modal-open', { modal: @js($deleteModal), props: { {{ $idProp }}: {{ $rowId }} } })"
             >
                 <x-lucide-trash-2 class="h-4 w-4" />
                 <span class="sr-only">{{ __('general.delete') }}</span>

@@ -83,13 +83,13 @@ final class UserTable extends PowerGridComponent
                     'modal' => 'administrator.user.roles',
                     'icon' => 'shield',
                     'label' => __('general.assign_roles'),
-                    'color' => 'teal',
+                    'color' => 'purple',
                 ],
                 [
                     'modal' => 'administrator.user.permissions',
                     'icon' => 'key-round',
                     'label' => __('general.assign_permissions'),
-                    'color' => 'indigo',
+                    'color' => 'orange',
                 ],
             ],
         ]);

@@ -65,19 +65,6 @@
     --color-fg-brand: #4F46E5;
     --color-fg-brand-strong: #4338CA;
 
-    /* Remap teal → indigo so AGENTS.md teal CTAs match primary */
-    --color-teal-50: #EEF2FF;
-    --color-teal-100: #E0E7FF;
-    --color-teal-200: #C7D2FE;
-    --color-teal-300: #A5B4FC;
-    --color-teal-400: #818CF8;
-    --color-teal-500: #6366F1;
-    --color-teal-600: #4F46E5;
-    --color-teal-700: #4338CA;
-    --color-teal-800: #3730A3;
-    --color-teal-900: #312E81;
-    --color-teal-950: #1E1B4B;
-
     /* PowerGrid — override vendor blue/gray with indigo */
     --color-pg-primary-50: #EEF2FF;
     --color-pg-primary-100: #E0E7FF;
@@ -144,6 +131,4 @@
     --color-accent-strong: #059669;
     --color-sale: #F43F5E;
     --color-table-header: #1E293B;
-    --color-teal-600: #4F46E5;
-    --color-teal-700: #4338CA;
 }

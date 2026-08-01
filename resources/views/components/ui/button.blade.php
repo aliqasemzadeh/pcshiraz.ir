@@ -3,7 +3,8 @@
 
   Variants: solid | outline | gradient | gradient-shadow | duotone
   Colors (solid): blue/brand, secondary, tertiary, green/success, red/danger,
-                  yellow/warning, dark, ghost, light, purple, cyan, teal, lime, pink, orange
+                  yellow/warning, dark, ghost, light, purple, cyan, teal, lime, pink,
+                  orange, indigo, zinc, sky, amber
   Duotone keys: purple-blue, cyan-blue, green-blue, purple-pink, pink-orange, teal-lime, red-yellow
   Shape: pill (rounded-full) or default rounded-base
   Loading: spinner + __('general.working') via wire:loading; busy store disables siblings
@@ -67,6 +68,10 @@
         'lime' => 'text-heading bg-lime-400 border border-transparent hover:bg-lime-500 focus:ring-4 focus:ring-lime-300 dark:focus:ring-lime-800 shadow-xs',
         'pink' => 'text-white bg-pink-700 border border-transparent hover:bg-pink-800 focus:ring-4 focus:ring-pink-300 dark:bg-pink-600 dark:hover:bg-pink-700 dark:focus:ring-pink-800 shadow-xs',
         'orange' => 'text-white bg-orange-700 border border-transparent hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 dark:bg-orange-600 dark:hover:bg-orange-700 dark:focus:ring-orange-800 shadow-xs',
+        'indigo' => 'text-white bg-indigo-700 border border-transparent hover:bg-indigo-800 focus:ring-4 focus:ring-indigo-300 dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:ring-indigo-800 shadow-xs',
+        'zinc' => 'text-white bg-zinc-700 border border-transparent hover:bg-zinc-800 focus:ring-4 focus:ring-zinc-300 dark:bg-zinc-600 dark:hover:bg-zinc-500 dark:focus:ring-zinc-800 shadow-xs',
+        'sky' => 'text-white bg-sky-700 border border-transparent hover:bg-sky-800 focus:ring-4 focus:ring-sky-300 dark:bg-sky-600 dark:hover:bg-sky-700 dark:focus:ring-sky-800 shadow-xs',
+        'amber' => 'text-heading bg-amber-400 border border-transparent hover:bg-amber-500 focus:ring-4 focus:ring-amber-300 dark:focus:ring-amber-800 shadow-xs',
         default => 'text-white bg-brand border border-transparent hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium shadow-xs',
     };
 
@@ -81,6 +86,10 @@
         'lime' => 'text-lime-700 bg-neutral-primary border border-lime-700 hover:bg-lime-500 hover:text-heading focus:ring-4 focus:ring-lime-300',
         'pink' => 'text-pink-700 bg-neutral-primary border border-pink-700 hover:bg-pink-700 hover:text-white focus:ring-4 focus:ring-pink-300 dark:border-pink-500 dark:text-pink-500 dark:hover:bg-pink-600 dark:hover:text-white',
         'orange' => 'text-orange-700 bg-neutral-primary border border-orange-700 hover:bg-orange-700 hover:text-white focus:ring-4 focus:ring-orange-300 dark:border-orange-500 dark:text-orange-500 dark:hover:bg-orange-600 dark:hover:text-white',
+        'indigo' => 'text-indigo-700 bg-neutral-primary border border-indigo-700 hover:bg-indigo-700 hover:text-white focus:ring-4 focus:ring-indigo-300 dark:border-indigo-500 dark:text-indigo-400 dark:hover:bg-indigo-600 dark:hover:text-white',
+        'zinc' => 'text-zinc-700 bg-neutral-primary border border-zinc-700 hover:bg-zinc-700 hover:text-white focus:ring-4 focus:ring-zinc-300 dark:border-zinc-500 dark:text-zinc-400 dark:hover:bg-zinc-600 dark:hover:text-white',
+        'sky' => 'text-sky-700 bg-neutral-primary border border-sky-700 hover:bg-sky-700 hover:text-white focus:ring-4 focus:ring-sky-300 dark:border-sky-500 dark:text-sky-400 dark:hover:bg-sky-600 dark:hover:text-white',
+        'amber' => 'text-amber-700 bg-neutral-primary border border-amber-500 hover:bg-amber-500 hover:text-heading focus:ring-4 focus:ring-amber-300',
         default => 'text-fg-brand bg-neutral-primary border border-brand hover:bg-brand hover:text-white focus:ring-4 focus:ring-brand-subtle',
     };
 
@@ -94,6 +103,9 @@
         'purple' => 'text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:ring-purple-300 dark:focus:ring-purple-800',
         'orange' => 'text-white bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 hover:bg-gradient-to-br focus:ring-4 focus:ring-orange-300 dark:focus:ring-orange-800',
         'yellow' => 'text-heading bg-gradient-to-r from-yellow-200 via-yellow-400 to-yellow-500 hover:bg-gradient-to-br focus:ring-4 focus:ring-yellow-300 dark:focus:ring-yellow-800',
+        'indigo' => 'text-white bg-gradient-to-r from-indigo-500 via-indigo-600 to-indigo-700 hover:bg-gradient-to-br focus:ring-4 focus:ring-indigo-300 dark:focus:ring-indigo-800',
+        'sky' => 'text-white bg-gradient-to-r from-sky-400 via-sky-500 to-sky-600 hover:bg-gradient-to-br focus:ring-4 focus:ring-sky-300 dark:focus:ring-sky-800',
+        'amber' => 'text-heading bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500 hover:bg-gradient-to-br focus:ring-4 focus:ring-amber-300 dark:focus:ring-amber-800',
         default => 'text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800',
     };
 
@@ -107,6 +119,9 @@
         'purple' => 'shadow-lg shadow-purple-500/50 dark:shadow-lg dark:shadow-purple-800/80',
         'orange' => 'shadow-lg shadow-orange-500/50 dark:shadow-lg dark:shadow-orange-800/80',
         'yellow' => 'shadow-lg shadow-yellow-500/50 dark:shadow-lg dark:shadow-yellow-800/80',
+        'indigo' => 'shadow-lg shadow-indigo-500/50 dark:shadow-lg dark:shadow-indigo-800/80',
+        'sky' => 'shadow-lg shadow-sky-500/50 dark:shadow-lg dark:shadow-sky-800/80',
+        'amber' => 'shadow-lg shadow-amber-500/50 dark:shadow-lg dark:shadow-amber-800/80',
         default => 'shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80',
     };
 
@@ -130,9 +145,9 @@
     };
 
     $isLightSpinner = in_array($variant, ['outline'], true)
-        || in_array($color, ['light', 'secondary', 'tertiary', 'ghost', 'lime'], true)
+        || in_array($color, ['light', 'secondary', 'tertiary', 'ghost', 'lime', 'amber'], true)
         || ($variant === 'duotone' && in_array($duotoneKey, ['teal-lime', 'red-yellow'], true))
-        || ($variant === 'gradient' && in_array($color, ['lime', 'yellow'], true));
+        || ($variant === 'gradient' && in_array($color, ['lime', 'yellow', 'amber'], true));
 
     $spinnerColor ??= $isLightSpinner ? 'blue' : 'white';
 
@@ -144,7 +159,13 @@
     @if ($href) href="{{ $href }}" @endif
     @if ($tag === 'button') type="{{ $type }}" @endif
     @if ($disabled) disabled @endif
-    wire:loading.attr="disabled"
+    @if ($loading)
+        @if ($target)
+            wire:loading.attr="disabled" wire:target="{{ $target }}"
+        @else
+            wire:loading.attr="disabled"
+        @endif
+    @endif
     x-bind:disabled="Boolean($store.ui?.busy)"
     {{ $attributes->class([$baseClasses, $sizeClasses, $colorClasses, $roundedClasses, $disabledClasses]) }}
 >

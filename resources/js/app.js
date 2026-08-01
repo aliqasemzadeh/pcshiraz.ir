@@ -18,6 +18,57 @@ window.addEventListener('pg-livewire-request-finished', bootFlowbite);
 document.addEventListener('livewire:morph.updated', bootFlowbite);
 
 document.addEventListener('alpine:init', () => {
+    Alpine.directive('modal', (el, { value, modifiers, expression }, { evaluate, cleanup }) => {
+        const prevent = modifiers?.includes('prevent');
+        const stop = modifiers?.includes('stop');
+        const params = expression ? evaluate(expression) : undefined;
+
+        if (value === 'open') {
+            const preload = modifiers?.includes('preload');
+
+            const onClick = (e) => {
+                if (prevent) e.preventDefault();
+                if (stop) e.stopImmediatePropagation();
+                Livewire.dispatch('modal-open', params);
+            };
+
+            const onMouseenter = () => {
+                Livewire.dispatch('modal-preload', params);
+            };
+
+            el.addEventListener('click', onClick, { capture: true });
+
+            if (preload) {
+                el.addEventListener('mouseenter', onMouseenter, { capture: true });
+            }
+
+            cleanup(() => {
+                el.removeEventListener('click', onClick, { capture: true });
+                if (preload) {
+                    el.removeEventListener('mouseenter', onMouseenter, { capture: true });
+                }
+            });
+        } else if (value === 'close') {
+            const onClick = (e) => {
+                if (prevent) e.preventDefault();
+                if (stop) e.stopImmediatePropagation();
+                Livewire.dispatch('modal-close', params);
+            };
+
+            el.addEventListener('click', onClick, { capture: true });
+            cleanup(() => el.removeEventListener('click', onClick, { capture: true }));
+        } else if (value === 'close-all') {
+            const onClick = (e) => {
+                if (prevent) e.preventDefault();
+                if (stop) e.stopImmediatePropagation();
+                Livewire.dispatch('modal-close-all', params);
+            };
+
+            el.addEventListener('click', onClick, { capture: true });
+            cleanup(() => el.removeEventListener('click', onClick, { capture: true }));
+        }
+    });
+
     Alpine.data('priceChartModal', () => ({
         open: false,
         title: '',

@@ -146,7 +146,7 @@
     x-on:modal-preload.window="onPreloadModal" x-on:modal-close.window="onCloseModal"
     x-on:modal-close-all.window="onCloseAllModal" x-on:mousedown.self="onCloseModal"
     x-on:keyup.escape.prevent.stop="onCloseModal" x-transition.opacity.duration.250ms
-    class="fixed left-0 top-0 z-40 grid h-dvh w-full select-none overflow-hidden bg-black/30"
+    class="fixed left-0 top-0 z-[60] grid h-dvh w-full select-none overflow-hidden bg-black/30"
     style="
         display: none;
         grid-template-areas: 'stack';
