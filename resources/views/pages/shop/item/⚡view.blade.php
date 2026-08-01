@@ -57,7 +57,11 @@ new #[Layout('layouts.app')] class extends Component
 
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $item->title }}</h1>
 
-            @if ($cash)
+            @if ($item->is_contact_price)
+                <p class="text-2xl font-bold text-amber-600 dark:text-amber-400">
+                    {{ __('app.contact_for_price') }}
+                </p>
+            @elseif ($cash)
                 <div class="flex flex-wrap items-baseline gap-3">
                     <span class="text-3xl font-bold text-brand">{{ number_format((float) $cash->sale_price) }}</span>
                     @if ($hasDiscount)

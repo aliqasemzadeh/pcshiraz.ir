@@ -49,7 +49,11 @@
         </h3>
 
         <div class="mt-auto pt-2">
-            @if ($cash)
+            @if ($item->is_contact_price)
+                <span class="text-sm font-semibold text-amber-600 dark:text-amber-400">
+                    {{ __('general.contact_price') }}
+                </span>
+            @elseif ($cash)
                 <div class="flex flex-wrap items-baseline gap-2">
                     <span class="text-base font-bold text-brand">
                         {{ number_format((float) $cash->sale_price) }}
