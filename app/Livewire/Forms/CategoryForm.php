@@ -4,10 +4,11 @@ namespace App\Livewire\Forms;
 
 use App\Models\Category;
 use App\Models\Domain;
+use App\Support\CurrentDomain;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\Form;
-use Illuminate\Support\Str;
 
 class CategoryForm extends Form
 {
@@ -133,8 +134,7 @@ class CategoryForm extends Form
         }
 
         $category
-            ->addMedia($this->logo->getRealPath())
-            ->usingFileName($this->logo->getClientOriginalName())
+            ->addMedia($this->logo)
             ->toMediaCollection('logo_image');
 
         $this->logo = null;
@@ -142,6 +142,6 @@ class CategoryForm extends Form
 
     protected function currentDomainId(): ?int
     {
-        return \App\Support\CurrentDomain::get()?->id;
+        return CurrentDomain::get()?->id;
     }
 }

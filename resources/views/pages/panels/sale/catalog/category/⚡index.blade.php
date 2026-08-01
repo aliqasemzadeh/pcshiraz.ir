@@ -1,21 +1,17 @@
 <?php
 
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\Title;
 use Livewire\Component;
 
-new
-#[Layout('layouts.panels')]
-#[Title('Categories')]
-class extends Component
+new #[Layout('layouts.panels')] class extends Component
 {
     //
 };
 ?>
 
-<div>
-    <x-slot name="title">{{ __('general.categories') }} - {{ config('app.name') }}</x-slot>
+<x-slot name="title">{{ __('general.categories') }} - {{ config('app.name') }}</x-slot>
 
+<div>
     <x-fwb.breadcrumb class="mb-4">
         <x-fwb.breadcrumb.item home>{{ __('general.sale') }}</x-fwb.breadcrumb.item>
         <x-fwb.breadcrumb.item>{{ __('general.categories') }}</x-fwb.breadcrumb.item>
