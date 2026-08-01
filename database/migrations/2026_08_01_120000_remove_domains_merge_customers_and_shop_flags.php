@@ -116,16 +116,35 @@ return new class extends Migration
             }
 
             Schema::table($table, function (Blueprint $blueprint) {
+                $blueprint->dropForeign([$blueprint->getTable() === 'brands' || true ? 'domain_id' : 'domain_id']);
+            });
+
+            // Drop FK first (MySQL may share the unique index with the FK).
+            Schema::table($table, function (Blueprint $blueprint) use ($table) {
                 try {
-                    $blueprint->dropUnique(['domain_id', 'slug']);
-                } catch (Throwable) {
-                    // Index name may differ; continue to drop FK.
+                    $blueprint->dropForeign([$table.'_domain_id_foreign']);
+                } catch (\Throwable) {
+                    try {
+                        $blueprint->dropForeign(['domain_id']);
+                    } catch (\Throwable) {
+                        // Already dropped.
+                    }
                 }
             });
 
             Schema::table($table, function (Blueprint $blueprint) {
-                $blueprint->dropConstrainedForeignId('domain_id');
+                try {
+                    $blueprint->dropUnique(['domain_id', 'slug']);
+                } catch (\Throwable) {
+                    // Already dropped.
+                }
             });
+
+            if (Schema::hasColumn($table, 'domain_id')) {
+                Schema::table($table, function (Blueprint $blueprint) {
+                    $blueprint->dropColumn('domain_id');
+                });
+            }
         }
 
         try {
