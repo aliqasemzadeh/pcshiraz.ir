@@ -119,7 +119,11 @@ new #[Layout('layouts.app')] class extends Component
 <div class="space-y-10">
     <x-shop.tag-carousel :tags="$this->tags" />
 
+    <x-shop.category-carousel :categories="$this->homeCategories" />
+
     @forelse ($this->homeCategories as $category)
+        @continue ($category->homeItems->isEmpty())
+
         <section class="space-y-4">
             <div class="flex items-center justify-between gap-3">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ $category->title }}</h2>
@@ -132,11 +136,17 @@ new #[Layout('layouts.app')] class extends Component
                 </a>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+            <x-shop.carousel :label="$category->title">
                 @foreach ($category->homeItems as $item)
-                    <x-shop.item-card :item="$item" />
+                    <li
+                        x-bind="disableNextAndPreviousButtons"
+                        class="w-1/2 shrink-0 snap-start sm:w-1/3 md:w-1/4 lg:w-1/6"
+                        role="option"
+                    >
+                        <x-shop.item-card :item="$item" />
+                    </li>
                 @endforeach
-            </div>
+            </x-shop.carousel>
         </section>
     @empty
         <div class="rounded-lg border border-dashed border-gray-300 p-8 text-center text-gray-500 dark:border-gray-600">
