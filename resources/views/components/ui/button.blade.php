@@ -41,10 +41,10 @@
             {{ $slot }}
         </span>
 
-        <span
-            @if ($target) wire:loading.inline-flex wire:target="{{ $target }}" @else wire:loading.inline-flex @endif
-            class="hidden items-center justify-center gap-2"
-        >
+            <span
+                @if ($target) wire:loading.inline-flex wire:target="{{ $target }}" @else wire:loading.inline-flex @endif
+                class="items-center justify-center gap-2"
+            >
             <x-fwb.spinner :color="$spinnerColor" size="xs" />
             <span>{{ $loadingText }}</span>
         </span>
