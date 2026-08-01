@@ -32,6 +32,10 @@
             <span class="absolute start-2 top-2 rounded bg-rose-600 px-2 py-0.5 text-xs font-medium text-white">
                 {{ __('app.not_purchasable') }}
             </span>
+        @elseif ($item->is_contact_price)
+            <span class="absolute start-2 top-2 rounded bg-amber-600 px-2 py-0.5 text-xs font-medium text-white">
+                {{ __('general.contact_price') }}
+            </span>
         @elseif ($hasDiscount)
             <span class="absolute start-2 top-2 rounded bg-emerald-600 px-2 py-0.5 text-xs font-medium text-white">
                 {{ __('app.discount') }}

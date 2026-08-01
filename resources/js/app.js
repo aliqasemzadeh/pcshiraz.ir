@@ -18,6 +18,81 @@ window.addEventListener('pg-livewire-request-finished', bootFlowbite);
 document.addEventListener('livewire:morph.updated', bootFlowbite);
 
 document.addEventListener('alpine:init', () => {
+    Alpine.data('priceChartModal', () => ({
+        open: false,
+        title: '',
+        hasData: false,
+        chart: null,
+
+        init() {
+            this.$watch('$wire.chartOpen', (value) => {
+                this.open = !!value;
+                if (!value) {
+                    this.destroyChart();
+                }
+            });
+        },
+
+        close() {
+            this.open = false;
+            this.destroyChart();
+        },
+
+        destroyChart() {
+            if (this.chart) {
+                this.chart.destroy();
+                this.chart = null;
+            }
+            this.hasData = false;
+        },
+
+        renderChart(points, title) {
+            this.open = true;
+            this.title = title || '';
+            this.destroyChart();
+
+            const labels = (points || []).map((p) => p.label);
+            const values = (points || []).map((p) => p.value);
+            this.hasData = values.length > 0;
+
+            if (!this.hasData || !window.Chart || !this.$refs.canvas) {
+                return;
+            }
+
+            this.$nextTick(() => {
+                this.chart = new window.Chart(this.$refs.canvas, {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: 'sale_price',
+                            data: values,
+                            borderColor: '#0f766e',
+                            backgroundColor: 'rgba(15, 118, 110, 0.12)',
+                            tension: 0.25,
+                            fill: true,
+                            pointRadius: 4,
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                        },
+                        scales: {
+                            y: {
+                                ticks: {
+                                    callback: (value) => Number(value).toLocaleString(),
+                                },
+                            },
+                        },
+                    },
+                });
+            });
+        },
+    }));
+
     Alpine.store('ui', {
         busy: false,
         busyCount: 0,

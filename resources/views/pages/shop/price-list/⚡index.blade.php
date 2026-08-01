@@ -9,19 +9,20 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Morilog\Jalali\Jalalian;
+
 new #[Layout('layouts.app')] class extends Component
 {
     use WithPagination;
 
     public ?Category $category = null;
 
-    public string $categoryId = '';
+    public ?string $categoryId = null;
 
     #[Url]
-    public string $brand = '';
+    public ?string $brand = null;
 
     #[Url]
-    public string $q = '';
+    public ?string $q = null;
 
     public bool $chartOpen = false;
 
@@ -35,12 +36,12 @@ new #[Layout('layouts.app')] class extends Component
     public function mount(?Category $category = null): void
     {
         $this->category = $category;
-        $this->categoryId = $category ? (string) $category->id : '';
+        $this->categoryId = $category ? (string) $category->id : null;
     }
 
-    public function updatedCategoryId(string $value): void
+    public function updatedCategoryId(?string $value): void
     {
-        if ($value === '') {
+        if ($value === null || $value === '') {
             $this->redirect(route('shop.price-list'), navigate: true);
 
             return;
@@ -90,8 +91,9 @@ new #[Layout('layouts.app')] class extends Component
         }
 
         $service = app(PriceListService::class);
-        $brandId = $this->brand !== '' ? (int) $this->brand : null;
-        $items = $service->all($this->category->id, $brandId, $this->q !== '' ? $this->q : null);
+        $brandId = filled($this->brand) ? (int) $this->brand : null;
+        $search = filled($this->q) ? $this->q : null;
+        $items = $service->all($this->category->id, $brandId, $search);
         $brandTitle = null;
 
         if ($brandId !== null) {
@@ -148,8 +150,8 @@ new #[Layout('layouts.app')] class extends Component
 
         return app(PriceListService::class)->paginate(
             $this->category->id,
-            $this->brand !== '' ? (int) $this->brand : null,
-            $this->q !== '' ? $this->q : null,
+            filled($this->brand) ? (int) $this->brand : null,
+            filled($this->q) ? $this->q : null,
         );
     }
 };
@@ -330,86 +332,3 @@ new #[Layout('layouts.app')] class extends Component
         </div>
     </div>
 </div>
-
-@script
-<script>
-    Alpine.data('priceChartModal', () => ({
-        open: false,
-        title: '',
-        hasData: false,
-        chart: null,
-
-        init() {
-            this.$watch('$wire.chartOpen', (value) => {
-                this.open = value;
-                if (!value) {
-                    this.destroyChart();
-                }
-            });
-        },
-
-        close() {
-            this.open = false;
-            this.destroyChart();
-        },
-
-        destroyChart() {
-            if (this.chart) {
-                this.chart.destroy();
-                this.chart = null;
-            }
-            this.hasData = false;
-        },
-
-        async renderChart(points, title) {
-            this.open = true;
-            this.title = title || '';
-            this.destroyChart();
-
-            const labels = (points || []).map((p) => p.label);
-            const values = (points || []).map((p) => p.value);
-            this.hasData = values.length > 0;
-
-            if (!this.hasData) {
-                return;
-            }
-
-            if (!window.Chart) {
-                return;
-            }
-
-            await this.$nextTick();
-
-            this.chart = new window.Chart(this.$refs.canvas, {
-                type: 'line',
-                data: {
-                    labels,
-                    datasets: [{
-                        label: @js(__('general.sale_price')),
-                        data: values,
-                        borderColor: '#0f766e',
-                        backgroundColor: 'rgba(15, 118, 110, 0.12)',
-                        tension: 0.25,
-                        fill: true,
-                        pointRadius: 4,
-                    }],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                    },
-                    scales: {
-                        y: {
-                            ticks: {
-                                callback: (value) => Number(value).toLocaleString(),
-                            },
-                        },
-                    },
-                },
-            });
-        },
-    }));
-</script>
-@endscript
