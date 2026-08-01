@@ -28,6 +28,34 @@
 </li>
 <li>
     <a
+        href="{{ route('panels.administrator.domain.index') }}"
+        wire:navigate
+        @class([
+            'group flex items-center rounded-lg p-2 hover:bg-sidebar-hover hover:text-white',
+            'bg-sidebar-active text-sidebar-fg-active' => request()->routeIs('panels.administrator.domain.*'),
+            'text-sidebar-fg' => ! request()->routeIs('panels.administrator.domain.*'),
+        ])
+    >
+        <x-lucide-globe @class(['h-5 w-5 group-hover:text-white', 'text-sidebar-fg-active' => request()->routeIs('panels.administrator.domain.*'), 'text-sidebar-fg' => ! request()->routeIs('panels.administrator.domain.*')]) />
+        <span class="ms-3">{{ __('general.domains') }}</span>
+    </a>
+</li>
+<li>
+    <a
+        href="{{ route('panels.administrator.customer.index') }}"
+        wire:navigate
+        @class([
+            'group flex items-center rounded-lg p-2 hover:bg-sidebar-hover hover:text-white',
+            'bg-sidebar-active text-sidebar-fg-active' => request()->routeIs('panels.administrator.customer.*'),
+            'text-sidebar-fg' => ! request()->routeIs('panels.administrator.customer.*'),
+        ])
+    >
+        <x-lucide-user-round @class(['h-5 w-5 group-hover:text-white', 'text-sidebar-fg-active' => request()->routeIs('panels.administrator.customer.*'), 'text-sidebar-fg' => ! request()->routeIs('panels.administrator.customer.*')]) />
+        <span class="ms-3">{{ __('general.customers') }}</span>
+    </a>
+</li>
+<li>
+    <a
         href="{{ route('panels.administrator.role.index') }}"
         wire:navigate
         @class([

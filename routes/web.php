@@ -23,6 +23,7 @@ Route::post('/logout', function () {
         Route::livewire('/roles', 'pages::panels.administrator.role.index')->name('role.index');
         Route::livewire('/permissions', 'pages::panels.administrator.permission.index')->name('permission.index');
         Route::livewire('/domains', 'pages::panels.administrator.domain.index')->name('domain.index');
+        Route::livewire('/customers', 'pages::panels.administrator.customer.index')->name('customer.index');
     });
 
     Route::prefix('sale')->name('panels.sale.')->group(function () {
