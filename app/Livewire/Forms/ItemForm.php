@@ -29,6 +29,8 @@ class ItemForm extends Form
 
     public bool $is_purchasable = true;
 
+    public bool $is_contact_price = false;
+
     public string $title = '';
 
     public string $slug = '';
@@ -72,6 +74,7 @@ class ItemForm extends Form
         $this->is_main = (bool) $item->is_main;
         $this->is_active = (bool) $item->is_active;
         $this->is_purchasable = (bool) $item->is_purchasable;
+        $this->is_contact_price = (bool) $item->is_contact_price;
         $this->title = $item->title;
         $this->slug = $item->slug;
         $this->description = $item->description;
@@ -177,6 +180,7 @@ class ItemForm extends Form
             'is_main' => ['boolean'],
             'is_active' => ['boolean'],
             'is_purchasable' => ['boolean'],
+            'is_contact_price' => ['boolean'],
             'title' => ['required', 'string', 'max:255'],
             'slug' => [
                 'required',
@@ -220,6 +224,7 @@ class ItemForm extends Form
             'is_main' => __('general.is_main'),
             'is_active' => __('app.is_active'),
             'is_purchasable' => __('app.is_purchasable'),
+            'is_contact_price' => __('app.is_contact_price'),
             'title' => __('general.title'),
             'slug' => __('general.slug'),
             'description' => __('general.description'),
@@ -250,6 +255,7 @@ class ItemForm extends Form
             'is_main' => $this->is_main,
             'is_active' => $this->is_active,
             'is_purchasable' => $this->is_purchasable,
+            'is_contact_price' => $this->is_contact_price,
             'title' => $this->title,
             'slug' => $this->slug,
             'description' => $this->description,
@@ -285,6 +291,7 @@ class ItemForm extends Form
             'is_main' => $this->is_main,
             'is_active' => $this->is_active,
             'is_purchasable' => $this->is_purchasable,
+            'is_contact_price' => $this->is_contact_price,
             'title' => $this->title,
             'slug' => $this->slug,
             'description' => $this->description,

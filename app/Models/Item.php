@@ -25,6 +25,7 @@ use Spatie\Tags\HasTags;
     'is_main',
     'is_active',
     'is_purchasable',
+    'is_contact_price',
     'views_count',
     'title',
     'slug',
@@ -50,6 +51,7 @@ class Item extends Model implements HasMedia
             'is_main' => 'boolean',
             'is_active' => 'boolean',
             'is_purchasable' => 'boolean',
+            'is_contact_price' => 'boolean',
             'views_count' => 'integer',
             'meta' => 'array',
         ];

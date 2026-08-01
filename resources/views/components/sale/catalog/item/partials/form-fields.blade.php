@@ -58,6 +58,9 @@
 <div>
     <x-fwb.checkbox wire:model="form.is_purchasable" :label="__('app.is_purchasable')" />
 </div>
+<div>
+    <x-fwb.checkbox wire:model="form.is_contact_price" :label="__('app.is_contact_price')" />
+</div>
 
 <div>
     <x-fwb.input
