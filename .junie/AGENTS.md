@@ -65,10 +65,13 @@ import '../../vendor/masmerise/livewire-toaster/resources/js';
 Ensure Tailwind content / `@source` includes (PowerGrid is already wired in `resources/css/app.css`):
 *   PowerGrid Tailwind 4 CSS import + `@source` for `app/Livewire/*Table.php`, vendor views, and `Tailwind.php` theme
 *   `./vendor/elegantly/livewire-modal/resources/views/**/*.blade.php`
+*   Published modal overrides: `resources/views/vendor/livewire-modal/**/*.blade.php` (adds logical `start` / `end` positions)
 *   Published toaster views under `resources/views/vendor/toaster/` (and/or vendor toaster views)
 *   `./vendor/themesberg/flowbite-laravel-components/resources/views/**/*.blade.php`
 *   `./vendor/themesberg/flowbite-laravel-components/src/**/*.php`
 *   Flowbite theme: `@import 'flowbite/src/themes/default';` + `@plugin "flowbite/plugin"`
+
+**Brand / PowerGrid colors:** In `resources/css/app.css`, remap `--color-pg-primary-*`, `--color-primary-*`, and `--color-pg-secondary-*` to the indigo brand scale (same as teal→indigo remap). Do **not** leave PowerGrid’s default blue/gray palette. After changing tokens, run `npm run build` (or `npm run dev`).
 
 Initialize Flowbite for interactive widgets (dropdown, tooltip, datepicker, etc.) after Livewire navigations when needed (`initFlowbite()`).
 
@@ -95,7 +98,7 @@ Initialize Flowbite for interactive widgets (dropdown, tooltip, datepicker, etc.
         return [
             PowerGrid::header()->showSearchInput(),
             PowerGrid::footer()
-                ->showPerPage(config('general.per_page'))
+                ->showPerPage(config('main.per_page'))
                 ->showRecordCount(),
         ];
     }
@@ -124,6 +127,19 @@ Initialize Flowbite for interactive widgets (dropdown, tooltip, datepicker, etc.
 *   **Relation fields:** Add display fields via closures in `fields()`, mark the column `->searchable()`, and keep `relationSearch()` in sync with the real DB columns on those relations.
 *   **Relation filters:** When filtering by a relation column, use `Filter::...()->filterRelation('relation', 'column')` AND keep that relation in `relationSearch()`.
 *   **Actions column:** Add `Column::action(__('general.actions'))` and implement `actions($row): array` with `Button::add(...)`. Prefer dispatching modal-open / domain events (edit/delete) instead of separate routes.
+*   **Action icons (REQUIRED):** PowerGrid injects action `slot` HTML via Alpine `x-html` — Blade components inside the slot string are **NOT** compiled. Always render Lucide to real SVG with `Blade::render(...)`. Never pass raw `'<x-lucide-pencil … />'` as the slot. Buttons must include `inline-flex items-center justify-center` so the SVG is visible:
+    ```php
+    use Illuminate\Support\Facades\Blade;
+
+    Button::add('edit')
+        ->slot(Blade::render('<x-lucide-pencil class="h-4 w-4" />'))
+        ->class('inline-flex items-center justify-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm p-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800')
+        ->tooltip(__('general.edit'))
+        ->dispatch('modal-open', [
+            'modal' => 'user.edit',
+            'props' => ['userId' => $row->id],
+        ]);
+    ```
 *   **Include on pages:**
     ```html
     <livewire:user-table :key="'user-table'" />
@@ -135,7 +151,14 @@ Initialize Flowbite for interactive widgets (dropdown, tooltip, datepicker, etc.
     Do not invent generic `refresh-data` listeners for tables.
 
 ### Modals (`elegantly/livewire-modal`)
-*   **Create / Edit:** Always use **slideover** (right-side panel). Never redirect to separate create/edit routes.
+*   **Create / Edit:** Always use **slideover**. Never redirect to separate create/edit routes.
+*   **Slideover side (REQUIRED — direction-aware):** Do **not** hardcode `position="right"`. Use logical positions from published views (`resources/views/vendor/livewire-modal/`):
+    *   LTR (`__('general.direction') === 'ltr'`) → `position="start"`
+    *   RTL (`__('general.direction') === 'rtl'`) → `position="end"`
+    ```blade
+    position="{{ __('general.direction') === 'rtl' ? 'end' : 'start' }}"
+    ```
+    Published `modal.blade.php` maps `start` → `me-auto` and `end` → `ms-auto`. Keep physical `left` / `right` only when intentionally forcing a physical edge.
 *   **Delete confirmation:** Use a **centered** modal (`position="center"`).
 *   **Wrapper:** Modal SFCs should root with `<x-livewire-modal::stack>` (no extra useless wrapper). Content goes inside `slideover` or `modal`.
 *   **Component naming:** Livewire modal component names use dot notation (e.g. `user.create`, `user.edit`).
@@ -158,7 +181,10 @@ Initialize Flowbite for interactive widgets (dropdown, tooltip, datepicker, etc.
 **Create/Edit slideover skeleton:**
 ```html
 <x-livewire-modal::stack>
-    <x-livewire-modal::slideover class="w-full max-w-md overflow-auto bg-white p-5 dark:bg-gray-800">
+    <x-livewire-modal::slideover
+        position="{{ __('general.direction') === 'rtl' ? 'end' : 'start' }}"
+        class="w-full max-w-md overflow-auto bg-white p-5 dark:bg-gray-800"
+    >
         <h2 class="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
             {{ __('general.create_user') }}
         </h2>
@@ -296,6 +322,7 @@ namespace App\Livewire;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Blade;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
@@ -311,7 +338,7 @@ final class UserTable extends PowerGridComponent
         return [
             PowerGrid::header()->showSearchInput(),
             PowerGrid::footer()
-                ->showPerPage(config('general.per_page'))
+                ->showPerPage(config('main.per_page'))
                 ->showRecordCount(),
         ];
     }
@@ -366,13 +393,18 @@ final class UserTable extends PowerGridComponent
     {
         return [
             Button::add('edit')
-                ->slot('<x-lucide-pencil class="w-4 h-4" />')
-                ->class('text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm p-2')
-                ->dispatch('panels.administrator.user.edit.assign-data', ['user' => $row->id]),
+                ->slot(Blade::render('<x-lucide-pencil class="h-4 w-4" />'))
+                ->class('inline-flex items-center justify-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm p-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800')
+                ->tooltip(__('general.edit'))
+                ->dispatch('modal-open', [
+                    'modal' => 'user.edit',
+                    'props' => ['userId' => $row->id],
+                ]),
 
             Button::add('delete')
-                ->slot('<x-lucide-trash-2 class="w-4 h-4" />')
-                ->class('text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm p-2')
+                ->slot(Blade::render('<x-lucide-trash-2 class="h-4 w-4" />'))
+                ->class('inline-flex items-center justify-center text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm p-2 dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none dark:focus:ring-red-800')
+                ->tooltip(__('general.delete'))
                 ->dispatch('modal-open', [
                     'modal' => 'user.delete',
                     'props' => ['userId' => $row->id],
@@ -383,17 +415,19 @@ final class UserTable extends PowerGridComponent
 ```
 
 ## 9. UI & CRUD Interaction Workflow
-*   **Create & Edit:** Always via `elegantly/livewire-modal` **slideover**. After success: `Toaster::success(...)`, `$this->dispatch('modal-close')`, and refresh the PowerGrid table.
+*   **Create & Edit:** Always via `elegantly/livewire-modal` **slideover** with direction-aware `position` (`rtl` → `end`, `ltr` → `start`). After success: `Toaster::success(...)`, `$this->dispatch('modal-close')`, and refresh the PowerGrid table.
 *   **Delete:** Always via centered confirmation modal. After success: toast + close modal + refresh PowerGrid.
 *   **PowerGrid refresh:** Dispatch `pg:eventRefresh-{tableName}` matching the table's `$tableName` property, e.g. `$this->dispatch('pg:eventRefresh-usersTable');`. Do not use generic names like `refresh-data`.
+*   **PowerGrid action icons:** Always `Blade::render('<x-lucide-… />')` in `Button::slot(...)` — raw Blade tags in the slot string will not render.
 
 ## 10. Quick Package Cheatsheet
 | Concern | Package / Tool | API |
 |---|---|---|
 | UI kit | Flowbite + `themesberg/flowbite-laravel-components` (aliqasemzadeh VCS) | `<x-fwb.*>`, data attributes + `initFlowbite()` |
-| Tables | `power-components/livewire-powergrid` | `PowerGridComponent`, `Column::make()->searchable()`, `relationSearch()` |
-| Icons | `mallardduck/blade-lucide-icons` | `<x-lucide-{name} class="w-4 h-4" />` |
-| Modal / Slideover | `elegantly/livewire-modal` | `x-modal:open`, `modal-open` / `modal-close`, `<x-livewire-modal::slideover>` |
+| Tables | `power-components/livewire-powergrid` | `PowerGridComponent`, `Column::make()->searchable()`, `relationSearch()`, action slots via `Blade::render` |
+| Icons | `mallardduck/blade-lucide-icons` | `<x-lucide-{name} class="w-4 h-4" />` (in Blade views); in PowerGrid actions use `Blade::render(...)` |
+| Modal / Slideover | `elegantly/livewire-modal` (+ published `start`/`end`) | `position="{{ __('general.direction') === 'rtl' ? 'end' : 'start' }}"`, `x-modal:open`, `modal-open` / `modal-close` |
 | Toast | `masmerise/livewire-toaster` (Flowbite-styled hub) | `Toaster::success()`, `<x-toaster-hub />` |
 | Dates | `morilog/jalali` | Jalali formatting/parsing everywhere |
 | Permissions | `spatie/laravel-permission` v6 | `/lang/{fa,en}/permissions.php` |
+| Per page | `config/main.php` | `config('main.per_page')` |
