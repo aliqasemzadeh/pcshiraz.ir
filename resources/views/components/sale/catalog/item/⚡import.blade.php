@@ -26,11 +26,10 @@ new class extends Component
         }
 
         $this->dispatch('modal-close');
-        $this->dispatch('panels.sale.catalog.item.create.assign-data', data: $data);
-        $this->dispatch('modal-open', modal: 'sale.catalog.item.create');
+        $this->dispatch('modal-open', modal: 'sale.catalog.item.create', props: [
+            'imported' => $data,
+        ]);
         $this->reset('url');
-
-        Toaster::success(__('general.saved'));
     }
 };
 ?>

@@ -239,6 +239,7 @@ class ItemForm extends Form
 
     public function store(Domain $domain): Item
     {
+        $this->normalizeNullableFields();
         $this->prepareSlug();
         $this->validate();
 
@@ -271,6 +272,7 @@ class ItemForm extends Form
     public function update(Item $item): Item
     {
         $this->item = $item;
+        $this->normalizeNullableFields();
         $this->prepareSlug();
         $this->validate();
 
@@ -297,6 +299,25 @@ class ItemForm extends Form
         $this->attachImage($item);
 
         return $item->refresh();
+    }
+
+    protected function normalizeNullableFields(): void
+    {
+        foreach (['brand_id', 'category_id', 'group_id', 'weight', 'length', 'width', 'height'] as $field) {
+            if ($this->{$field} === '' || $this->{$field} === 0 && $field === 'group_id') {
+                $this->{$field} = null;
+            }
+        }
+
+        if ($this->group_id === 0) {
+            $this->group_id = null;
+        }
+
+        foreach (['description', 'color_code', 'color_name', 'seo_title', 'meta_description', 'remote_image_url'] as $field) {
+            if ($this->{$field} === '') {
+                $this->{$field} = null;
+            }
+        }
     }
 
     protected function syncTags(Item $item): void

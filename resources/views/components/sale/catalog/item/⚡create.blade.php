@@ -10,6 +10,7 @@ use App\Support\CurrentDomain;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
+// On kept for late assign if create is already open
 use Livewire\WithFileUploads;
 use Masmerise\Toaster\Toaster;
 use Spatie\Tags\Tag;
@@ -23,6 +24,16 @@ new class extends Component
     public ?string $selectedExistingTag = null;
 
     public ?string $currentImageUrl = null;
+
+    /**
+     * @param  array<string, mixed>|null  $imported
+     */
+    public function mount(?array $imported = null): void
+    {
+        if ($imported !== null) {
+            $this->form->fillFromImport($imported);
+        }
+    }
 
     #[On('panels.sale.catalog.item.create.assign-data')]
     public function assignImportedData(array $data): void
