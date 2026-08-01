@@ -75,7 +75,7 @@ Initialize Flowbite for interactive widgets (dropdown, tooltip, datepicker, etc.
 
 ### Layout & Pages
 *   **Page Titles:** Use `<x-slot name="title">Page Title - {{ config('app.name') }}</x-slot>`.
-*   **Breadcrumbs:** Always include Flowbite breadcrumb markup (`nav` + `ol` with `inline-flex items-center`).
+*   **Breadcrumbs:** Prefer `<x-fwb.breadcrumb>` / `<x-fwb.breadcrumb.item>`. Fall back to Flowbite breadcrumb markup (`nav` + `ol`) when needed.
 *   **Cards:** Optionally wrap the PowerGrid include in a Flowbite card container for page layout consistency. Do NOT build a separate manual search box above PowerGrid — use PowerGrid header search.
 
 ### Tables & Lists (`livewire-powergrid`)
