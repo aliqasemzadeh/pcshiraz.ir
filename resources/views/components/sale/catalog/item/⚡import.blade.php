@@ -3,7 +3,6 @@
 use App\Services\Sale\Catalog\HamrahtelProductImporter;
 use Livewire\Component;
 use Masmerise\Toaster\Toaster;
-use RuntimeException;
 
 new class extends Component
 {
@@ -19,7 +18,7 @@ new class extends Component
 
         try {
             $data = $importer->import($this->url);
-        } catch (RuntimeException $exception) {
+        } catch (\RuntimeException $exception) {
             Toaster::error($exception->getMessage());
 
             return;
