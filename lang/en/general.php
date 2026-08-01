@@ -57,6 +57,8 @@ return [
     'delete' => 'Delete',
     'create_category' => 'Create category',
     'edit_category' => 'Edit category',
+    'create_brand' => 'Create brand',
+    'edit_brand' => 'Edit brand',
     'title' => 'Title',
     'slug' => 'Slug',
     'seo_title' => 'SEO title',

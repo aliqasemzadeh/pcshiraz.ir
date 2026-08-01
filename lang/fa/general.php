@@ -57,6 +57,8 @@ return [
     'delete' => 'حذف',
     'create_category' => 'ایجاد دسته',
     'edit_category' => 'ویرایش دسته',
+    'create_brand' => 'ایجاد برند',
+    'edit_brand' => 'ویرایش برند',
     'title' => 'عنوان',
     'slug' => 'نامک',
     'seo_title' => 'عنوان سئو',
