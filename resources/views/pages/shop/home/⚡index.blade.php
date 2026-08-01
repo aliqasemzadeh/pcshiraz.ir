@@ -18,11 +18,21 @@ new #[Layout('layouts.app')] class extends Component
     public function tags(): array
     {
         return Cache::remember(CatalogCache::HOME_TAGS, CatalogCache::TTL, function () {
+            $tagIds = Item::query()
+                ->active()
+                ->with('tags')
+                ->get()
+                ->pluck('tags')
+                ->flatten()
+                ->pluck('id')
+                ->unique()
+                ->take(24)
+                ->values();
+
             return Tag::query()
-                ->whereHas('items', fn ($q) => $q->active())
+                ->whereIn('id', $tagIds)
                 ->orderBy('order_column')
                 ->orderBy('id')
-                ->limit(24)
                 ->get()
                 ->map(fn (Tag $tag) => [
                     'name' => (string) $tag->name,

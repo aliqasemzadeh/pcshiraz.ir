@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Forms\UserForm;
+use App\Models\User;
 use Livewire\Component;
 use Masmerise\Toaster\Toaster;
 
@@ -8,14 +9,22 @@ new class extends Component
 {
     public UserForm $form;
 
+    public int $userId;
+
+    public function mount(int $userId): void
+    {
+        $this->userId = $userId;
+        $this->form->setUser(User::query()->findOrFail($userId));
+    }
+
     public function save(): void
     {
-        $this->form->store();
+        $user = User::query()->findOrFail($this->userId);
+        $this->form->update($user);
 
         Toaster::success(__('general.saved'));
         $this->dispatch('modal-close');
         $this->dispatch('pg:eventRefresh-administratorUsersTable');
-        $this->form->reset();
     }
 };
 ?>
@@ -26,7 +35,7 @@ new class extends Component
         class="w-full max-w-md overflow-auto bg-white p-5 dark:bg-gray-800"
     >
         <h2 class="mb-4 text-xl font-semibold text-heading">
-            {{ __('general.create_user') }}
+            {{ __('general.edit_user') }}
         </h2>
 
         <form wire:submit="save" class="space-y-4">
@@ -39,6 +48,34 @@ new class extends Component
                     inputmode="numeric"
                 />
                 @error('form.mobile')
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <x-fwb.input wire:model="form.first_name" :label="__('general.first_name')" type="text" />
+                @error('form.first_name')
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <x-fwb.input wire:model="form.last_name" :label="__('general.last_name')" type="text" />
+                @error('form.last_name')
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <x-fwb.input wire:model="form.national_code" :label="__('general.national_code')" type="text" dir="ltr" />
+                @error('form.national_code')
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <x-fwb.input wire:model="form.birth_date" :label="__('general.birth_date')" type="text" dir="ltr" placeholder="1400/01/01" />
+                @error('form.birth_date')
                     <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
                 @enderror
             </div>

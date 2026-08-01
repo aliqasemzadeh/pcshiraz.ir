@@ -52,6 +52,34 @@ new class extends Component
                 @enderror
             </div>
 
+            <div>
+                <x-fwb.input wire:model="form.first_name" :label="__('general.first_name')" type="text" />
+                @error('form.first_name')
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <x-fwb.input wire:model="form.last_name" :label="__('general.last_name')" type="text" />
+                @error('form.last_name')
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <x-fwb.input wire:model="form.national_code" :label="__('general.national_code')" type="text" dir="ltr" />
+                @error('form.national_code')
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <x-fwb.input wire:model="form.birth_date" :label="__('general.birth_date')" type="text" dir="ltr" placeholder="1400/01/01" />
+                @error('form.birth_date')
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                @enderror
+            </div>
+
             <x-ui.button type="submit" color="green" target="save" class="w-full">
                 {{ __('general.save') }}
             </x-ui.button>
