@@ -9,6 +9,33 @@ new #[Layout('layouts.panels')] class extends Component
 };
 ?>
 
+<x-slot name="title">{{ __('general.users') }} - {{ config('app.name') }}</x-slot>
+
 <div>
-    <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">{{ __('general.users') }}</h1>
+    <x-fwb.breadcrumb class="mb-4">
+        <x-fwb.breadcrumb.item home>{{ __('general.administrator') }}</x-fwb.breadcrumb.item>
+        <x-fwb.breadcrumb.item>{{ __('general.users') }}</x-fwb.breadcrumb.item>
+    </x-fwb.breadcrumb>
+
+    <div class="space-y-6">
+        <div class="flex items-center justify-between gap-3">
+            <h1 class="text-2xl font-semibold text-heading">{{ __('general.users') }}</h1>
+
+            <x-ui.button
+                type="button"
+                color="green"
+                :loading="false"
+                x-modal:open="{ modal: 'administrator.user.create' }"
+            >
+                <x-slot:icon>
+                    <x-lucide-plus class="h-4 w-4 me-2" />
+                </x-slot:icon>
+                {{ __('general.create_user') }}
+            </x-ui.button>
+        </div>
+
+        <x-fwb.card>
+            <livewire:administrator.user-table :key="'administrator-user-table'" />
+        </x-fwb.card>
+    </div>
 </div>
