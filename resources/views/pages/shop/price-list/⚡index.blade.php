@@ -9,16 +9,16 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Morilog\Jalali\Jalalian;
-use Symfony\Component\HttpFoundation\StreamedResponse;
-
 new #[Layout('layouts.app')] class extends Component
 {
     use WithPagination;
 
     public ?Category $category = null;
 
+    public string $categoryId = '';
+
     #[Url]
-    public ?int $brand = null;
+    public string $brand = '';
 
     #[Url]
     public string $q = '';
@@ -35,6 +35,19 @@ new #[Layout('layouts.app')] class extends Component
     public function mount(?Category $category = null): void
     {
         $this->category = $category;
+        $this->categoryId = $category ? (string) $category->id : '';
+    }
+
+    public function updatedCategoryId(string $value): void
+    {
+        if ($value === '') {
+            $this->redirect(route('shop.price-list'), navigate: true);
+
+            return;
+        }
+
+        $category = Category::query()->findOrFail((int) $value);
+        $this->redirect(route('shop.price-list', $category), navigate: true);
     }
 
     public function updatedBrand(): void
@@ -45,18 +58,6 @@ new #[Layout('layouts.app')] class extends Component
     public function updatedQ(): void
     {
         $this->resetPage();
-    }
-
-    public function selectCategory(?int $categoryId): void
-    {
-        if ($categoryId === null) {
-            $this->redirect(route('shop.price-list'), navigate: true);
-
-            return;
-        }
-
-        $category = Category::query()->findOrFail($categoryId);
-        $this->redirect(route('shop.price-list', $category), navigate: true);
     }
 
     public function openChart(int $itemId): void
@@ -82,19 +83,20 @@ new #[Layout('layouts.app')] class extends Component
         $this->chartPoints = [];
     }
 
-    public function exportPdf(): mixed
+    public function exportPdf()
     {
         if ($this->category === null) {
             return null;
         }
 
         $service = app(PriceListService::class);
-        $items = $service->all($this->category->id, $this->brand, $this->q !== '' ? $this->q : null);
+        $brandId = $this->brand !== '' ? (int) $this->brand : null;
+        $items = $service->all($this->category->id, $brandId, $this->q !== '' ? $this->q : null);
         $brandTitle = null;
 
-        if ($this->brand !== null) {
+        if ($brandId !== null) {
             $brandTitle = collect($service->brandOptions($this->category->id))
-                ->firstWhere('id', $this->brand)['title'] ?? null;
+                ->firstWhere('id', $brandId)['title'] ?? null;
         }
 
         $pdf = Pdf::loadView('shop.price-list.pdf', [
@@ -146,7 +148,7 @@ new #[Layout('layouts.app')] class extends Component
 
         return app(PriceListService::class)->paginate(
             $this->category->id,
-            $this->brand,
+            $this->brand !== '' ? (int) $this->brand : null,
             $this->q !== '' ? $this->q : null,
         );
     }
@@ -185,10 +187,9 @@ new #[Layout('layouts.app')] class extends Component
     <div class="grid gap-3 rounded-xl border border-nav-border bg-surface p-4 sm:grid-cols-2 lg:grid-cols-3">
         <div>
             <x-fwb.select
-                wire:change="selectCategory($event.target.value || null)"
+                wire:model.live="categoryId"
                 :label="__('general.category')"
                 :options="$this->categoryOptions"
-                :value="$category?->id"
             />
         </div>
 
@@ -373,12 +374,13 @@ new #[Layout('layouts.app')] class extends Component
                 return;
             }
 
-            const { Chart, registerables } = await import('chart.js');
-            Chart.register(...registerables);
+            if (!window.Chart) {
+                return;
+            }
 
             await this.$nextTick();
 
-            this.chart = new Chart(this.$refs.canvas, {
+            this.chart = new window.Chart(this.$refs.canvas, {
                 type: 'line',
                 data: {
                     labels,

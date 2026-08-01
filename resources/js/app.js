@@ -1,8 +1,12 @@
 import 'flowbite';
 import { initFlowbite } from 'flowbite';
 import smoothscroll from 'smoothscroll-polyfill';
+import { Chart, registerables } from 'chart.js';
 import './../../vendor/power-components/livewire-powergrid/dist/powergrid';
 import '../../vendor/masmerise/livewire-toaster/resources/js';
+
+Chart.register(...registerables);
+window.Chart = Chart;
 
 smoothscroll.polyfill();
 
