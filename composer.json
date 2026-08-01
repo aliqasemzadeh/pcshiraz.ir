@@ -17,7 +17,6 @@
         "morilog/jalali": "^3.5",
         "opcodesio/log-viewer": "^3.24",
         "power-components/livewire-powergrid": "^6.10",
-        "revoltify/subscriptionify": "^1.0",
         "sadegh19b/laravel-persian-validation": "^2.1",
         "shetabit/payment": "*",
         "spatie/laravel-medialibrary": "^11.23",
