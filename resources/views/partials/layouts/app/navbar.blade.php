@@ -16,6 +16,20 @@
         </div>
 
         <a
+            href="{{ route('shop.price-list') }}"
+            wire:navigate
+            @class([
+                'hidden shrink-0 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition duration-200 hover:bg-brand-softer hover:text-brand md:inline-flex',
+                'text-brand' => request()->routeIs('shop.price-list'),
+                'text-navbar-fg' => ! request()->routeIs('shop.price-list'),
+            ])
+            title="{{ __('general.price_list') }}"
+        >
+            <x-lucide-list class="h-5 w-5" />
+            <span>{{ __('general.price_list') }}</span>
+        </a>
+
+        <a
             href="{{ route('home') }}"
             wire:navigate
             class="inline-flex shrink-0 items-center justify-center rounded-lg p-2.5 text-navbar-fg transition duration-200 hover:bg-brand-softer hover:text-brand focus:ring-2 focus:ring-brand/30 focus:outline-none"
