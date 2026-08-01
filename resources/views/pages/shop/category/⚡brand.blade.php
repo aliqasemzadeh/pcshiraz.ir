@@ -55,7 +55,7 @@ new #[Layout('layouts.app')] class extends Component
     }
 
     #[Computed]
-    public function colors(): array
+    public function colorOptions(): array
     {
         return Item::query()
             ->active()
@@ -129,11 +129,11 @@ new #[Layout('layouts.app')] class extends Component
 
     <div class="grid gap-6 lg:grid-cols-[240px_1fr]">
         <aside class="space-y-6 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-            @if (count($this->colors) > 0)
+            @if (count($this->colorOptions) > 0)
                 <div>
                     <h2 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white">{{ __('app.filter_color') }}</h2>
                     <div class="max-h-64 space-y-2 overflow-y-auto">
-                        @foreach ($this->colors as $color)
+                        @foreach ($this->colorOptions as $color)
                             <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
                                 <input type="checkbox" wire:model.live="colors" value="{{ $color['name'] }}" class="rounded border-gray-300 text-brand focus:ring-brand" />
                                 @if ($color['code'])
