@@ -18,6 +18,9 @@ return new class extends Migration
 
             $table->unsignedBigInteger('group_id')->nullable()->index();
             $table->boolean('is_main')->default(false);
+            $table->boolean('is_active')->default(true)->index();
+            $table->boolean('is_purchasable')->default(true)->index();
+            $table->unsignedBigInteger('views_count')->default(0);
 
             $table->string('title');
             $table->text('description')->nullable();
@@ -38,9 +41,9 @@ return new class extends Migration
             $table->softDeletes();
             $table->timestamps();
 
-            $table->index(['domain_id', 'category_id', 'is_main'], 'items_union_main_idx');
-            $table->index(['domain_id', 'category_id', 'group_id'], 'items_union_no_group_idx');
-            $table->index(['domain_id', 'category_id', 'title'], 'items_search_by_category_idx');
+            $table->index(['category_id', 'is_main'], 'items_union_main_idx');
+            $table->index(['category_id', 'group_id'], 'items_union_no_group_idx');
+            $table->index(['category_id', 'title'], 'items_search_by_category_idx');
         });
     }
 

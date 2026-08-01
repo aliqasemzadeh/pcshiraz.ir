@@ -15,13 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->string('seo_title')->nullable();
-            $table->string('slug');
+            $table->string('slug')->unique();
             $table->unsignedInteger('sort_order')->default(0);
+            $table->boolean('show_on_home')->default(false);
+            $table->unsignedBigInteger('views_count')->default(0);
             $table->json('meta')->nullable();
             $table->timestamps();
             $table->softDeletes();
-
-            $table->unique(['domain_id', 'slug']);
         });
     }
 
