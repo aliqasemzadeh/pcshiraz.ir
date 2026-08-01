@@ -21,4 +21,6 @@ return [
     'no_products' => 'No products found',
     'view_product' => 'View product',
     'cash_price' => 'Cash price',
+    'is_contact_price' => 'Call for price',
+    'contact_for_price' => 'Contact us for price',
 ];

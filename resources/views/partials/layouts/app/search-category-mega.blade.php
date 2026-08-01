@@ -41,7 +41,7 @@
     <button
         id="shop-search-category-button"
         type="button"
-        @click="open = !open"
+        @click="window.matchMedia('(min-width: 768px)').matches ? (open = !open) : $dispatch('shop-mobile-category-open')"
         class="box-border inline-flex h-10 shrink-0 items-center rounded-s-lg border border-e-0 border-nav-border bg-shop-canvas px-2.5 text-sm font-medium text-ink transition duration-200 hover:bg-brand-softer focus:ring-4 focus:ring-brand/20 focus:outline-none sm:px-3"
         :aria-expanded="open.toString()"
         aria-haspopup="true"
@@ -60,7 +60,7 @@
         x-transition:leave="transition ease-in duration-100"
         x-transition:leave-start="opacity-100 translate-y-0"
         x-transition:leave-end="opacity-0 translate-y-1"
-        class="absolute start-0 top-full z-50 mt-1 flex w-[min(100vw-1.5rem,22rem)] overflow-hidden rounded-xl border border-nav-border bg-surface p-0 shadow-xl md:w-[min(96vw,56rem)]"
+        class="absolute start-0 top-full z-50 mt-1 hidden w-[min(100vw-1.5rem,22rem)] overflow-hidden rounded-xl border border-nav-border bg-surface p-0 shadow-xl md:flex md:w-[min(96vw,56rem)]"
         role="menu"
         aria-labelledby="shop-search-category-button"
     >

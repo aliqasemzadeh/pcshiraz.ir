@@ -21,4 +21,6 @@ return [
     'no_products' => 'کالایی یافت نشد',
     'view_product' => 'مشاهده کالا',
     'cash_price' => 'قیمت نقد',
+    'is_contact_price' => 'قیمت با تماس',
+    'contact_for_price' => 'برای اطلاع از قیمت تماس بگیرید',
 ];

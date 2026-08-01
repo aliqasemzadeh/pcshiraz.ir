@@ -123,4 +123,12 @@ return [
     'delete_warning_message' => 'Are you sure you want to delete this item?',
     'action_cannot_be_reversed' => 'This action cannot be reversed.',
     'created_at' => 'Created at',
+    'price_list' => 'Price list',
+    'contact_price' => 'Call for price',
+    'price_chart' => 'Price chart',
+    'export_price_list' => 'Export price list',
+    'search_items' => 'Search products...',
+    'all_brands' => 'All brands',
+    'select_category_for_price_list' => 'Select a category to view the price list',
+    'no_price_history' => 'No price history available',
 ];
