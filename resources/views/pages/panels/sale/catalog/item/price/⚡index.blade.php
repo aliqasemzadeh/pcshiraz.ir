@@ -4,7 +4,6 @@ use App\Enums\PriceTypeEnum;
 use App\Livewire\Forms\ItemPriceForm;
 use App\Models\Item;
 use App\Models\ItemPrice;
-use App\Support\CurrentDomain;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -21,12 +20,6 @@ new #[Layout('layouts.panels')] class extends Component
 
     public function mount(Item $item): void
     {
-        $domain = CurrentDomain::get();
-
-        if ($domain === null || $item->domain_id !== $domain->id) {
-            abort(404);
-        }
-
         $this->item = $item->load(['brand', 'category', 'media']);
         $this->activeType = PriceTypeEnum::Cash->value;
         $this->form->setType($this->activeType);
@@ -41,14 +34,6 @@ new #[Layout('layouts.panels')] class extends Component
 
     public function save(): void
     {
-        $domain = CurrentDomain::get();
-
-        if ($domain === null || $this->item->domain_id !== $domain->id) {
-            Toaster::error(__('general.error'));
-
-            return;
-        }
-
         $this->form->price_type = $this->activeType;
         $this->form->store($this->item);
         $this->form->setType($this->activeType);

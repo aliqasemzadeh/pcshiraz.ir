@@ -53,6 +53,13 @@
 </div>
 
 <div>
+    <x-fwb.checkbox wire:model="form.is_active" :label="__('app.is_active')" />
+</div>
+<div>
+    <x-fwb.checkbox wire:model="form.is_purchasable" :label="__('app.is_purchasable')" />
+</div>
+
+<div>
     <x-fwb.input
         wire:model="form.title"
         :label="__('general.title')"
