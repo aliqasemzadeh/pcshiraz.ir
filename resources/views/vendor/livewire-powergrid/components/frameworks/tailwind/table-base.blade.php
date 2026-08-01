@@ -34,7 +34,7 @@
 
             <div
                 @class([
-                    'overflow-auto' => $readyToLoad,
+                    'overflow-x-auto' => $readyToLoad,
                     'overflow-hidden' => !$readyToLoad,
                     theme_style($theme, 'table.layout.div'),
                 ])

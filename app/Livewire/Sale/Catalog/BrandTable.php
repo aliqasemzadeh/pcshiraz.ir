@@ -5,9 +5,8 @@ namespace App\Livewire\Sale\Catalog;
 use App\Models\Brand;
 use App\Support\CurrentDomain;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Blade;
+use Illuminate\View\View;
 use Morilog\Jalali\Jalalian;
-use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
@@ -105,26 +104,13 @@ final class BrandTable extends PowerGridComponent
         ];
     }
 
-    public function actions(Brand $row): array
+    public function actionsFromView(Brand $row): View
     {
-        return [
-            Button::add('edit')
-                ->slot(Blade::render('<x-lucide-pencil class="h-4 w-4" />'))
-                ->class('inline-flex items-center justify-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm p-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800')
-                ->tooltip(__('general.edit'))
-                ->dispatch('modal-open', [
-                    'modal' => 'sale.catalog.brand.edit',
-                    'props' => ['brandId' => $row->id],
-                ]),
-
-            Button::add('delete')
-                ->slot(Blade::render('<x-lucide-trash-2 class="h-4 w-4" />'))
-                ->class('inline-flex items-center justify-center text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm p-2 dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none dark:focus:ring-red-800')
-                ->tooltip(__('general.delete'))
-                ->dispatch('modal-open', [
-                    'modal' => 'sale.catalog.brand.delete',
-                    'props' => ['brandId' => $row->id],
-                ]),
-        ];
+        return view('components.powergrid.row-actions', [
+            'row' => $row,
+            'editModal' => 'sale.catalog.brand.edit',
+            'deleteModal' => 'sale.catalog.brand.delete',
+            'idProp' => 'brandId',
+        ]);
     }
 }

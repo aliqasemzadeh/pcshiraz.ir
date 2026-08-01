@@ -1,3 +1,8 @@
+---
+description: 
+alwaysApply: true
+---
+
 # Project Role & Context
 You are an expert full-stack developer working on a Laravel project. Your task is to generate code that strictly adheres to the following project guidelines, tech stack, and architectural rules.
 
@@ -58,7 +63,7 @@ import '../../vendor/masmerise/livewire-toaster/resources/js';
 ```
 
 Ensure Tailwind content / `@source` includes (PowerGrid is already wired in `resources/css/app.css`):
-*   PowerGrid Tailwind 4 CSS import + `@source` for `app/Livewire/*Table.php`, vendor views, and `Tailwind.php` theme
+*   PowerGrid Tailwind 4 CSS import + `@source` for `app/Livewire/*Table.php`, `app/Support/PowerGrid/FlowbiteTheme.php`, vendor views, and stock `Tailwind.php`
 *   `./vendor/elegantly/livewire-modal/resources/views/**/*.blade.php`
 *   Published modal overrides: `resources/views/vendor/livewire-modal/**/*.blade.php` (adds logical `start` / `end` positions)
 *   Published toaster views under `resources/views/vendor/toaster/` (and/or vendor toaster views)
@@ -66,9 +71,9 @@ Ensure Tailwind content / `@source` includes (PowerGrid is already wired in `res
 *   `./vendor/themesberg/flowbite-laravel-components/src/**/*.php`
 *   Flowbite theme: `@import 'flowbite/src/themes/default';` + `@plugin "flowbite/plugin"`
 
-**Brand / PowerGrid colors:** In `resources/css/app.css`, remap `--color-pg-primary-*`, `--color-primary-*`, and `--color-pg-secondary-*` to the indigo brand scale (same as teal→indigo remap). Do **not** leave PowerGrid’s default blue/gray palette. After changing tokens, run `npm run build` (or `npm run dev`).
+**Brand / PowerGrid colors:** In `resources/css/app.css`, remap `--color-pg-primary-*`, `--color-primary-*`, and `--color-pg-secondary-*` to the indigo brand scale (same as teal→indigo remap). Do **not** leave PowerGrid’s default blue/gray palette. After changing tokens or `FlowbiteTheme` class strings, run `npm run build` (or `npm run dev`).
 
-Initialize Flowbite for interactive widgets (dropdown, tooltip, datepicker, etc.) after Livewire navigations when needed (`initFlowbite()`).
+**Flowbite JS (REQUIRED):** Call `initFlowbite()` on `DOMContentLoaded`, `livewire:navigated`, `pg-livewire-request-finished`, and `livewire:morph.updated` so tooltips/dropdowns work after PowerGrid pagination/search.
 
 ## 6. Flowbite Component Rules & UI Innovation
 *   **Innovative UI/UX:** Build modern, clean UIs with Flowbite patterns + Tailwind utility classes (smart empty states, loading transitions, clean alignment, modern spacing).
@@ -82,7 +87,9 @@ Initialize Flowbite for interactive widgets (dropdown, tooltip, datepicker, etc.
 *   **Cards:** Optionally wrap the PowerGrid include in a Flowbite card container for page layout consistency. Do NOT build a separate manual search box above PowerGrid — use PowerGrid header search.
 
 ### Tables & Lists (`livewire-powergrid`)
-*   **Mandatory:** All index/list tables MUST use PowerGrid. Never build custom Blade `<table>` CRUD lists.
+*   **Mandatory:** All index/list tables MUST use PowerGrid. Never build custom Blade `<table>` CRUD lists. Do **not** use `x-fwb.table` for CRUD indexes — PowerGrid is the list engine; visual style comes from `FlowbiteTheme`.
+*   **Theme (REQUIRED):** Config must use `App\Support\PowerGrid\FlowbiteTheme` (`config/livewire-powergrid.php`). Classes mirror Flowbite Blade Data Display (`x-fwb.table` / `.row` / `.cell`) — see https://github.com/themesberg/flowbite-laravel-components#data-display. Do **not** switch back to stock `Tailwind`/`DaisyUI`/`Bootstrap5` for CRUD tables. Do **not** override row/header background classes per table unless there is an explicit product exception.
+*   **Striped + hover (REQUIRED):** Built into `FlowbiteTheme` (`odd:bg-neutral-primary even:bg-neutral-secondary-soft hover:bg-neutral-secondary-medium`) — same as `<x-fwb.table striped hoverable>`. Every PowerGrid table gets this automatically.
 *   **Create:** `php artisan powergrid:create` → class under `app/Livewire/` extending `PowerGridComponent`.
 *   **Docs / patterns:** Follow https://livewire-powergrid.com and the official demo https://github.com/Power-Components/powergrid-demo (e.g. Search With Relationship).
 *   **Unique table name:** Always set `public string $tableName = 'usersTable';` (CamelCase, unique per page). Required for refresh events.
@@ -121,19 +128,21 @@ Initialize Flowbite for interactive widgets (dropdown, tooltip, datepicker, etc.
     ```
 *   **Relation fields:** Add display fields via closures in `fields()`, mark the column `->searchable()`, and keep `relationSearch()` in sync with the real DB columns on those relations.
 *   **Relation filters:** When filtering by a relation column, use `Filter::...()->filterRelation('relation', 'column')` AND keep that relation in `relationSearch()`.
-*   **Actions column:** Add `Column::action(__('general.actions'))` and implement `actions($row): array` with `Button::add(...)`. Prefer dispatching modal-open / domain events (edit/delete) instead of separate routes.
-*   **Action icons (REQUIRED):** PowerGrid injects action `slot` HTML via Alpine `x-html` — Blade components inside the slot string are **NOT** compiled. Always render Lucide to real SVG with `Blade::render(...)`. Never pass raw `'<x-lucide-pencil … />'` as the slot. Buttons must include `inline-flex items-center justify-center` so the SVG is visible:
+*   **Actions column (REQUIRED):** Add `Column::action(__('general.actions'))` and implement **`actionsFromView($row)`** returning a Blade view with Flowbite tooltips. Prefer dispatching `modal-open` (edit/delete) instead of separate routes.
+*   **Do NOT use `actions()` + `Button::tooltip()` for styled tooltips:** PowerGrid’s `->tooltip()` only sets the native HTML `title` attribute. Alpine `x-html` action buttons also cannot emit Flowbite’s two-element tooltip markup. If both `actions()` and `actionsFromView()` exist, **both render** (duplicate buttons) — use only `actionsFromView()`.
+*   **Shared row actions:** Prefer `resources/views/components/powergrid/row-actions.blade.php` (`<x-fwb.tooltip>` + Lucide icon buttons with brand/danger classes):
     ```php
-    use Illuminate\Support\Facades\Blade;
+    use Illuminate\View\View;
 
-    Button::add('edit')
-        ->slot(Blade::render('<x-lucide-pencil class="h-4 w-4" />'))
-        ->class('inline-flex items-center justify-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm p-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800')
-        ->tooltip(__('general.edit'))
-        ->dispatch('modal-open', [
-            'modal' => 'user.edit',
-            'props' => ['userId' => $row->id],
+    public function actionsFromView(User $row): View
+    {
+        return view('components.powergrid.row-actions', [
+            'row' => $row,
+            'editModal' => 'user.edit',
+            'deleteModal' => 'user.delete',
+            'idProp' => 'userId',
         ]);
+    }
     ```
 *   **Include on pages:**
     ```html
@@ -240,18 +249,18 @@ Initialize Flowbite for interactive widgets (dropdown, tooltip, datepicker, etc.
     *   Neutral / secondary → gray/light alternative button classes
 *   **One page action:** single button.
 *   **Multiple page actions:** Flowbite dropdown menu to avoid mobile overflow.
-*   **Row actions:** icon-only small buttons with Lucide icons + Flowbite tooltip (`data-tooltip-target`):
+*   **Row actions:** icon-only small buttons with Lucide icons + Flowbite tooltip. For PowerGrid tables use `actionsFromView()` + `components.powergrid.row-actions` (`<x-fwb.tooltip>`). For non-PowerGrid Blade lists (rare), use `data-tooltip-target` + tooltip div:
     ```html
     <button
         type="button"
         data-tooltip-target="tooltip-edit-{{ $user->id }}"
         wire:click="$dispatch('panels.administrator.user.edit.assign-data', { user: {{ $user->id }} })"
-        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm p-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+        class="inline-flex items-center justify-center p-2 text-white bg-brand border border-transparent rounded-base shadow-xs hover:bg-brand-strong focus:outline-none focus:ring-4 focus:ring-brand-medium"
     >
         <x-lucide-pencil class="w-4 h-4" />
         <span class="sr-only">{{ __('general.edit') }}</span>
     </button>
-    <div id="tooltip-edit-{{ $user->id }}" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
+    <div id="tooltip-edit-{{ $user->id }}" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-dark rounded-lg shadow-sm opacity-0 tooltip">
         {{ __('general.edit') }}
         <div class="tooltip-arrow" data-popper-arrow></div>
     </div>
@@ -309,7 +318,7 @@ Initialize Flowbite for interactive widgets (dropdown, tooltip, datepicker, etc.
 </div>
 ```
 
-**PowerGrid table component (`app/Livewire/UserTable.php`) — searchable + relationSearch:**
+**PowerGrid table component (`app/Livewire/UserTable.php`) — searchable + relationSearch + actionsFromView:**
 ```php
 <?php
 
@@ -317,8 +326,7 @@ namespace App\Livewire;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Blade;
-use PowerComponents\LivewirePowerGrid\Button;
+use Illuminate\View\View;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
@@ -384,27 +392,14 @@ final class UserTable extends PowerGridComponent
         ];
     }
 
-    public function actions(User $row): array
+    public function actionsFromView(User $row): View
     {
-        return [
-            Button::add('edit')
-                ->slot(Blade::render('<x-lucide-pencil class="h-4 w-4" />'))
-                ->class('inline-flex items-center justify-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm p-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800')
-                ->tooltip(__('general.edit'))
-                ->dispatch('modal-open', [
-                    'modal' => 'user.edit',
-                    'props' => ['userId' => $row->id],
-                ]),
-
-            Button::add('delete')
-                ->slot(Blade::render('<x-lucide-trash-2 class="h-4 w-4" />'))
-                ->class('inline-flex items-center justify-center text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm p-2 dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none dark:focus:ring-red-800')
-                ->tooltip(__('general.delete'))
-                ->dispatch('modal-open', [
-                    'modal' => 'user.delete',
-                    'props' => ['userId' => $row->id],
-                ]),
-        ];
+        return view('components.powergrid.row-actions', [
+            'row' => $row,
+            'editModal' => 'user.edit',
+            'deleteModal' => 'user.delete',
+            'idProp' => 'userId',
+        ]);
     }
 }
 ```
@@ -413,14 +408,14 @@ final class UserTable extends PowerGridComponent
 *   **Create & Edit:** Always via `elegantly/livewire-modal` **slideover** with direction-aware `position` (`rtl` → `end`, `ltr` → `start`). After success: `Toaster::success(...)`, `$this->dispatch('modal-close')`, and refresh the PowerGrid table.
 *   **Delete:** Always via centered confirmation modal. After success: toast + close modal + refresh PowerGrid.
 *   **PowerGrid refresh:** Dispatch `pg:eventRefresh-{tableName}` matching the table's `$tableName` property, e.g. `$this->dispatch('pg:eventRefresh-usersTable');`. Do not use generic names like `refresh-data`.
-*   **PowerGrid action icons:** Always `Blade::render('<x-lucide-… />')` in `Button::slot(...)` — raw Blade tags in the slot string will not render.
+*   **PowerGrid row actions:** Use `actionsFromView()` + `components.powergrid.row-actions` (Flowbite `<x-fwb.tooltip>`). Do not use `Button::tooltip()` for styled tooltips.
 
 ## 10. Quick Package Cheatsheet
 | Concern | Package / Tool | API |
 |---|---|---|
 | UI kit | Flowbite + `themesberg/flowbite-laravel-components` (aliqasemzadeh VCS) | `<x-fwb.*>`, data attributes + `initFlowbite()` |
-| Tables | `power-components/livewire-powergrid` | `PowerGridComponent`, `Column::make()->searchable()`, `relationSearch()`, action slots via `Blade::render` |
-| Icons | `mallardduck/blade-lucide-icons` | `<x-lucide-{name} class="w-4 h-4" />` (in Blade views); in PowerGrid actions use `Blade::render(...)` |
+| Tables | `power-components/livewire-powergrid` + `App\Support\PowerGrid\FlowbiteTheme` | `PowerGridComponent`, `Column::make()->searchable()`, `relationSearch()`, `actionsFromView()` + `components.powergrid.row-actions` |
+| Icons | `mallardduck/blade-lucide-icons` | `<x-lucide-{name} class="w-4 h-4" />` (in Blade views / actionsFromView) |
 | Modal / Slideover | `elegantly/livewire-modal` (+ published `start`/`end`) | `position="{{ __('general.direction') === 'rtl' ? 'end' : 'start' }}"`, `x-modal:open`, `modal-open` / `modal-close` |
 | Toast | `masmerise/livewire-toaster` (Flowbite-styled hub) | `Toaster::success()`, `<x-toaster-hub />` |
 | Dates | `morilog/jalali` | Jalali formatting/parsing everywhere |

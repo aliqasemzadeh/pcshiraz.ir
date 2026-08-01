@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\PowerGrid\FlowbiteTheme;
 use PowerComponents\LivewirePowerGrid\Components\Exports\OpenSpout\v5\{ExportToCsv, ExportToXLS};
 use PowerComponents\LivewirePowerGrid\FilterAttributes\{Boolean, InputText, Number, Select};
 use PowerComponents\LivewirePowerGrid\Themes\Tailwind;
@@ -13,9 +14,13 @@ return [
     |
     | PowerGrid supports Tailwind and Bootstrap 5 themes.
     | Configure here the theme of your choice.
+    |
+    | Project standard: FlowbiteTheme (Flowbite Data Display table look —
+    | striped + hoverable). Do not switch back to stock Tailwind for CRUD tables.
     */
 
-    'theme' => Tailwind::class,
+    'theme' => FlowbiteTheme::class,
+    // 'theme' => Tailwind::class,
     // 'theme' => \PowerComponents\LivewirePowerGrid\Themes\DaisyUI::class,
     // 'theme' => \PowerComponents\LivewirePowerGrid\Themes\Bootstrap5::class,
 

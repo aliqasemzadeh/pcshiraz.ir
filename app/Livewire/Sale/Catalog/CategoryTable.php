@@ -5,9 +5,8 @@ namespace App\Livewire\Sale\Catalog;
 use App\Models\Category;
 use App\Support\CurrentDomain;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Blade;
+use Illuminate\View\View;
 use Morilog\Jalali\Jalalian;
-use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
@@ -105,26 +104,13 @@ final class CategoryTable extends PowerGridComponent
         ];
     }
 
-    public function actions(Category $row): array
+    public function actionsFromView(Category $row): View
     {
-        return [
-            Button::add('edit')
-                ->slot(Blade::render('<x-lucide-pencil class="h-4 w-4" />'))
-                ->class('inline-flex items-center justify-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm p-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800')
-                ->tooltip(__('general.edit'))
-                ->dispatch('modal-open', [
-                    'modal' => 'sale.catalog.category.edit',
-                    'props' => ['categoryId' => $row->id],
-                ]),
-
-            Button::add('delete')
-                ->slot(Blade::render('<x-lucide-trash-2 class="h-4 w-4" />'))
-                ->class('inline-flex items-center justify-center text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm p-2 dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none dark:focus:ring-red-800')
-                ->tooltip(__('general.delete'))
-                ->dispatch('modal-open', [
-                    'modal' => 'sale.catalog.category.delete',
-                    'props' => ['categoryId' => $row->id],
-                ]),
-        ];
+        return view('components.powergrid.row-actions', [
+            'row' => $row,
+            'editModal' => 'sale.catalog.category.edit',
+            'deleteModal' => 'sale.catalog.category.delete',
+            'idProp' => 'categoryId',
+        ]);
     }
 }

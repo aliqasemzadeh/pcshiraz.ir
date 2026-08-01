@@ -3,10 +3,9 @@ import { initFlowbite } from 'flowbite';
 import './../../vendor/power-components/livewire-powergrid/dist/powergrid';
 import '../../vendor/masmerise/livewire-toaster/resources/js';
 
-document.addEventListener('DOMContentLoaded', () => {
-    initFlowbite();
-});
+const bootFlowbite = () => initFlowbite();
 
-document.addEventListener('livewire:navigated', () => {
-    initFlowbite();
-});
+document.addEventListener('DOMContentLoaded', bootFlowbite);
+document.addEventListener('livewire:navigated', bootFlowbite);
+window.addEventListener('pg-livewire-request-finished', bootFlowbite);
+document.addEventListener('livewire:morph.updated', bootFlowbite);
