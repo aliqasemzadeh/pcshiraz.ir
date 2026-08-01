@@ -1,6 +1,6 @@
 # پی سی شیراز (pcshiraz.ir)
 
-Multi-domain e-commerce platform for selling computer parts and related products — built for the Iranian market with Persian (RTL) UI, Jalali dates, mobile OTP login, and local payment gateways.
+E-commerce platform for selling computer parts and related products — built for the Iranian market with Persian (RTL) UI, Jalali dates, mobile OTP login, and local payment gateways.
 
 ## Stack
 
@@ -16,7 +16,6 @@ Multi-domain e-commerce platform for selling computer parts and related products
 | Access control | Spatie Permission |
 | Catalog / media | Spatie Media Library, Tags, Sluggable |
 | Payments | Shetabit Payment (Iranian gateways) |
-| Subscriptions | Subscriptionify |
 | Dates | Morilog Jalali |
 | Validation | Persian validation helpers |
 | Frontend build | Vite 8, Vazirmatn |
@@ -24,13 +23,12 @@ Multi-domain e-commerce platform for selling computer parts and related products
 ## Features
 
 - **Shop storefront** — home, profile, category browsing, product search
-- **Multi-domain** — each shop lives under its own domain with isolated catalog data
 - **Role-based panels**
-  - Administrator — users, roles, permissions, domains
+  - Administrator — users, roles, permissions
   - Sale — brands, categories, items (catalog)
   - Colleague — colleague dashboard
   - Organization — organization / partner dashboard
-- **Catalog** — brands, categories, items, prices, inventory, media, tags
+- **Catalog** — brands, categories, items, prices, media, tags
 - **Bilingual** — Persian (`fa`, RTL) and English (`en`) via `/lang`
 - **Toasts & modals** — slideover create/edit, centered delete confirm, toaster feedback after actions
 
@@ -93,7 +91,7 @@ After seeding:
 | `09121111111` | `password` | Base test user |
 | `09120000000` | `password` | Demo shop owner (`demo@pcshiraz.ir`) |
 
-Demo data includes a domain titled **پی سی شیراز** with sample PC categories, brands, and items.
+Demo data includes sample PC categories, brands, and items.
 
 Login uses **mobile OTP** in the UI; seeded passwords support non-OTP flows if enabled.
 
@@ -101,7 +99,7 @@ Login uses **mobile OTP** in the UI; seeded passwords support non-OTP flows if e
 
 ```
 app/
-  Models/           # Domain, Item, Brand, Category, User, …
+  Models/           # Item, Brand, Category, User, …
   Livewire/         # PowerGrid *Table components (class-based)
   Livewire/Forms/   # Livewire form objects
   Services/Shop/    # Shop domain services
