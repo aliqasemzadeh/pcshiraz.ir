@@ -50,26 +50,68 @@ new #[Layout('layouts.app')] class extends Component
     #[Computed]
     public function homeCategories()
     {
-        return Cache::remember(CatalogCache::HOME_CATEGORIES, CatalogCache::TTL, function () {
+        /** @var list<array{id: int, item_ids: list<int>}> $payload */
+        $payload = Cache::remember(CatalogCache::HOME_CATEGORIES, CatalogCache::TTL, function () {
             return Category::query()
                 ->showOnHome()
-                ->with(['media'])
                 ->orderBy('sort_order')
                 ->orderBy('title')
-                ->get()
-                ->each(function (Category $category) {
-                    $category->setRelation(
-                        'homeItems',
-                        Item::query()
-                            ->active()
-                            ->where('category_id', $category->id)
-                            ->with(['brand', 'media', 'activeCashPrice'])
-                            ->orderByDesc('id')
-                            ->limit(12)
-                            ->get()
-                    );
-                });
+                ->get(['id'])
+                ->map(fn (Category $category) => [
+                    'id' => $category->id,
+                    'item_ids' => Item::query()
+                        ->active()
+                        ->where('category_id', $category->id)
+                        ->orderByDesc('id')
+                        ->limit(12)
+                        ->pluck('id')
+                        ->all(),
+                ])
+                ->all();
         });
+
+        if ($payload === []) {
+            return collect();
+        }
+
+        $categoryIds = array_column($payload, 'id');
+        $itemIds = collect($payload)->pluck('item_ids')->flatten()->unique()->values()->all();
+
+        $categories = Category::query()
+            ->with(['media'])
+            ->whereIn('id', $categoryIds)
+            ->get()
+            ->keyBy('id');
+
+        $items = $itemIds === []
+            ? collect()
+            : Item::query()
+                ->active()
+                ->with(['brand', 'media', 'activeCashPrice'])
+                ->whereIn('id', $itemIds)
+                ->get()
+                ->keyBy('id');
+
+        return collect($payload)
+            ->map(function (array $row) use ($categories, $items) {
+                $category = $categories->get($row['id']);
+
+                if ($category === null) {
+                    return null;
+                }
+
+                $category->setRelation(
+                    'homeItems',
+                    collect($row['item_ids'])
+                        ->map(fn (int $id) => $items->get($id))
+                        ->filter()
+                        ->values()
+                );
+
+                return $category;
+            })
+            ->filter()
+            ->values();
     }
 };
 ?>

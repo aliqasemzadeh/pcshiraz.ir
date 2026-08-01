@@ -10,7 +10,7 @@ class CatalogCache
 
     public const HOME_TAGS = 'shop.home.tags';
 
-    public const HOME_CATEGORIES = 'shop.home.categories';
+    public const HOME_CATEGORIES = 'shop.home.categories.v2';
 
     public const TTL = 3600;
 
@@ -20,8 +20,9 @@ class CatalogCache
         Cache::forget(self::HOME_TAGS);
         Cache::forget(self::HOME_CATEGORIES);
 
-        // Legacy keys from domain-scoped menu.
+        // Legacy keys (domain-scoped menu + Eloquent-serialized homepage payload).
         Cache::forget('shop.category_menu.v2');
+        Cache::forget('shop.home.categories');
     }
 
     public static function categoryFilters(int $categoryId): string
