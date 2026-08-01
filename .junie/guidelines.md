@@ -242,30 +242,38 @@ Ensure Tailwind content / `@source` includes (PowerGrid is already wired in `res
 *   **File uploads:** Use Flowbite file input styles. Inside slideovers/modals keep uploads compact/inline.
 
 ### Buttons & Actions
-*   Use Flowbite button class sets. Map actions to colors:
-    *   Save / Create / Import → teal or green (`bg-teal-700` / `bg-green-700`)
-    *   Edit → blue (`bg-blue-700`)
-    *   Delete → red (`bg-red-700`)
-    *   Neutral / secondary → gray/light alternative button classes
-*   **One page action:** single button.
-*   **Multiple page actions:** Flowbite dropdown menu to avoid mobile overflow.
-*   **Row actions:** icon-only small buttons with Lucide icons + Flowbite tooltip. For PowerGrid tables use `actionsFromView()` + `components.powergrid.row-actions` (`<x-fwb.tooltip>`). For non-PowerGrid Blade lists (rare), use `data-tooltip-target` + tooltip div:
+*   **REQUIRED action button:** Always use `<x-ui.button>` (Flowbite models in `resources/views/components/ui/button.blade.php`). It shows spinner + `__('general.working')` while the Livewire request runs, and `wire:loading.attr="disabled"` so sibling buttons cannot be clicked until the request finishes. During file upload, `$store.ui.busy` also disables all `<x-ui.button>`s. Do **not** hand-roll raw `<button class="...">` for actions.
+*   Pass `target="methodName"` to scope the loading label (e.g. `target="save"`, `target="delete"`).
+*   Secondary / cancel buttons that must not show the working label: `:loading="false"` (they still disable while busy).
+*   **Models / props** (see Flowbite: https://flowbite.com/docs/components/buttons/):
+    *   `variant`: `solid` (default), `outline`, `gradient`, `gradient-shadow`, `duotone`
+    *   `pill`: fully rounded (`rounded-full`)
+    *   `color` (solid): `blue`/`brand`, `secondary`, `tertiary`, `green`/`success`, `red`/`danger`, `yellow`/`warning`, `dark`, `ghost`, `light`, `purple`, `cyan`, `teal`, `lime`, `pink`, `orange`
+    *   `duotone` (when `variant="duotone"`): `purple-blue`, `cyan-blue`, `green-blue`, `purple-pink`, `pink-orange`, `teal-lime`, `red-yellow`
+    *   Legacy `:outline="true"` maps to `variant="outline"`.
+*   **Semantic color mapping** (priority over decorative choice):
+    *   Save / Create → `color="green"`
+    *   Import / secondary primary action → `color="teal"` or `cyan` (optionally `variant="gradient"`)
+    *   Edit / brand primary → `color="blue"`
+    *   Delete → `color="red"`
+    *   Warning / caution → `color="yellow"`
+    *   Neutral / cancel → `color="light"` + `outline`, or `secondary` / `ghost`
+*   **Adjacent buttons must not share a color:** When two or more action buttons sit in the same row/group, each must use a **different** `color` (and preferably different themes). Suggested rotation for non-delete actions: `blue` → `teal` → `purple` → `cyan` → `yellow` → `pink`. Keep `red` for danger only and `green` for save/create only. Never place two solid greens (or two identical colors) side by side.
+*   **One page action:** single `<x-ui.button>`.
+*   **Multiple page actions:** Prefer `<x-fwb.dropdown>` to avoid mobile overflow; if several visible buttons are required, apply the adjacent-color rule.
+*   **Tooltips (REQUIRED):** Always use `<x-fwb.tooltip>` with `<x-slot:triggerSlot>`. Do **not** hand-roll `data-tooltip-target` markup when wrapping interactive triggers.
     ```html
-    <button
-        type="button"
-        data-tooltip-target="tooltip-edit-{{ $user->id }}"
-        wire:click="$dispatch('panels.administrator.user.edit.assign-data', { user: {{ $user->id }} })"
-        class="inline-flex items-center justify-center p-2 text-white bg-brand border border-transparent rounded-base shadow-xs hover:bg-brand-strong focus:outline-none focus:ring-4 focus:ring-brand-medium"
-    >
-        <x-lucide-pencil class="w-4 h-4" />
-        <span class="sr-only">{{ __('general.edit') }}</span>
-    </button>
-    <div id="tooltip-edit-{{ $user->id }}" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-dark rounded-lg shadow-sm opacity-0 tooltip">
+    <x-fwb.tooltip :id="'tooltip-edit-'.$user->id" placement="top">
+        <x-slot:triggerSlot>
+            <x-ui.button type="button" size="xs" color="blue" wire:click="...">
+                <x-lucide-pencil class="w-4 h-4" />
+            </x-ui.button>
+        </x-slot:triggerSlot>
         {{ __('general.edit') }}
-        <div class="tooltip-arrow" data-popper-arrow></div>
-    </div>
+    </x-fwb.tooltip>
     ```
-*   In forms/modals only use full-width primary save buttons.
+*   **Row actions (PowerGrid):** `actionsFromView()` + `components.powergrid.row-actions` (`<x-fwb.tooltip>` + `<x-ui.button>` icon buttons with distinct colors).
+*   In forms/modals only use full-width primary save buttons (`class="w-full"` on `<x-ui.button>`).
 
 ### Data Display
 *   Use Flowbite Alert / Callout-style boxes to display record summaries (permissions, roles, users) inside modals:

@@ -77,7 +77,7 @@ new class extends Component
             ->where('domain_id', $domain->id)
             ->findOrFail($this->itemId);
 
-        if ($this->form->group_id === null || $this->form->group_id === 0) {
+        if ($this->form->group_id === null || $this->form->group_id === 0 || $this->form->group_id === '') {
             $this->form->group_id = $item->group_id;
         }
 

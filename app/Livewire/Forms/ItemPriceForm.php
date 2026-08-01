@@ -16,7 +16,7 @@ class ItemPriceForm extends Form
 
     public string $sale_price = '';
 
-    public ?int $sales_cap = null;
+    public string|int|null $sales_cap = null;
 
     public bool $is_active = true;
 

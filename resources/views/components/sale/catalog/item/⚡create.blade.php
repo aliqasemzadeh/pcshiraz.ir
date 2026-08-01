@@ -74,7 +74,7 @@ new class extends Component
             return;
         }
 
-        if ($this->form->group_id === null || $this->form->group_id === 0) {
+        if ($this->form->group_id === null || $this->form->group_id === 0 || $this->form->group_id === '') {
             $this->form->group_id = null;
         }
 

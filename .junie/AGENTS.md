@@ -259,28 +259,37 @@ Ensure Tailwind content / `@source` includes (PowerGrid is already wired in `res
 *   **File upload progress (REQUIRED):** `<x-ui.file-input wire:model="form.logo" :label="__('general.logo')" />` shows `<x-fwb>`-styled progress during `livewire-upload-*` events and locks other `<x-ui.button>`s via Alpine `$store.ui.busy`.
 
 ### Buttons & Actions
-*   **REQUIRED action button:** Always use `<x-ui.button>` (wraps `<x-fwb.button>`). It shows spinner + `__('general.working')` while the Livewire request runs, and `wire:loading.attr="disabled"` so sibling buttons cannot be clicked until the request finishes. During file upload, `$store.ui.busy` also disables all `<x-ui.button>`s.
+*   **REQUIRED action button:** Always use `<x-ui.button>` (Flowbite models in `resources/views/components/ui/button.blade.php`). It shows spinner + `__('general.working')` while the Livewire request runs, and `wire:loading.attr="disabled"` so sibling buttons cannot be clicked until the request finishes. During file upload, `$store.ui.busy` also disables all `<x-ui.button>`s. Do **not** hand-roll raw `<button class="...">` for actions.
 *   Pass `target="methodName"` to scope the loading label (e.g. `target="save"`, `target="delete"`).
 *   Secondary / cancel buttons that must not show the working label: `:loading="false"` (they still disable while busy).
-*   Color mapping via `color` prop on `<x-ui.button>` / `<x-fwb.button>`:
-    *   Save / Create / Import → `color="green"`
-    *   Edit / primary brand → default / `color="blue"` (brand)
+*   **Models / props** (see Flowbite: https://flowbite.com/docs/components/buttons/):
+    *   `variant`: `solid` (default), `outline`, `gradient`, `gradient-shadow`, `duotone`
+    *   `pill`: fully rounded (`rounded-full`)
+    *   `color` (solid): `blue`/`brand`, `secondary`, `tertiary`, `green`/`success`, `red`/`danger`, `yellow`/`warning`, `dark`, `ghost`, `light`, `purple`, `cyan`, `teal`, `lime`, `pink`, `orange`
+    *   `duotone` (when `variant="duotone"`): `purple-blue`, `cyan-blue`, `green-blue`, `purple-pink`, `pink-orange`, `teal-lime`, `red-yellow`
+    *   Legacy `:outline="true"` maps to `variant="outline"`.
+*   **Semantic color mapping** (priority over decorative choice):
+    *   Save / Create → `color="green"`
+    *   Import / secondary primary action → `color="teal"` or `cyan` (optionally `variant="gradient"`)
+    *   Edit / brand primary → `color="blue"`
     *   Delete → `color="red"`
-    *   Neutral / cancel → `color="light"` + `outline`
+    *   Warning / caution → `color="yellow"`
+    *   Neutral / cancel → `color="light"` + `outline`, or `secondary` / `ghost`
+*   **Adjacent buttons must not share a color:** When two or more action buttons sit in the same row/group, each must use a **different** `color` (and preferably different themes). Suggested rotation for non-delete actions: `blue` → `teal` → `purple` → `cyan` → `yellow` → `pink`. Keep `red` for danger only and `green` for save/create only. Never place two solid greens (or two identical colors) side by side.
 *   **One page action:** single `<x-ui.button>`.
-*   **Multiple page actions:** `<x-fwb.dropdown>` to avoid mobile overflow.
+*   **Multiple page actions:** Prefer `<x-fwb.dropdown>` to avoid mobile overflow; if several visible buttons are required, apply the adjacent-color rule.
 *   **Tooltips (REQUIRED):** Always use `<x-fwb.tooltip>` with `<x-slot:triggerSlot>`. Do **not** hand-roll `data-tooltip-target` markup when wrapping interactive triggers.
     ```html
     <x-fwb.tooltip :id="'tooltip-edit-'.$user->id" placement="top">
         <x-slot:triggerSlot>
-            <x-ui.button type="button" size="xs" wire:click="...">
+            <x-ui.button type="button" size="xs" color="blue" wire:click="...">
                 <x-lucide-pencil class="w-4 h-4" />
             </x-ui.button>
         </x-slot:triggerSlot>
         {{ __('general.edit') }}
     </x-fwb.tooltip>
     ```
-*   **Row actions (PowerGrid):** `actionsFromView()` + `components.powergrid.row-actions` (`<x-fwb.tooltip>` + Lucide icon buttons).
+*   **Row actions (PowerGrid):** `actionsFromView()` + `components.powergrid.row-actions` (`<x-fwb.tooltip>` + `<x-ui.button>` icon buttons with distinct colors).
 *   In forms/modals only use full-width primary save buttons (`class="w-full"` on `<x-ui.button>`).
 
 ### Data Display

@@ -3,8 +3,6 @@
 namespace App\Livewire\Forms;
 
 use App\Enums\ItemTypeEnum;
-use App\Models\Brand;
-use App\Models\Category;
 use App\Models\Domain;
 use App\Models\Item;
 use App\Support\CurrentDomain;
@@ -18,13 +16,13 @@ class ItemForm extends Form
 {
     public ?Item $item = null;
 
-    public ?int $brand_id = null;
+    public int|string|null $brand_id = null;
 
-    public ?int $category_id = null;
+    public int|string|null $category_id = null;
 
     public string $item_type = ItemTypeEnum::Product->value;
 
-    public ?int $group_id = null;
+    public int|string|null $group_id = null;
 
     public bool $is_main = true;
 
@@ -38,13 +36,13 @@ class ItemForm extends Form
 
     public ?string $color_name = null;
 
-    public ?int $weight = null;
+    public int|string|null $weight = null;
 
-    public ?int $length = null;
+    public int|string|null $length = null;
 
-    public ?int $width = null;
+    public int|string|null $width = null;
 
-    public ?int $height = null;
+    public int|string|null $height = null;
 
     public ?string $seo_title = null;
 
