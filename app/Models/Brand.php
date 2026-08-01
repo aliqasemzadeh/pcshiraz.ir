@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use App\Services\Shop\CatalogCache;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -13,11 +13,11 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 #[Fillable([
-    'domain_id',
     'title',
     'slug',
     'seo_title',
     'sort_order',
+    'views_count',
     'meta',
 ])]
 class Brand extends Model implements HasMedia
@@ -29,12 +29,14 @@ class Brand extends Model implements HasMedia
         return [
             'meta' => 'array',
             'sort_order' => 'integer',
+            'views_count' => 'integer',
         ];
     }
 
-    public function domain(): BelongsTo
+    protected static function booted(): void
     {
-        return $this->belongsTo(Domain::class);
+        static::saved(fn () => CatalogCache::forgetAll());
+        static::deleted(fn () => CatalogCache::forgetAll());
     }
 
     public function items(): HasMany

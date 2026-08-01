@@ -4,40 +4,37 @@ namespace App\Services\Shop;
 
 use App\Models\Brand;
 use App\Models\Category;
-use App\Models\Domain;
 use App\Models\Item;
 use Illuminate\Support\Facades\Cache;
 
 class CategoryMenuService
 {
-    public function cacheKey(Domain $domain): string
+    public function cacheKey(): string
     {
-        return "shop.category_menu.v2.{$domain->id}";
+        return CatalogCache::MENU;
     }
 
     /**
      * @return list<array{id: int, title: string, slug: string, image: ?string, brands: list<array{id: int, title: string, slug: string, image: ?string}>}>
      */
-    public function for(Domain $domain): array
+    public function get(): array
     {
-        return Cache::remember($this->cacheKey($domain), 3600, function () use ($domain) {
-            return $this->build($domain);
+        return Cache::remember($this->cacheKey(), CatalogCache::TTL, function () {
+            return $this->build();
         });
     }
 
-    public function forget(Domain $domain): void
+    public function forget(): void
     {
-        Cache::forget($this->cacheKey($domain));
-        Cache::forget("shop.category_menu.{$domain->id}");
+        CatalogCache::forgetAll();
     }
 
     /**
      * @return list<array{id: int, title: string, slug: string, image: ?string, brands: list<array{id: int, title: string, slug: string, image: ?string}>}>
      */
-    protected function build(Domain $domain): array
+    protected function build(): array
     {
         $categories = Category::query()
-            ->where('domain_id', $domain->id)
             ->with('media')
             ->orderBy('sort_order')
             ->orderBy('title')
@@ -48,15 +45,14 @@ class CategoryMenuService
         }
 
         $brands = Brand::query()
-            ->where('domain_id', $domain->id)
             ->with('media')
             ->orderBy('sort_order')
             ->orderBy('title')
-            ->get(['id', 'title', 'slug'])
+            ->get(['id', 'title', 'slug', 'sort_order'])
             ->keyBy('id');
 
         $pairs = Item::query()
-            ->where('domain_id', $domain->id)
+            ->active()
             ->select('category_id', 'brand_id')
             ->distinct()
             ->get()

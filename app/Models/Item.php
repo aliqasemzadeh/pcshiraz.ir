@@ -4,7 +4,9 @@ namespace App\Models;
 
 use App\Enums\ItemTypeEnum;
 use App\Enums\PriceTypeEnum;
+use App\Services\Shop\CatalogCache;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -16,12 +18,14 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Tags\HasTags;
 
 #[Fillable([
-    'domain_id',
     'brand_id',
     'category_id',
     'item_type',
     'group_id',
     'is_main',
+    'is_active',
+    'is_purchasable',
+    'views_count',
     'title',
     'slug',
     'description',
@@ -44,6 +48,9 @@ class Item extends Model implements HasMedia
         return [
             'item_type' => ItemTypeEnum::class,
             'is_main' => 'boolean',
+            'is_active' => 'boolean',
+            'is_purchasable' => 'boolean',
+            'views_count' => 'integer',
             'meta' => 'array',
         ];
     }
@@ -62,12 +69,25 @@ class Item extends Model implements HasMedia
                     ->where('is_main', true)
                     ->update(['is_main' => false]);
             }
+
+            CatalogCache::forgetAll();
+            CatalogCache::forgetCategory((int) $item->category_id);
+        });
+
+        static::deleted(function (Item $item): void {
+            CatalogCache::forgetAll();
+            CatalogCache::forgetCategory((int) $item->category_id);
         });
     }
 
-    public function domain(): BelongsTo
+    public function scopeActive(Builder $query): Builder
     {
-        return $this->belongsTo(Domain::class);
+        return $query->where('is_active', true);
+    }
+
+    public function scopePurchasable(Builder $query): Builder
+    {
+        return $query->where('is_purchasable', true);
     }
 
     public function brand(): BelongsTo
@@ -94,14 +114,31 @@ class Item extends Model implements HasMedia
     {
         return $this->hasOne(ItemPrice::class)
             ->where('price_type', $type)
+            ->where('is_active', true)
             ->latestOfMany();
+    }
+
+    public function activeCashPrice(): HasOne
+    {
+        return $this->latestPriceByType(PriceTypeEnum::Cash);
     }
 
     public function getLatestPrice(?PriceTypeEnum $type = null): ?string
     {
         $type ??= config('main.default_price_type');
 
-        return $this->latestPriceByType($type)->first()?->price;
+        return $this->latestPriceByType($type)->first()?->sale_price;
+    }
+
+    public function hasDiscount(): bool
+    {
+        $price = $this->activeCashPrice;
+
+        if ($price === null) {
+            return false;
+        }
+
+        return (float) $price->sale_price < (float) $price->price;
     }
 
     public function registerMediaCollections(): void
