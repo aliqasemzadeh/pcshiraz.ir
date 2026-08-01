@@ -4,6 +4,10 @@ namespace App\Jobs\Notification;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class SendSmsMessageJob implements ShouldQueue
 {
@@ -15,8 +19,7 @@ class SendSmsMessageJob implements ShouldQueue
     public function __construct(
         public string $mobile,
         public string $text
-    )
-    {
+    ) {
     }
 
     /**
@@ -24,10 +27,9 @@ class SendSmsMessageJob implements ShouldQueue
      */
     public function handle(): void
     {
-        // Normalize and send SMS via Sabapnovin
         [$originalMobile, $normalizedMobile] = $this->normalizeIranMobile($this->mobile);
 
-        $this->sendViaSabapnovin($normalizedMobile, $this->text, $originalMobile);
+        $this->sendViaSetaregan($normalizedMobile, $this->text, $originalMobile);
     }
 
     /**
@@ -65,35 +67,41 @@ class SendSmsMessageJob implements ShouldQueue
     }
 
     /**
-     * Send SMS via Sabapnovin using provided gateway.
+     * Send SMS via پنل پیامک ستارگان.
      */
-    private function sendViaSabapnovin(string $normalizedTo, string $text, string $originalTo): void
+    private function sendViaSetaregan(string $normalizedTo, string $text, string $originalTo): void
     {
         try {
-            $request = \Illuminate\Support\Facades\Http::withoutVerifying()->withOptions(["verify"=>false])->get(
-                sprintf('https://api.sabanovin.com/v1/%s/sms/send.json', (string) \Illuminate\Support\Facades\Config::get('sms.api-key')),
-                [
-                    'gateway' => \Illuminate\Support\Facades\Config::get('sms.gateway'),
+            $response = Http::withToken((string) Config::get('sms.token'))
+                ->acceptJson()
+                ->asJson()
+                ->post((string) Config::get('sms.url'), [
                     'to' => $normalizedTo,
-                    'text' => $text,
-                ]
-            );
+                    'message' => $text,
+                    'gateway' => (string) Config::get('sms.gateway'),
+                ]);
 
-            $responseData = $request->json();
+            $responseData = $response->json();
 
-            // Optional: info log and simple auditing
-            \Illuminate\Support\Facades\Log::info('SMS send attempt via Sabapnovin', [
+            Log::info('SMS send attempt via Setaregan', [
                 'to' => $normalizedTo,
                 'original' => $originalTo,
                 'message' => $text,
+                'http_status' => $response->status(),
                 'response' => $responseData,
             ]);
 
-            if (($responseData['status']['code'] ?? 0) != 200) {
-                \Illuminate\Support\Facades\Log::error('Send SMS Error: '.($responseData['status']['message'] ?? 'unknown error'));
+            $ok = (bool) ($responseData['ok'] ?? false);
+            $code = $responseData['code'] ?? null;
+
+            if (! $response->successful() || ! $ok || $code !== 'queued') {
+                Log::error('Send SMS Error: '.($responseData['message'] ?? 'unknown error'), [
+                    'code' => $code,
+                    'http_status' => $response->status(),
+                ]);
             }
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('Failed to send SMS: '.$e->getMessage(), [
+        } catch (Throwable $e) {
+            Log::error('Failed to send SMS: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
         }
