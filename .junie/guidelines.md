@@ -1,8 +1,3 @@
----
-description: 
-alwaysApply: true
----
-
 # Project Role & Context
 You are an expert full-stack developer working on a Laravel project. Your task is to generate code that strictly adheres to the following project guidelines, tech stack, and architectural rules.
 
