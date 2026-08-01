@@ -73,7 +73,6 @@ new class extends Component
                 <x-fwb.select
                     wire:model="form.user_id"
                     :label="__('general.user')"
-                    :placeholder="__('general.select_user')"
                     :options="$this->users"
                 />
                 @error('form.user_id')
@@ -85,7 +84,6 @@ new class extends Component
                 <x-fwb.select
                     wire:model="form.domain_id"
                     :label="__('general.domains')"
-                    :placeholder="__('general.select_domain')"
                     :options="$this->domains"
                 />
                 @error('form.domain_id')
