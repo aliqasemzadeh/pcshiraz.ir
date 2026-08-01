@@ -6,7 +6,6 @@ use App\Enums\ItemTypeEnum;
 use App\Enums\PriceTypeEnum;
 use App\Models\Brand;
 use App\Models\Category;
-use App\Models\Domain;
 use App\Models\Item;
 use App\Models\ItemPrice;
 use App\Models\User;
@@ -23,7 +22,7 @@ class DemoDataSeeder extends Seeder
     {
         $this->media = app(DemoMediaDownloader::class);
 
-        $user = User::query()->firstOrCreate(
+        User::query()->firstOrCreate(
             ['mobile' => '09120000000'],
             [
                 'email' => 'demo@pcshiraz.ir',
@@ -31,36 +30,18 @@ class DemoDataSeeder extends Seeder
             ]
         );
 
-        $host = parse_url((string) config('app.url'), PHP_URL_HOST) ?: 'localhost';
+        $categories = $this->seedCategories();
+        $brands = $this->seedBrands();
+        $this->seedItems($categories, $brands);
+        $this->seedItemImages();
 
-        $domain = Domain::query()->firstOrCreate(
-            [
-                'user_id' => $user->id,
-                'domain' => $host,
-            ],
-            [
-                'title' => 'پی سی شیراز',
-                'description' => 'فروشگاه دمو موبایل و لوازم جانبی',
-            ]
-        );
-
-        $domain->fill([
-            'title' => 'پی سی شیراز',
-            'description' => 'فروشگاه دمو موبایل و لوازم جانبی',
-        ])->save();
-
-        $categories = $this->seedCategories($domain);
-        $brands = $this->seedBrands($domain);
-        $this->seedItems($domain, $categories, $brands);
-        $this->seedItemImages($domain);
-
-        app(CategoryMenuService::class)->forget($domain);
+        app(CategoryMenuService::class)->forget();
     }
 
     /**
      * @return list<Category>
      */
-    protected function seedCategories(Domain $domain): array
+    protected function seedCategories(): array
     {
         $titles = [
             ['موبایل', 'mobile'],
@@ -101,13 +82,13 @@ class DemoDataSeeder extends Seeder
         foreach ($titles as $index => [$title, $slug]) {
             $category = Category::query()->updateOrCreate(
                 [
-                    'domain_id' => $domain->id,
                     'slug' => $slug,
                 ],
                 [
                     'title' => $title,
                     'seo_title' => $title,
                     'sort_order' => $index + 1,
+                    'show_on_home' => $index < 4,
                 ]
             );
 
@@ -137,9 +118,9 @@ class DemoDataSeeder extends Seeder
     /**
      * @return list<Brand>
      */
-    protected function seedBrands(Domain $domain): array
+    protected function seedBrands(): array
     {
-        // domain used for clearbit logo download: brand domain => title
+        // brand domain used for clearbit logo download: brand domain => title
         $titles = [
             ['Samsung', 'samsung.com'],
             ['Apple', 'apple.com'],
@@ -200,7 +181,6 @@ class DemoDataSeeder extends Seeder
 
             $brand = Brand::query()->updateOrCreate(
                 [
-                    'domain_id' => $domain->id,
                     'slug' => $slug,
                 ],
                 [
@@ -228,7 +208,7 @@ class DemoDataSeeder extends Seeder
      * @param  list<Category>  $categories
      * @param  list<Brand>  $brands
      */
-    protected function seedItems(Domain $domain, array $categories, array $brands): void
+    protected function seedItems(array $categories, array $brands): void
     {
         if ($categories === [] || $brands === []) {
             return;
@@ -237,11 +217,20 @@ class DemoDataSeeder extends Seeder
         $brandsBySlug = collect($brands)->keyBy('slug');
         $categoryBrandMap = $this->categoryBrandSlugs();
 
-        $existingCount = Item::query()->where('domain_id', $domain->id)->count();
+        $existingCount = Item::query()->count();
 
         if ($existingCount >= 500) {
             return;
         }
+
+        $colors = [
+            ['مشکی', '#111827'],
+            ['سفید', '#F9FAFB'],
+            ['نقره‌ای', '#9CA3AF'],
+            ['آبی', '#2563EB'],
+            ['قرمز', '#DC2626'],
+            ['سبز', '#16A34A'],
+        ];
 
         $target = 550;
         $toCreate = $target - $existingCount;
@@ -263,25 +252,28 @@ class DemoDataSeeder extends Seeder
             }
 
             foreach ($relatedBrands as $brandOffset => $brand) {
-                $slug = sprintf('demo-%d-%d-%d', $domain->id, $category->id, $brand->id);
+                $slug = sprintf('demo-%d-%d', $category->id, $brand->id);
 
                 if (Item::query()->where('slug', $slug)->exists()) {
                     continue;
                 }
 
                 $title = sprintf('%s %s مدل %s', $brand->title, $category->title, chr(65 + ($brandOffset % 26)));
+                [$colorName, $colorCode] = $colors[$brandOffset % count($colors)];
 
                 $items[] = [
-                    'domain_id' => $domain->id,
                     'brand_id' => $brand->id,
                     'category_id' => $category->id,
                     'item_type' => ItemTypeEnum::Product->value,
                     'group_id' => null,
                     'is_main' => true,
+                    'is_active' => true,
+                    'is_purchasable' => true,
+                    'views_count' => 0,
                     'title' => $title,
                     'description' => 'کالای دمو برای نمایش مگامنو دسته‌ها و برندها',
-                    'color_code' => null,
-                    'color_name' => null,
+                    'color_code' => $colorCode,
+                    'color_name' => $colorName,
                     'weight' => null,
                     'length' => null,
                     'width' => null,
@@ -301,20 +293,23 @@ class DemoDataSeeder extends Seeder
         for ($i = 0; $i < $remaining; $i++) {
             $category = $categories[array_rand($categories)];
             $brand = $brands[array_rand($brands)];
-            $slug = sprintf('demo-extra-%d-%d', $domain->id, $existingCount + count($items) + $i + 1);
+            $slug = sprintf('demo-extra-%d', $existingCount + count($items) + $i + 1);
             $title = sprintf('%s %s #%d', $brand->title, $category->title, $i + 1);
+            [$colorName, $colorCode] = $colors[$i % count($colors)];
 
             $items[] = [
-                'domain_id' => $domain->id,
                 'brand_id' => $brand->id,
                 'category_id' => $category->id,
                 'item_type' => ItemTypeEnum::Product->value,
                 'group_id' => null,
                 'is_main' => true,
+                'is_active' => true,
+                'is_purchasable' => true,
+                'views_count' => 0,
                 'title' => $title,
                 'description' => 'کالای دمو برای نمایش مگامنو دسته‌ها و برندها',
-                'color_code' => null,
-                'color_name' => null,
+                'color_code' => $colorCode,
+                'color_name' => $colorName,
                 'weight' => null,
                 'length' => null,
                 'width' => null,
@@ -333,7 +328,6 @@ class DemoDataSeeder extends Seeder
         }
 
         $createdItems = Item::query()
-            ->where('domain_id', $domain->id)
             ->whereDoesntHave('itemPrices')
             ->get(['id']);
 
@@ -361,10 +355,9 @@ class DemoDataSeeder extends Seeder
         }
     }
 
-    protected function seedItemImages(Domain $domain): void
+    protected function seedItemImages(): void
     {
         $items = Item::query()
-            ->where('domain_id', $domain->id)
             ->whereDoesntHave('media', fn ($q) => $q->where('collection_name', 'product_image'))
             ->limit(120)
             ->get();
@@ -405,7 +398,7 @@ class DemoDataSeeder extends Seeder
             'power-bank' => ['anker', 'baseus', 'xiaomi', 'green-lion', 'hoco', 'remax', 'tsco'],
             'phone-holder' => ['baseus', 'yesido', 'hoco', 'earldom', 'green-lion', 'tsco'],
             'keyboard-mouse' => ['logitech', 'razer', 'steelseries', 'microsoft', 'havit', 'tsco'],
-            'monitor' => ['lg', 'samsung', 'msi', 'asus', 'dell', 'benq' => 'lg'],
+            'monitor' => ['lg', 'samsung', 'msi', 'asus', 'dell'],
             'power-protector' => ['tp-link', 'tsco', 'green-lion', 'ugreen'],
             'home-gadget' => ['xiaomi', 'huawei', 'samsung', 'anker', 'baseus'],
             'home-appliance' => ['samsung', 'lg', 'xiaomi', 'huawei'],
@@ -413,9 +406,9 @@ class DemoDataSeeder extends Seeder
             'computer-gear' => ['logitech', 'razer', 'steelseries', 'kingston', 'asus', 'msi'],
             'modem-network' => ['tp-link', 'd-link', 'xiaomi', 'huawei', 'asus'],
             'smart-home' => ['xiaomi', 'google', 'apple', 'tp-link', 'huawei'],
-            'network-camera' => ['tp-link', 'xiaomi', 'hikvision' => 'tp-link', 'd-link'],
+            'network-camera' => ['tp-link', 'xiaomi', 'd-link'],
             'computer' => ['asus', 'lenovo', 'hp', 'dell', 'msi', 'acer'],
-            'android-box' => ['xiaomi', 'tv-box' => 'xiaomi', 'google', 'nvidia' => 'asus'],
+            'android-box' => ['xiaomi', 'google', 'asus'],
             'mobile-accessories' => ['baseus', 'hoco', 'remax', 'yesido', 'earldom', 'borofone', 'green-lion', 'tsco', 'spigen'],
             'smart-tag' => ['apple', 'samsung', 'xiaomi', 'baseus'],
             'other' => ['samsung', 'xiaomi', 'anker', 'baseus', 'tsco', 'hoco'],
