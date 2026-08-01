@@ -3,10 +3,9 @@
 ])
 
 @if (count($tags) > 0)
-    <x-shop.carousel :title="__('app.popular_tags')" :label="__('app.popular_tags')">
+    <x-shop.carousel :label="__('app.popular_tags')">
         @foreach ($tags as $tag)
             <li
-                x-bind="disableNextAndPreviousButtons"
                 class="w-1/3 shrink-0 snap-start sm:w-1/4 md:w-1/5 lg:w-1/6"
                 role="option"
             >
