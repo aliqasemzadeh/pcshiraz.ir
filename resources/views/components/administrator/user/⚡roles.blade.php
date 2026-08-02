@@ -62,17 +62,34 @@ new class extends Component
         <p class="mb-4 text-sm text-body" dir="ltr">{{ $userLabel }}</p>
 
         <form wire:submit="save" class="space-y-4">
-            <div class="max-h-[60vh] space-y-2 overflow-y-auto rounded-lg border border-default p-3">
-                @forelse ($this->roles as $role)
-                    <x-fwb.checkbox
-                        :id="'user-role-'.$role->id"
-                        wire:model="selectedRoleIds"
-                        :value="$role->id"
-                        :label="$role->name.' ('.$role->guard_name.')'"
-                    />
-                @empty
-                    <p class="text-sm text-body">{{ __('general.no_roles') }}</p>
-                @endforelse
+            <div x-data="{ search: '' }" class="space-y-2">
+                <x-fwb.input
+                    type="search"
+                    size="sm"
+                    x-model="search"
+                    :placeholder="__('general.search')"
+                />
+
+                <div class="max-h-[60vh] space-y-2 overflow-y-auto rounded-lg border border-default p-3">
+                    @forelse ($this->roles as $role)
+                        @php
+                            $label = $role->name.' ('.$role->guard_name.')';
+                        @endphp
+                        <div
+                            x-show="!search || $el.dataset.search.includes(search.toLowerCase())"
+                            data-search="{{ mb_strtolower($label) }}"
+                        >
+                            <x-fwb.checkbox
+                                :id="'user-role-'.$role->id"
+                                wire:model="selectedRoleIds"
+                                :value="$role->id"
+                                :label="$label"
+                            />
+                        </div>
+                    @empty
+                        <p class="text-sm text-body">{{ __('general.no_roles') }}</p>
+                    @endforelse
+                </div>
             </div>
 
             @error('selectedRoleIds')
