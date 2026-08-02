@@ -28,6 +28,7 @@ Route::prefix('administrator')->name('panels.administrator.')->group(function ()
     Route::livewire('/users', 'pages::panels.administrator.user.index')->name('user.index');
     Route::livewire('/roles', 'pages::panels.administrator.role.index')->name('role.index');
     Route::livewire('/permissions', 'pages::panels.administrator.permission.index')->name('permission.index');
+    Route::livewire('/settings', 'pages::panels.administrator.setting.index')->name('setting.index');
 });
 
 Route::prefix('sale')->name('panels.sale.')->group(function () {
