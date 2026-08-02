@@ -60,7 +60,7 @@ class GeneralSettingsForm extends Form
             'site_tags' => ['nullable', 'array'],
             'site_tags.*' => ['string', 'max:50'],
             'locale' => ['required', 'string', Rule::in(['fa', 'en'])],
-            'timezone' => ['required', 'timezone:all'],
+            'timezone' => ['required', 'timezone'],
             'logo' => [
                 'nullable',
                 'file',

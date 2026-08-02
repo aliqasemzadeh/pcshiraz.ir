@@ -15,8 +15,11 @@
 <div class="flex min-h-screen flex-col items-center justify-center px-4 py-8">
     <div class="w-full max-w-md space-y-6">
         <div class="text-center">
-            <a href="{{ route('home') }}" wire:navigate class="text-2xl font-semibold text-ink">
-                {{ config('app.name') }}
+            <a href="{{ route('home') }}" wire:navigate class="inline-flex items-center justify-center gap-2 text-2xl font-semibold text-ink">
+                @if (! empty($siteLogoUrl))
+                    <img src="{{ $siteLogoUrl }}" alt="{{ $siteName ?? config('app.name') }}" class="h-10 w-auto max-w-[160px] object-contain">
+                @endif
+                <span>{{ $siteName ?? config('app.name') }}</span>
             </a>
         </div>
 
