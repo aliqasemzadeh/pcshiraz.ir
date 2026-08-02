@@ -27,8 +27,11 @@
                     <span class="sr-only">Open sidebar</span>
                     <x-lucide-menu class="h-6 w-6" />
                 </button>
-                <a href="{{ route('home') }}" wire:navigate class="ms-2 flex md:me-24">
-                    <span class="self-center text-xl font-semibold whitespace-nowrap text-ink">{{ config('app.name') }}</span>
+                <a href="{{ route('home') }}" wire:navigate class="ms-2 flex items-center gap-2 md:me-24">
+                    @if (! empty($siteLogoUrl))
+                        <img src="{{ $siteLogoUrl }}" alt="{{ $siteName ?? config('app.name') }}" class="h-8 w-auto max-w-[140px] object-contain">
+                    @endif
+                    <span class="self-center text-xl font-semibold whitespace-nowrap text-ink">{{ $siteName ?? config('app.name') }}</span>
                 </a>
             </div>
             <div class="flex items-center gap-3">

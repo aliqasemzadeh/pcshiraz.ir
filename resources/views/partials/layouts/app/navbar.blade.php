@@ -1,7 +1,10 @@
 <nav class="fixed top-0 start-0 z-40 h-16 w-full border-b border-nav-border bg-navbar shadow-sm">
     <div class="mx-auto flex h-full max-w-screen-2xl items-center gap-2 px-3">
-        <a href="{{ route('home') }}" wire:navigate class="shrink-0">
-            <span class="text-lg font-semibold whitespace-nowrap text-ink">{{ config('app.name') }}</span>
+        <a href="{{ route('home') }}" wire:navigate class="flex shrink-0 items-center gap-2">
+            @if (! empty($siteLogoUrl))
+                <img src="{{ $siteLogoUrl }}" alt="{{ $siteName ?? config('app.name') }}" class="h-8 w-auto max-w-[140px] object-contain">
+            @endif
+            <span class="text-lg font-semibold whitespace-nowrap text-ink">{{ $siteName ?? config('app.name') }}</span>
         </a>
 
         <div class="min-w-0 flex-1">
