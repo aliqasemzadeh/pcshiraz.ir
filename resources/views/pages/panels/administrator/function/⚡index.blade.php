@@ -406,6 +406,7 @@ new #[Layout('layouts.panels')] class extends Component
                         class="w-full"
                         placeholder="{{ __('app.function_artisan_placeholder') }}"
                         :disabled="$this->isRunning"
+                        x-on:keydown.enter.prevent="$el.form.requestSubmit()"
                     />
 
                     <x-ui.button

@@ -85,6 +85,8 @@ new #[Layout('layouts.auth')] class extends Component
                         placeholder="09123456789"
                         class="block w-full rounded-lg border border-nav-border bg-surface p-2.5 ps-10 text-sm text-ink placeholder:text-navbar-fg focus:border-brand focus:ring-brand"
                         autocomplete="tel"
+                        autofocus
+                        x-on:keydown.enter.prevent="$el.form.requestSubmit()"
                     >
                 </div>
                 @error('form.mobile')
@@ -120,6 +122,8 @@ new #[Layout('layouts.auth')] class extends Component
                         class="mx-auto block w-full max-w-xs rounded-lg border border-nav-border bg-surface p-3 text-center text-2xl tracking-[0.4em] text-ink focus:border-brand focus:ring-brand"
                         placeholder="------"
                         dir="ltr"
+                        x-init="$nextTick(() => $el.focus())"
+                        x-on:keydown.enter.prevent="$el.form.requestSubmit()"
                     >
                     @error('form.code')
                         <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
