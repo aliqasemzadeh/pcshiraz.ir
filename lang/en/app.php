@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'otp_message' => "Your verification code: :code\n:app_name\n:app_url",
+    'otp_message' => "Your verification code: :code\n:app_name\n:app_url\nلغو11",
     'is_purchasable' => 'Purchasable',
     'is_active' => 'Active in shop',
     'show_on_home' => 'Show on homepage',

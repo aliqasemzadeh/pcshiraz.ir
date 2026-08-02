@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'otp_message' => "کد تایید شما: :code\n:app_name\n:app_url",
+    'otp_message' => "کد تایید شما: :code\n:app_name\n:app_url\nلغو11",
     'is_purchasable' => 'قابل خرید',
     'is_active' => 'فعال در فروشگاه',
     'show_on_home' => 'نمایش در صفحه اول',

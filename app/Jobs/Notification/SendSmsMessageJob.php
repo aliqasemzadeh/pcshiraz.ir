@@ -33,46 +33,37 @@ class SendSmsMessageJob implements ShouldQueue
     }
 
     /**
-     * Normalize Iranian mobile to start with 98 while preserving original.
+     * Normalize Iranian mobile to 09xxxxxxxxx for پنل پیامک ستارگان.
      * Returns [original, normalized].
      */
     private function normalizeIranMobile(string $mobile): array
     {
         $original = trim($mobile);
 
-        // Remove spaces, dashes and plus sign
-        $m = preg_replace('/[^0-9+]/', '', $original) ?? $original;
+        $m = preg_replace('/\D+/', '', $original) ?? $original;
 
-        // Convert leading +98 to 98
-        if (str_starts_with($m, '+98')) {
-            $m = substr($m, 1); // remove +
+        // +98 / 98 → strip country code
+        if (str_starts_with($m, '98') && strlen($m) >= 12) {
+            $m = substr($m, 2);
         }
 
-        // If starts with 0, replace with 98
-        if (str_starts_with($m, '0')) {
-            $m = '98'.substr($m, 1);
-        }
-
-        // If already starts with 98, keep
-        if (str_starts_with($m, '98')) {
-            return [$original, $m];
-        }
-
-        // If starts with 9 and looks like 9xxxxxxxxx, prepend 98
-        if (str_starts_with($m, '9') && strlen($m) >= 10) {
-            $m = '98'.$m;
+        // 9xxxxxxxxx → 09xxxxxxxxx
+        if (str_starts_with($m, '9') && strlen($m) === 10) {
+            $m = '0'.$m;
         }
 
         return [$original, $m];
     }
 
     /**
-     * Send SMS via پنل پیامک ستارگان.
+     * Send SMS via پنل پیامک ستارگان (https://srscrm.ir/api/sms/send).
      */
     private function sendViaSetaregan(string $normalizedTo, string $text, string $originalTo): void
     {
         try {
-            $response = Http::withToken((string) Config::get('sms.token'))
+            $response = Http::timeout(30)
+                ->connectTimeout(10)
+                ->withToken((string) Config::get('sms.token'))
                 ->acceptJson()
                 ->asJson()
                 ->post((string) Config::get('sms.url'), [
@@ -81,28 +72,30 @@ class SendSmsMessageJob implements ShouldQueue
                     'gateway' => (string) Config::get('sms.gateway'),
                 ]);
 
-            $responseData = $response->json();
+            $responseData = $response->json() ?? [];
+            $ok = (bool) ($responseData['ok'] ?? false);
+            $code = $responseData['code'] ?? null;
+            $message = $responseData['message'] ?? 'unknown error';
 
             Log::info('SMS send attempt via Setaregan', [
                 'to' => $normalizedTo,
                 'original' => $originalTo,
-                'message' => $text,
                 'http_status' => $response->status(),
+                'code' => $code,
                 'response' => $responseData,
             ]);
 
-            $ok = (bool) ($responseData['ok'] ?? false);
-            $code = $responseData['code'] ?? null;
-
             if (! $response->successful() || ! $ok || $code !== 'queued') {
-                Log::error('Send SMS Error: '.($responseData['message'] ?? 'unknown error'), [
+                Log::error('Send SMS Error: '.$message, [
                     'code' => $code,
                     'http_status' => $response->status(),
+                    'to' => $normalizedTo,
                 ]);
             }
         } catch (Throwable $e) {
             Log::error('Failed to send SMS: '.$e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
+                'to' => $normalizedTo,
+                'original' => $originalTo,
             ]);
         }
     }
