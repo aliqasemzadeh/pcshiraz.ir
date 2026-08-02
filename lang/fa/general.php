@@ -28,6 +28,7 @@ return [
     'users' => 'کاربران',
     'roles' => 'نقش‌ها',
     'permissions' => 'مجوزها',
+    'settings' => 'تنظیمات',
     'brands' => 'برندها',
     'items' => 'کالاها',
     'orders' => 'سفارش‌ها',

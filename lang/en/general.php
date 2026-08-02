@@ -28,6 +28,7 @@ return [
     'users' => 'Users',
     'roles' => 'Roles',
     'permissions' => 'Permissions',
+    'settings' => 'Settings',
     'brands' => 'Brands',
     'items' => 'Items',
     'orders' => 'Orders',
