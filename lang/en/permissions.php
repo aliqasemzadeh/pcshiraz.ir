@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'administrator' => [
+        'banner_view' => 'View banners',
+        'banner_create' => 'Create banner',
+        'banner_edit' => 'Edit banner',
+        'banner_delete' => 'Delete banner',
+    ],
     'sale' => [
         'category_view' => 'View categories',
         'category_create' => 'Create category',

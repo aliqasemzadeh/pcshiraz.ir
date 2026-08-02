@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BannerClickController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,7 @@ Route::livewire('/price-list/{category:slug?}', 'pages::shop.price-list.index')-
 Route::livewire('/items', 'pages::shop.item.index')->name('shop.items');
 Route::livewire('/item/{item:slug}', 'pages::shop.item.view')->name('shop.item');
 Route::livewire('/tag/{tag}', 'pages::shop.tag.index')->name('shop.tag');
+Route::get('/banner/{banner}', BannerClickController::class)->name('banner.click');
 
 Route::post('/logout', function () {
     Auth::logout();
@@ -28,6 +30,7 @@ Route::prefix('administrator')->name('panels.administrator.')->group(function ()
     Route::livewire('/users', 'pages::panels.administrator.user.index')->name('user.index');
     Route::livewire('/roles', 'pages::panels.administrator.role.index')->name('role.index');
     Route::livewire('/permissions', 'pages::panels.administrator.permission.index')->name('permission.index');
+    Route::livewire('/banners', 'pages::panels.administrator.banner.index')->name('banner.index');
     Route::livewire('/settings', 'pages::panels.administrator.setting.index')->name('setting.index');
     Route::livewire('/functions', 'pages::panels.administrator.function.index')->name('function.index');
 });

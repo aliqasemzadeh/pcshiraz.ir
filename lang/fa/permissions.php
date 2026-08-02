@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'administrator' => [
+        'banner_view' => 'مشاهده بنرها',
+        'banner_create' => 'ایجاد بنر',
+        'banner_edit' => 'ویرایش بنر',
+        'banner_delete' => 'حذف بنر',
+    ],
     'sale' => [
         'category_view' => 'مشاهده دسته‌ها',
         'category_create' => 'ایجاد دسته',
