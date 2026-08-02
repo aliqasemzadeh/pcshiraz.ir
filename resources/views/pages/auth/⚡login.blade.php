@@ -71,24 +71,17 @@ new #[Layout('layouts.auth')] class extends Component
     @if (! $otpSent)
         <form wire:submit="sendOtp" class="space-y-6">
             <div>
-                <label for="mobile" class="mb-2 block text-sm font-medium text-ink">
-                    {{ __('general.mobile') }}
-                </label>
-                <div class="relative">
-                    <div class="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3">
-                        <x-lucide-smartphone class="h-4 w-4 text-navbar-fg" />
-                    </div>
-                    <input
-                        id="mobile"
-                        type="tel"
-                        wire:model="form.mobile"
-                        placeholder="09123456789"
-                        class="block w-full rounded-lg border border-nav-border bg-surface p-2.5 ps-10 text-sm text-ink placeholder:text-navbar-fg focus:border-brand focus:ring-brand"
-                        autocomplete="tel"
-                        autofocus
-                        x-on:keydown.enter.prevent="$el.form.requestSubmit()"
-                    >
-                </div>
+                <x-fwb.floating-label
+                    type="tel"
+                    variant="outlined"
+                    :label="__('general.mobile')"
+                    wire:model="form.mobile"
+                    id="mobile"
+                    dir="ltr"
+                    autocomplete="tel"
+                    autofocus
+                    x-on:keydown.enter.prevent="$el.form.requestSubmit()"
+                />
                 @error('form.mobile')
                     <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
                 @enderror
@@ -110,21 +103,20 @@ new #[Layout('layouts.auth')] class extends Component
                 </p>
 
                 <div>
-                    <label for="otp-code" class="sr-only">{{ __('general.otp_code') }}</label>
-                    <input
-                        id="otp-code"
+                    <x-fwb.floating-label
                         type="text"
+                        variant="outlined"
+                        :label="__('general.otp_code')"
+                        wire:model="form.code"
+                        id="otp-code"
+                        dir="ltr"
                         inputmode="numeric"
                         pattern="[0-9]*"
                         maxlength="6"
                         autocomplete="one-time-code"
-                        wire:model="form.code"
-                        class="mx-auto block w-full max-w-xs rounded-lg border border-nav-border bg-surface p-3 text-center text-2xl tracking-[0.4em] text-ink focus:border-brand focus:ring-brand"
-                        placeholder="------"
-                        dir="ltr"
                         x-init="$nextTick(() => $el.focus())"
                         x-on:keydown.enter.prevent="$el.form.requestSubmit()"
-                    >
+                    />
                     @error('form.code')
                         <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
                     @enderror
