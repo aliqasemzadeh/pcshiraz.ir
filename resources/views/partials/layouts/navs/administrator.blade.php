@@ -70,6 +70,20 @@
 </li>
 <li>
     <a
+        href="{{ route('panels.administrator.article.index') }}"
+        wire:navigate
+        @class([
+            'group flex items-center rounded-lg p-2 hover:bg-sidebar-hover hover:text-white',
+            'bg-sidebar-active text-sidebar-fg-active' => request()->routeIs('panels.administrator.article.*'),
+            'text-sidebar-fg' => ! request()->routeIs('panels.administrator.article.*'),
+        ])
+    >
+        <x-lucide-newspaper @class(['h-5 w-5 group-hover:text-white', 'text-sidebar-fg-active' => request()->routeIs('panels.administrator.article.*'), 'text-sidebar-fg' => ! request()->routeIs('panels.administrator.article.*')]) />
+        <span class="ms-3">{{ __('general.articles') }}</span>
+    </a>
+</li>
+<li>
+    <a
         href="{{ route('panels.administrator.setting.index') }}"
         wire:navigate
         @class([

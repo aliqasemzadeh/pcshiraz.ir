@@ -6,6 +6,10 @@ return [
         'banner_create' => 'Create banner',
         'banner_edit' => 'Edit banner',
         'banner_delete' => 'Delete banner',
+        'article_view' => 'View articles',
+        'article_create' => 'Create article',
+        'article_edit' => 'Edit article',
+        'article_delete' => 'Delete article',
     ],
     'sale' => [
         'category_view' => 'View categories',
