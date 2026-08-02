@@ -68,3 +68,17 @@
         <span class="ms-3">{{ __('general.settings') }}</span>
     </a>
 </li>
+<li>
+    <a
+        href="{{ route('panels.administrator.function.index') }}"
+        wire:navigate
+        @class([
+            'group flex items-center rounded-lg p-2 hover:bg-sidebar-hover hover:text-white',
+            'bg-sidebar-active text-sidebar-fg-active' => request()->routeIs('panels.administrator.function.*'),
+            'text-sidebar-fg' => ! request()->routeIs('panels.administrator.function.*'),
+        ])
+    >
+        <x-lucide-terminal @class(['h-5 w-5 group-hover:text-white', 'text-sidebar-fg-active' => request()->routeIs('panels.administrator.function.*'), 'text-sidebar-fg' => ! request()->routeIs('panels.administrator.function.*')]) />
+        <span class="ms-3">{{ __('general.functions') }}</span>
+    </a>
+</li>
