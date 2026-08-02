@@ -73,22 +73,36 @@ new class extends Component
         <p class="mb-4 text-sm text-body" dir="ltr">{{ $roleName }}</p>
 
         <form wire:submit="save" class="space-y-4">
-            <div class="max-h-[60vh] space-y-2 overflow-y-auto rounded-lg border border-default p-3">
-                @forelse ($this->users as $user)
-                    @php
-                        $label = $user->full_name !== ''
-                            ? $user->full_name.' ('.$user->mobile.')'
-                            : $user->mobile;
-                    @endphp
-                    <x-fwb.checkbox
-                        :id="'role-user-'.$user->id"
-                        wire:model="selectedUserIds"
-                        :value="$user->id"
-                        :label="$label"
-                    />
-                @empty
-                    <p class="text-sm text-body">{{ __('general.no_users') }}</p>
-                @endforelse
+            <div x-data="{ search: '' }" class="space-y-2">
+                <x-fwb.input
+                    type="search"
+                    size="sm"
+                    x-model="search"
+                    :placeholder="__('general.search')"
+                />
+
+                <div class="max-h-[60vh] space-y-2 overflow-y-auto rounded-lg border border-default p-3">
+                    @forelse ($this->users as $user)
+                        @php
+                            $label = $user->full_name !== ''
+                                ? $user->full_name.' ('.$user->mobile.')'
+                                : $user->mobile;
+                        @endphp
+                        <div
+                            x-show="!search || $el.dataset.search.includes(search.toLowerCase())"
+                            data-search="{{ mb_strtolower($label) }}"
+                        >
+                            <x-fwb.checkbox
+                                :id="'role-user-'.$user->id"
+                                wire:model="selectedUserIds"
+                                :value="$user->id"
+                                :label="$label"
+                            />
+                        </div>
+                    @empty
+                        <p class="text-sm text-body">{{ __('general.no_users') }}</p>
+                    @endforelse
+                </div>
             </div>
 
             @error('selectedUserIds')

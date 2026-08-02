@@ -60,24 +60,38 @@ new class extends Component
         <p class="mb-4 text-sm text-body" dir="ltr">{{ $roleName }}</p>
 
         <form wire:submit="save" class="space-y-4">
-            <div class="max-h-[60vh] space-y-2 overflow-y-auto rounded-lg border border-default p-3">
-                @forelse ($this->permissions as $permission)
-                    @php
-                        $labelKey = 'permissions.'.$permission->name;
-                        $translated = __($labelKey);
-                        $label = $translated !== $labelKey
-                            ? $translated.' ('.$permission->name.')'
-                            : $permission->name.' ('.$permission->guard_name.')';
-                    @endphp
-                    <x-fwb.checkbox
-                        :id="'role-permission-'.$permission->id"
-                        wire:model="selectedPermissionIds"
-                        :value="$permission->id"
-                        :label="$label"
-                    />
-                @empty
-                    <p class="text-sm text-body">{{ __('general.no_permissions') }}</p>
-                @endforelse
+            <div x-data="{ search: '' }" class="space-y-2">
+                <x-fwb.input
+                    type="search"
+                    size="sm"
+                    x-model="search"
+                    :placeholder="__('general.search')"
+                />
+
+                <div class="max-h-[60vh] space-y-2 overflow-y-auto rounded-lg border border-default p-3">
+                    @forelse ($this->permissions as $permission)
+                        @php
+                            $labelKey = 'permissions.'.$permission->name;
+                            $translated = __($labelKey);
+                            $label = $translated !== $labelKey
+                                ? $translated.' ('.$permission->name.')'
+                                : $permission->name.' ('.$permission->guard_name.')';
+                        @endphp
+                        <div
+                            x-show="!search || $el.dataset.search.includes(search.toLowerCase())"
+                            data-search="{{ mb_strtolower($label) }}"
+                        >
+                            <x-fwb.checkbox
+                                :id="'role-permission-'.$permission->id"
+                                wire:model="selectedPermissionIds"
+                                :value="$permission->id"
+                                :label="$label"
+                            />
+                        </div>
+                    @empty
+                        <p class="text-sm text-body">{{ __('general.no_permissions') }}</p>
+                    @endforelse
+                </div>
             </div>
 
             @error('selectedPermissionIds')
