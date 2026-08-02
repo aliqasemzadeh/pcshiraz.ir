@@ -285,7 +285,6 @@ new #[Layout('layouts.panels')] class extends Component
 
                     <div class="grid gap-4 md:grid-cols-2">
                         <div>
-                            <label class="mb-2 block text-sm font-medium text-heading">{{ __('app.site_logo') }}</label>
                             <p class="mb-2 text-xs text-body">{{ __('app.site_logo_help') }}</p>
                             @if ($this->logoPreviewUrl())
                                 <div class="mb-3 flex items-center gap-3 rounded-lg border border-default bg-neutral-secondary-soft p-3">
@@ -294,6 +293,7 @@ new #[Layout('layouts.panels')] class extends Component
                             @endif
                             <x-ui.file-input
                                 wire:model="generalForm.logo"
+                                :label="__('app.site_logo')"
                                 :helper="__('app.logo_file_help')"
                                 accept="image/jpeg,image/png,image/webp,image/svg+xml"
                                 dropzone
@@ -304,7 +304,6 @@ new #[Layout('layouts.panels')] class extends Component
                         </div>
 
                         <div>
-                            <label class="mb-2 block text-sm font-medium text-heading">{{ __('app.favicon') }}</label>
                             <p class="mb-2 text-xs text-body">{{ __('app.favicon_help') }}</p>
                             @if ($this->faviconPreviewUrl())
                                 <div class="mb-3 flex items-center gap-3 rounded-lg border border-default bg-neutral-secondary-soft p-3">
@@ -313,6 +312,7 @@ new #[Layout('layouts.panels')] class extends Component
                             @endif
                             <x-ui.file-input
                                 wire:model="generalForm.favicon"
+                                :label="__('app.favicon')"
                                 :helper="__('app.favicon_file_help')"
                                 accept="image/png,image/x-icon,image/jpeg,image/webp"
                                 dropzone

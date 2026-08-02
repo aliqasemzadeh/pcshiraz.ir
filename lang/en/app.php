@@ -56,6 +56,7 @@ return [
     'favicon' => 'Favicon',
     'favicon_help' => 'Small icon shown next to the page title in the browser.',
     'favicon_file_help' => 'PNG (max 1MB)',
+    'file_click_or_drop' => 'Click to upload or drag and drop',
 
     'maintenance_mode' => 'Maintenance mode',
     'maintenance_mode_help' => 'When enabled, the site becomes unavailable to visitors.',
