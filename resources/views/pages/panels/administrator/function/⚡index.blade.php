@@ -110,16 +110,6 @@ new #[Layout('layouts.panels')] class extends Component
         $this->dispatchArtisanCommands(['config:clear']);
     }
 
-    public function clearAll(): void
-    {
-        $this->dispatchArtisanCommands([
-            'route:clear',
-            'cache:clear',
-            'view:clear',
-            'config:clear',
-        ]);
-    }
-
     public function optimize(): void
     {
         $this->dispatchArtisanCommands(['optimize']);
@@ -313,28 +303,12 @@ new #[Layout('layouts.panels')] class extends Component
 
         <x-fwb.card>
             <div class="space-y-4">
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <h2 class="text-lg font-semibold text-heading">{{ __('app.function_commands_title') }}</h2>
-                        <p class="mt-1 text-sm text-body">{{ __('app.function_commands_help') }}</p>
-                    </div>
-
-                    <x-ui.button
-                        type="button"
-                        color="red"
-                        target="clearAll"
-                        wire:click="clearAll"
-                        wire:confirm="{{ __('general.are_you_sure') }}"
-                        :disabled="$this->isRunning"
-                    >
-                        <x-slot:icon>
-                            <x-lucide-trash-2 class="h-4 w-4 me-2" />
-                        </x-slot:icon>
-                        {{ __('app.function_clear_all') }}
-                    </x-ui.button>
+                <div>
+                    <h2 class="text-lg font-semibold text-heading">{{ __('app.function_commands_title') }}</h2>
+                    <p class="mt-1 text-sm text-body">{{ __('app.function_commands_help') }}</p>
                 </div>
 
-                <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                     <x-ui.button
                         type="button"
                         color="cyan"
@@ -425,50 +399,66 @@ new #[Layout('layouts.panels')] class extends Component
             </div>
         </x-fwb.card>
 
-        <x-fwb.card>
-            <div class="space-y-4">
-                <div class="flex items-center justify-between gap-3">
-                    <div>
-                        <h2 class="text-lg font-semibold text-heading">{{ __('app.function_progress_title') }}</h2>
-                        <p class="mt-1 text-sm text-body">
-                            @if ($currentStep !== '')
-                                {{ $currentStep }}
-                            @else
-                                {{ __('app.function_progress_idle') }}
-                            @endif
-                        </p>
+        <div>
+            <h2 class="mb-3 text-lg font-semibold text-heading">{{ __('app.function_progress_title') }}</h2>
+
+            <div
+                dir="ltr"
+                class="overflow-hidden rounded-xl border border-zinc-700/80 bg-zinc-950 shadow-lg shadow-zinc-950/20"
+            >
+                <div class="flex items-center gap-3 border-b border-zinc-800 bg-zinc-900 px-4 py-2.5">
+                    <div class="flex shrink-0 items-center gap-1.5">
+                        <span class="size-2.5 rounded-full bg-red-500"></span>
+                        <span class="size-2.5 rounded-full bg-amber-400"></span>
+                        <span class="size-2.5 rounded-full bg-emerald-500"></span>
                     </div>
 
-                    <span @class([
-                        'inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium',
-                        'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200' => $status === 'idle',
-                        'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200' => $status === 'running',
-                        'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200' => $status === 'success',
-                        'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200' => $status === 'failed',
-                    ])>
-                        {{ __('app.function_status_'.$status) }}
-                    </span>
+                    <div class="min-w-0 flex-1 truncate font-mono text-xs text-zinc-400">
+                        @if ($currentStep !== '')
+                            <span class="text-emerald-400">$</span>
+                            <span class="text-zinc-200">{{ $currentStep }}</span>
+                        @else
+                            <span class="text-zinc-500">{{ __('app.function_progress_idle') }}</span>
+                        @endif
+                    </div>
+
+                    <div class="flex shrink-0 items-center gap-2">
+                        <span @class([
+                            'inline-flex items-center rounded px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-wide',
+                            'bg-zinc-800 text-zinc-400' => $status === 'idle',
+                            'bg-amber-500/15 text-amber-300' => $status === 'running',
+                            'bg-emerald-500/15 text-emerald-300' => $status === 'success',
+                            'bg-red-500/15 text-red-300' => $status === 'failed',
+                        ])>
+                            {{ __('app.function_status_'.$status) }}
+                        </span>
+                        <span class="font-mono text-[10px] tabular-nums text-zinc-500">{{ $progress }}%</span>
+                    </div>
                 </div>
 
-                <div class="h-3 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+                <div class="h-1 w-full bg-zinc-900">
                     <div
-                        class="h-full rounded-full bg-brand transition-all duration-300"
+                        @class([
+                            'h-full transition-all duration-300',
+                            'bg-zinc-600' => $status === 'idle',
+                            'bg-amber-400' => $status === 'running',
+                            'bg-emerald-400' => $status === 'success',
+                            'bg-red-400' => $status === 'failed',
+                        ])
                         style="width: {{ max(0, min(100, $progress)) }}%"
                     ></div>
                 </div>
 
-                <div class="flex items-center justify-between text-xs text-body">
-                    <span>{{ $progress }}%</span>
-                    @if ($this->isRunning)
-                        <span class="inline-flex items-center gap-1">
-                            <x-fwb.spinner color="blue" size="xs" />
-                            {{ __('general.working') }}
-                        </span>
-                    @endif
+                <div
+                    class="max-h-96 overflow-auto"
+                    x-data
+                    x-effect="$wire.output; $wire.status; $nextTick(() => { $el.scrollTop = $el.scrollHeight })"
+                >
+                    <pre class="p-4 text-left font-mono text-xs leading-relaxed whitespace-pre-wrap text-zinc-300">@if ($output !== ''){{ $output }}
+@else<span class="text-zinc-600">{{ __('app.function_output_empty') }}</span>
+@endif@if ($this->isRunning)<span class="ms-0.5 inline-block h-3.5 w-1.5 animate-pulse bg-emerald-400 align-text-bottom"></span>@endif</pre>
                 </div>
-
-                <pre dir="ltr" class="max-h-96 overflow-auto rounded-lg border border-default bg-slate-950 p-4 text-left text-xs leading-relaxed whitespace-pre-wrap text-slate-100">{{ $output !== '' ? $output : __('app.function_output_empty') }}</pre>
             </div>
-        </x-fwb.card>
+        </div>
     </div>
 </div>
