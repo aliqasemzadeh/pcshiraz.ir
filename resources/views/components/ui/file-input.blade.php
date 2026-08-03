@@ -19,8 +19,8 @@
     x-data="{ uploading: false, progress: 0 }"
     x-on:livewire-upload-start="uploading = true; progress = 0; $store.ui.start()"
     x-on:livewire-upload-finish="uploading = false; progress = 0; $store.ui.end()"
-    x-on:livewire-upload-cancel="uploading = false; progress = 0; $store.ui.end()"
-    x-on:livewire-upload-error="uploading = false; progress = 0; $store.ui.end()"
+    x-on:livewire-upload-cancel="uploading = false; progress = 0; $store.ui.reset()"
+    x-on:livewire-upload-error="uploading = false; progress = 0; $store.ui.reset()"
     x-on:livewire-upload-progress="progress = $event.detail.progress"
 >
     @if ($dropzone)
