@@ -71,8 +71,16 @@ new #[Layout('layouts.panels')] class extends Component
 
     public function saveGeneral(GeneralSettings $settings): void
     {
-        $this->generalForm->save($settings);
-        Toaster::success(__('general.saved'));
+        try {
+            $this->generalForm->save($settings);
+            Toaster::success(__('general.saved'));
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Toaster::error(__('general.error'));
+            throw $e;
+        } catch (\Exception $e) {
+            Toaster::error(__('general.error'));
+            logger()->error('Settings save error: ' . $e->getMessage());
+        }
     }
 
     public function saveMaintenance(MaintenanceSettings $settings): void
