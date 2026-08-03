@@ -49,7 +49,7 @@ class CheckoutService
             ]);
         }
 
-        $cart = $this->cartService->getOrCreateCart($user)->load(['items.item']);
+        $cart = $this->cartService->getOrCreateCart($user)->load(['items.item', 'items.itemPrice']);
 
         if ($cart->items->isEmpty()) {
             throw ValidationException::withMessages([
@@ -65,21 +65,32 @@ class CheckoutService
             ]);
         }
 
-        $subtotal = $this->cartService->subtotal($cart);
+        $breakdown = $this->cartService->breakdown($cart);
 
         if ($saleType === PriceTypeEnum::Installment) {
-            return $this->placeInstallmentOrder($user, $organization, $cart, $subtotal, $installmentPlanId);
+            return $this->placeInstallmentOrder(
+                $user,
+                $organization,
+                $cart,
+                $breakdown,
+                $installmentPlanId,
+            );
         }
 
-        return $this->placeCashOrder($user, $organization, $cart, $subtotal);
+        return $this->placeCashOrder($user, $organization, $cart, $breakdown);
     }
 
+    /**
+     * @param  array{subtotal: string, cash_only_subtotal: string, installment_subtotal: string, cash_only_count: int}  $breakdown
+     */
     protected function placeCashOrder(
         User $user,
         Organization $organization,
         Cart $cart,
-        string $subtotal,
+        array $breakdown,
     ): Order {
+        $subtotal = $breakdown['subtotal'];
+
         return DB::transaction(function () use ($user, $organization, $cart, $subtotal) {
             $order = Order::query()->create([
                 'order_number' => $this->generateOrderNumber(),
@@ -91,10 +102,13 @@ class CheckoutService
                 'subtotal' => $subtotal,
                 'discount' => 0,
                 'total_amount' => $subtotal,
+                'cash_only_subtotal' => 0,
+                'installment_subtotal' => 0,
                 'plan_term_months' => null,
                 'plan_down_payment_percent' => null,
                 'plan_monthly_interest_percent' => null,
                 'plan_max_financiable_amount' => null,
+                'plan_down_payment_amount' => 0,
                 'down_payment_amount' => 0,
                 'financed_amount' => 0,
                 'total_interest' => 0,
@@ -110,11 +124,14 @@ class CheckoutService
         });
     }
 
+    /**
+     * @param  array{subtotal: string, cash_only_subtotal: string, installment_subtotal: string, cash_only_count: int}  $breakdown
+     */
     protected function placeInstallmentOrder(
         User $user,
         Organization $organization,
         Cart $cart,
-        string $subtotal,
+        array $breakdown,
         ?int $installmentPlanId,
     ): Order {
         if ($installmentPlanId === null) {
@@ -123,7 +140,17 @@ class CheckoutService
             ]);
         }
 
-        $eligible = $this->matcher->eligiblePlans($organization, $subtotal);
+        if (bccomp($breakdown['installment_subtotal'], '0', 4) <= 0) {
+            throw ValidationException::withMessages([
+                'installment_plan_id' => __('app.no_installmentable_items_hint'),
+            ]);
+        }
+
+        $eligible = $this->matcher->eligiblePlans(
+            $organization,
+            $breakdown['installment_subtotal'],
+            $breakdown['cash_only_subtotal'],
+        );
         $selected = $eligible->first(fn (array $row) => $row['plan']->id === $installmentPlanId);
 
         if ($selected === null) {
@@ -135,8 +162,9 @@ class CheckoutService
         /** @var InstallmentPlan $plan */
         $plan = $selected['plan'];
         $preview = $selected['preview'];
+        $subtotal = $breakdown['subtotal'];
 
-        return DB::transaction(function () use ($user, $organization, $cart, $plan, $preview, $subtotal) {
+        return DB::transaction(function () use ($user, $organization, $cart, $plan, $preview, $subtotal, $breakdown) {
             $order = Order::query()->create([
                 'order_number' => $this->generateOrderNumber(),
                 'organization_id' => $organization->id,
@@ -147,10 +175,13 @@ class CheckoutService
                 'subtotal' => $subtotal,
                 'discount' => 0,
                 'total_amount' => $subtotal,
+                'cash_only_subtotal' => $breakdown['cash_only_subtotal'],
+                'installment_subtotal' => $breakdown['installment_subtotal'],
                 'plan_term_months' => $plan->term_months,
                 'plan_down_payment_percent' => $preview['effective_down_payment_percent'],
                 'plan_monthly_interest_percent' => $plan->monthly_interest_percent,
                 'plan_max_financiable_amount' => $plan->max_financiable_amount,
+                'plan_down_payment_amount' => $preview['plan_down_payment_amount'],
                 'down_payment_amount' => $preview['down_payment_amount'],
                 'financed_amount' => $preview['financed_amount'],
                 'total_interest' => $preview['total_interest'],
@@ -182,9 +213,12 @@ class CheckoutService
     protected function createOrderItems(Order $order, Cart $cart): void
     {
         foreach ($cart->items as $cartItem) {
+            $priceType = $this->cartService->linePriceType($cart, $cartItem);
+
             $order->items()->create([
                 'item_id' => $cartItem->item_id,
                 'item_price_id' => $cartItem->item_price_id,
+                'price_type' => $priceType,
                 'title' => $cartItem->item?->title ?? __('general.item'),
                 'quantity' => $cartItem->quantity,
                 'unit_price' => $cartItem->unit_price,

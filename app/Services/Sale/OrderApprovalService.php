@@ -4,6 +4,7 @@ namespace App\Services\Sale;
 
 use App\Enums\OrderInstallmentStatusEnum;
 use App\Enums\OrderStatusEnum;
+use App\Enums\PriceTypeEnum;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -131,8 +132,18 @@ class OrderApprovalService
             $order->load('items');
 
             $subtotal = '0.0000';
+            $cashOnlySubtotal = '0.0000';
+            $installmentSubtotal = '0.0000';
+
             foreach ($order->items as $item) {
-                $subtotal = bcadd($subtotal, (string) $item->line_total, 4);
+                $lineTotal = (string) $item->line_total;
+                $subtotal = bcadd($subtotal, $lineTotal, 4);
+
+                if ($item->price_type === PriceTypeEnum::Installment) {
+                    $installmentSubtotal = bcadd($installmentSubtotal, $lineTotal, 4);
+                } elseif ($order->sale_type === PriceTypeEnum::Installment) {
+                    $cashOnlySubtotal = bcadd($cashOnlySubtotal, $lineTotal, 4);
+                }
             }
 
             if (bccomp($subtotal, '0', 4) <= 0) {
@@ -147,6 +158,9 @@ class OrderApprovalService
                 $order->update([
                     'subtotal' => $subtotal,
                     'total_amount' => $subtotal,
+                    'cash_only_subtotal' => 0,
+                    'installment_subtotal' => 0,
+                    'plan_down_payment_amount' => 0,
                     'total_payable' => $subtotal,
                     'outstanding_balance' => $subtotal,
                 ]);
@@ -154,7 +168,7 @@ class OrderApprovalService
                 return $order->refresh();
             }
 
-            $preview = $this->calculator->calculate($plan, $subtotal);
+            $preview = $this->calculator->calculate($plan, $installmentSubtotal, $cashOnlySubtotal);
 
             $order->installments()->delete();
 
@@ -173,7 +187,10 @@ class OrderApprovalService
             $order->update([
                 'subtotal' => $subtotal,
                 'total_amount' => $subtotal,
+                'cash_only_subtotal' => $cashOnlySubtotal,
+                'installment_subtotal' => $installmentSubtotal,
                 'plan_down_payment_percent' => $preview['effective_down_payment_percent'],
+                'plan_down_payment_amount' => $preview['plan_down_payment_amount'],
                 'down_payment_amount' => $preview['down_payment_amount'],
                 'financed_amount' => $preview['financed_amount'],
                 'total_interest' => $preview['total_interest'],

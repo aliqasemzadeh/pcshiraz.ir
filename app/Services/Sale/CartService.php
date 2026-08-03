@@ -179,7 +179,7 @@ class CartService
      */
     public function breakdown(Cart $cart): array
     {
-        $cart->loadMissing(['items.itemPrice', 'sale_type']);
+        $cart->loadMissing(['items.itemPrice']);
 
         $subtotal = '0.0000';
         $cashOnlySubtotal = '0.0000';

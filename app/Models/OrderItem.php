@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PriceTypeEnum;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'order_id',
     'item_id',
     'item_price_id',
+    'price_type',
     'title',
     'quantity',
     'unit_price',
@@ -21,6 +23,7 @@ class OrderItem extends Model
     protected function casts(): array
     {
         return [
+            'price_type' => PriceTypeEnum::class,
             'quantity' => 'integer',
             'unit_price' => 'decimal:4',
             'line_total' => 'decimal:4',
