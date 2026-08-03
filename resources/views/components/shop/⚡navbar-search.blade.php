@@ -9,15 +9,32 @@ new class extends Component
 {
     public string $q = '';
 
-    #[Computed]
-    public function results(): Collection
+    public bool $open = false;
+
+    public function updatedQ(): void
     {
-        return app(ProductSearchService::class)->search($this->q);
+        $this->open = true;
+    }
+
+    public function openPanel(): void
+    {
+        $this->open = true;
+    }
+
+    public function closePanel(): void
+    {
+        $this->open = false;
     }
 
     public function submit(): void
     {
-        // Keep the panel open; results refresh via computed $q.
+        $this->open = true;
+    }
+
+    #[Computed]
+    public function results(): Collection
+    {
+        return app(ProductSearchService::class)->search($this->q);
     }
 };
 ?>
@@ -25,15 +42,20 @@ new class extends Component
 <div
     class="relative flex min-w-0 flex-1 items-stretch self-stretch"
     x-data="{
-        open: false,
+        open: $wire.entangle('open').live,
         isDesktop() {
             return window.matchMedia('(min-width: 768px)').matches;
         },
+        syncBodyScroll() {
+            if (this.open && ! this.isDesktop()) {
+                document.body.classList.add('overflow-hidden');
+            } else {
+                document.body.classList.remove('overflow-hidden');
+            }
+        },
         openPanel() {
             this.open = true;
-            if (! this.isDesktop()) {
-                document.body.classList.add('overflow-hidden');
-            }
+            this.$nextTick(() => this.syncBodyScroll());
         },
         closePanel() {
             this.open = false;
@@ -44,6 +66,7 @@ new class extends Component
             $wire.submit();
         }
     }"
+    x-effect="syncBodyScroll()"
     @keydown.escape.window="open && closePanel()"
     @click.outside="open && isDesktop() && closePanel()"
 >
