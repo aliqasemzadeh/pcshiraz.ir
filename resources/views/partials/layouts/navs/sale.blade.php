@@ -54,3 +54,31 @@
         <span class="ms-3">{{ __('general.items') }}</span>
     </a>
 </li>
+<li>
+    <a
+        href="{{ route('panels.sale.banner.index') }}"
+        wire:navigate
+        @class([
+            'group flex items-center rounded-lg p-2 hover:bg-sidebar-hover hover:text-white',
+            'bg-sidebar-active text-sidebar-fg-active' => request()->routeIs('panels.sale.banner.*'),
+            'text-sidebar-fg' => ! request()->routeIs('panels.sale.banner.*'),
+        ])
+    >
+        <x-lucide-image @class(['h-5 w-5 group-hover:text-white', 'text-sidebar-fg-active' => request()->routeIs('panels.sale.banner.*'), 'text-sidebar-fg' => ! request()->routeIs('panels.sale.banner.*')]) />
+        <span class="ms-3">{{ __('general.banners') }}</span>
+    </a>
+</li>
+<li>
+    <a
+        href="{{ route('panels.sale.article.index') }}"
+        wire:navigate
+        @class([
+            'group flex items-center rounded-lg p-2 hover:bg-sidebar-hover hover:text-white',
+            'bg-sidebar-active text-sidebar-fg-active' => request()->routeIs('panels.sale.article.*'),
+            'text-sidebar-fg' => ! request()->routeIs('panels.sale.article.*'),
+        ])
+    >
+        <x-lucide-newspaper @class(['h-5 w-5 group-hover:text-white', 'text-sidebar-fg-active' => request()->routeIs('panels.sale.article.*'), 'text-sidebar-fg' => ! request()->routeIs('panels.sale.article.*')]) />
+        <span class="ms-3">{{ __('general.articles') }}</span>
+    </a>
+</li>

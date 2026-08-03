@@ -29,7 +29,7 @@ class ItemForm extends Form
 
     public bool $is_purchasable = true;
 
-    public int|string $stock = 0;
+    public int|string $stock = 1;
 
     public bool $is_contact_price = false;
 

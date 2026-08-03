@@ -25,7 +25,6 @@ const bootJalaliDatepicker = () => {
         window.jalaliDatepicker.startWatch({
             autoShow: true,
             autoHide: true,
-            hideAfterChange: true,
             showTodayBtn: true,
             showEmptyBtn: true,
             maxDate: 'today',

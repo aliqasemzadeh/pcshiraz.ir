@@ -55,16 +55,15 @@ class ProfileForm extends Form
     {
         $locked = $this->user?->isIdentityVerified() ?? false;
 
-        $rules = [
-            'email' => [
-                'nullable',
-                'email',
-                'max:255',
-                Rule::unique('users', 'email')->whereNull('deleted_at')->ignore($this->user?->id),
-            ],
-            'password' => ['nullable', 'string', 'confirmed', Password::defaults()],
-            'password_confirmation' => ['nullable', 'string'],
-        ];
+        $rules = [];
+
+        if (filled($this->password)) {
+            $rules['password'] = ['required', 'string', 'confirmed', Password::min(8)];
+            $rules['password_confirmation'] = ['required', 'string'];
+        } else {
+            $rules['password'] = ['nullable', 'string'];
+            $rules['password_confirmation'] = ['nullable', 'string'];
+        }
 
         if ($locked) {
             return $rules;
@@ -80,6 +79,12 @@ class ProfileForm extends Form
             'last_name' => ['nullable', 'string', 'max:255'],
             'national_code' => ['nullable', 'ir_national_id', 'max:10'],
             'birth_date' => ['nullable', 'string', 'regex:/^\d{4}\/\d{1,2}\/\d{1,2}$/'],
+            'email' => [
+                'nullable',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->whereNull('deleted_at')->ignore($this->user?->id),
+            ],
             'request_identity_verification' => ['boolean'],
         ]);
     }
@@ -110,25 +115,26 @@ class ProfileForm extends Form
 
         $locked = $user->isIdentityVerified();
 
-        $data = [
-            'email' => $this->email,
-        ];
+        $data = [];
 
         if (! $locked) {
-            $data = array_merge($data, [
+            $data = [
                 'mobile' => $this->mobile,
                 'first_name' => $this->first_name,
                 'last_name' => $this->last_name,
                 'national_code' => $this->national_code,
                 'birth_date' => $this->gregorianBirthDate(),
-            ]);
+                'email' => $this->email,
+            ];
         }
 
-        if ($this->password !== '') {
+        if (filled($this->password)) {
             $data['password'] = $this->password;
         }
 
-        $user->update($data);
+        if ($data !== []) {
+            $user->update($data);
+        }
 
         if (! $locked && $this->request_identity_verification) {
             $this->markIdentityVerified($user->fresh());

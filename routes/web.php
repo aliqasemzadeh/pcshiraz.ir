@@ -30,8 +30,6 @@ Route::prefix('administrator')->name('panels.administrator.')->group(function ()
     Route::livewire('/users', 'pages::panels.administrator.user.index')->name('user.index');
     Route::livewire('/roles', 'pages::panels.administrator.role.index')->name('role.index');
     Route::livewire('/permissions', 'pages::panels.administrator.permission.index')->name('permission.index');
-    Route::livewire('/banners', 'pages::panels.administrator.banner.index')->name('banner.index');
-    Route::livewire('/articles', 'pages::panels.administrator.article.index')->name('article.index');
     Route::livewire('/settings', 'pages::panels.administrator.setting.index')->name('setting.index');
     Route::livewire('/functions', 'pages::panels.administrator.function.index')->name('function.index');
 });
@@ -42,6 +40,8 @@ Route::prefix('sale')->name('panels.sale.')->group(function () {
     Route::livewire('/catalog/categories', 'pages::panels.sale.catalog.category.index')->name('catalog.category.index');
     Route::livewire('/catalog/items', 'pages::panels.sale.catalog.item.index')->name('catalog.item.index');
     Route::livewire('/catalog/items/{item}/prices', 'pages::panels.sale.catalog.item.price.index')->name('catalog.item.price.index');
+    Route::livewire('/banners', 'pages::panels.sale.banner.index')->name('banner.index');
+    Route::livewire('/articles', 'pages::panels.sale.article.index')->name('article.index');
 });
 
 Route::prefix('colleague')->name('panels.colleague.')->group(function () {
