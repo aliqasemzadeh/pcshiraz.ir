@@ -4,6 +4,8 @@ import smoothscroll from 'smoothscroll-polyfill';
 import { Chart, registerables } from 'chart.js';
 import './../../vendor/power-components/livewire-powergrid/dist/powergrid';
 import '../../vendor/masmerise/livewire-toaster/resources/js';
+import 'jalalidatepicker/dist/jalalidatepicker.min.css';
+import 'jalalidatepicker/dist/jalalidatepicker.min.js';
 
 Chart.register(...registerables);
 window.Chart = Chart;
@@ -12,7 +14,43 @@ smoothscroll.polyfill();
 
 const bootFlowbite = () => initFlowbite();
 
-document.addEventListener('DOMContentLoaded', bootFlowbite);
+let jalaliDatepickerReady = false;
+
+const bootJalaliDatepicker = () => {
+    if (! window.jalaliDatepicker) {
+        return;
+    }
+
+    if (! jalaliDatepickerReady) {
+        window.jalaliDatepicker.startWatch({
+            autoShow: true,
+            autoHide: true,
+            hideAfterChange: true,
+            showTodayBtn: true,
+            showEmptyBtn: true,
+            maxDate: 'today',
+            zIndex: 9999,
+        });
+
+        document.addEventListener('jdp:change', (event) => {
+            const input = event.target;
+
+            if (! (input instanceof HTMLInputElement)) {
+                return;
+            }
+
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        jalaliDatepickerReady = true;
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    bootFlowbite();
+    bootJalaliDatepicker();
+});
 document.addEventListener('livewire:navigated', bootFlowbite);
 window.addEventListener('pg-livewire-request-finished', bootFlowbite);
 document.addEventListener('livewire:morph.updated', bootFlowbite);

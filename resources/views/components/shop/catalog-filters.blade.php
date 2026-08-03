@@ -1,6 +1,7 @@
 @props([
     'id' => 'catalog',
     'sort' => 'price_asc',
+    'availability' => 'in_stock',
     'brands' => null,
     'colors' => [],
     'selectedBrands' => [],
@@ -10,12 +11,18 @@
 @php
     $uid = 'cf-'.$id;
     $sortId = $uid.'-sort';
+    $availabilityId = $uid.'-availability';
     $brandId = $uid.'-brand';
     $colorId = $uid.'-color';
     $placement = __('general.direction') === 'rtl' ? 'bottom-end' : 'bottom-start';
     $sortLabel = $sort === 'price_desc'
         ? __('app.sort_price_desc')
         : __('app.sort_price_asc');
+    $availabilityLabel = match ($availability) {
+        'out_of_stock' => __('app.availability_out_of_stock'),
+        'all' => __('app.availability_all'),
+        default => __('app.availability_in_stock'),
+    };
     $brandCount = is_array($selectedBrands) ? count($selectedBrands) : 0;
     $colorCount = is_array($selectedColors) ? count($selectedColors) : 0;
     $hasBrands = is_array($brands) && count($brands) > 0;
@@ -53,6 +60,51 @@
                         class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded {{ $sort === 'price_desc' ? 'bg-neutral-tertiary-medium text-heading' : '' }}"
                     >
                         {{ __('app.sort_price_desc') }}
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    {{-- Availability --}}
+    <div>
+        <button
+            id="{{ $availabilityId }}-btn"
+            data-dropdown-toggle="{{ $availabilityId }}"
+            data-dropdown-placement="{{ $placement }}"
+            class="inline-flex items-center justify-center text-heading bg-neutral-primary-medium box-border border border-default-medium hover:bg-neutral-tertiary-medium focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none"
+            type="button"
+        >
+            {{ __('app.filter_availability') }}: {{ $availabilityLabel }}
+            <x-lucide-chevron-down class="w-4 h-4 ms-1.5 -me-0.5" />
+        </button>
+        <div id="{{ $availabilityId }}" class="z-10 hidden bg-neutral-primary-medium border border-default-medium rounded-base shadow-lg w-48">
+            <ul class="p-2 text-sm text-body font-medium" aria-labelledby="{{ $availabilityId }}-btn">
+                <li>
+                    <button
+                        type="button"
+                        wire:click="$set('availability', 'in_stock')"
+                        class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded {{ $availability === 'in_stock' ? 'bg-neutral-tertiary-medium text-heading' : '' }}"
+                    >
+                        {{ __('app.availability_in_stock') }}
+                    </button>
+                </li>
+                <li>
+                    <button
+                        type="button"
+                        wire:click="$set('availability', 'out_of_stock')"
+                        class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded {{ $availability === 'out_of_stock' ? 'bg-neutral-tertiary-medium text-heading' : '' }}"
+                    >
+                        {{ __('app.availability_out_of_stock') }}
+                    </button>
+                </li>
+                <li>
+                    <button
+                        type="button"
+                        wire:click="$set('availability', 'all')"
+                        class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded {{ $availability === 'all' ? 'bg-neutral-tertiary-medium text-heading' : '' }}"
+                    >
+                        {{ __('app.availability_all') }}
                     </button>
                 </li>
             </ul>

@@ -4,22 +4,25 @@ use App\Enums\PriceTypeEnum;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Item;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 new #[Layout('layouts.app')] class extends Component
 {
-    use WithPagination;
-
     public Category $category;
 
     public Brand $brand;
 
+    public int $perPage = 30;
+
     #[Url]
     public string $sort = 'price_asc';
+
+    #[Url]
+    public string $availability = 'in_stock';
 
     /** @var list<string> */
     #[Url]
@@ -29,6 +32,7 @@ new #[Layout('layouts.app')] class extends Component
     {
         $this->category = $category;
         $this->brand = $brand;
+        $this->perPage = (int) config('main.per_page', 30);
 
         $hasItems = Item::query()
             ->active()
@@ -46,12 +50,62 @@ new #[Layout('layouts.app')] class extends Component
 
     public function updatedSort(): void
     {
-        $this->resetPage();
+        $this->resetListing();
+    }
+
+    public function updatedAvailability(): void
+    {
+        $this->resetListing();
     }
 
     public function updatedColors(): void
     {
-        $this->resetPage();
+        $this->resetListing();
+    }
+
+    public function loadMore(): void
+    {
+        if (! $this->hasMore) {
+            return;
+        }
+
+        $this->perPage += (int) config('main.per_page', 30);
+        unset($this->items, $this->hasMore);
+    }
+
+    protected function resetListing(): void
+    {
+        $this->perPage = (int) config('main.per_page', 30);
+        unset($this->items, $this->hasMore);
+    }
+
+    protected function itemsQuery(): Builder
+    {
+        $query = Item::query()
+            ->active()
+            ->where('items.category_id', $this->category->id)
+            ->where('items.brand_id', $this->brand->id)
+            ->with(['brand', 'media', 'activeCashPrice'])
+            ->leftJoin('item_prices as cash_prices', function ($join) {
+                $join->on('cash_prices.item_id', '=', 'items.id')
+                    ->where('cash_prices.price_type', PriceTypeEnum::Cash->value)
+                    ->where('cash_prices.is_active', true);
+            })
+            ->select('items.*')
+            ->when($this->availability === 'in_stock', fn (Builder $q) => $q->purchasable())
+            ->when(
+                $this->availability === 'out_of_stock',
+                fn (Builder $q) => $q->where('items.is_purchasable', false),
+            )
+            ->when($this->colors !== [], fn (Builder $q) => $q->whereIn('items.color_name', $this->colors));
+
+        if ($this->sort === 'price_desc') {
+            $query->orderByDesc('cash_prices.sale_price');
+        } else {
+            $query->orderBy('cash_prices.sale_price');
+        }
+
+        return $query;
     }
 
     #[Computed]
@@ -78,26 +132,13 @@ new #[Layout('layouts.app')] class extends Component
     #[Computed]
     public function items()
     {
-        $query = Item::query()
-            ->active()
-            ->where('items.category_id', $this->category->id)
-            ->where('items.brand_id', $this->brand->id)
-            ->with(['brand', 'media', 'activeCashPrice'])
-            ->leftJoin('item_prices as cash_prices', function ($join) {
-                $join->on('cash_prices.item_id', '=', 'items.id')
-                    ->where('cash_prices.price_type', PriceTypeEnum::Cash->value)
-                    ->where('cash_prices.is_active', true);
-            })
-            ->select('items.*')
-            ->when($this->colors !== [], fn ($q) => $q->whereIn('items.color_name', $this->colors));
+        return $this->itemsQuery()->limit($this->perPage)->get();
+    }
 
-        if ($this->sort === 'price_desc') {
-            $query->orderByDesc('cash_prices.sale_price');
-        } else {
-            $query->orderBy('cash_prices.sale_price');
-        }
-
-        return $query->paginate(config('main.per_page', 24));
+    #[Computed]
+    public function hasMore(): bool
+    {
+        return $this->itemsQuery()->count() > $this->perPage;
     }
 };
 ?>
@@ -118,6 +159,7 @@ new #[Layout('layouts.app')] class extends Component
         <x-shop.catalog-filters
             :id="'category-brand-'.$category->id.'-'.$brand->id"
             :sort="$sort"
+            :availability="$availability"
             :colors="$this->colorOptions"
             :selected-colors="$colors"
         />
@@ -130,11 +172,17 @@ new #[Layout('layouts.app')] class extends Component
     @else
         <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
             @foreach ($this->items as $item)
-                <x-shop.item-card :item="$item" :show-brand="false" />
+                <x-shop.item-card :item="$item" :show-brand="false" wire:key="item-{{ $item->id }}" />
             @endforeach
         </div>
-        <div class="mt-6">
-            {{ $this->items->links() }}
-        </div>
+
+        @if ($this->hasMore)
+            <div
+                wire:intersect="loadMore"
+                class="flex items-center justify-center py-6 text-sm text-gray-500"
+            >
+                <span wire:loading wire:target="loadMore">{{ __('app.loading_more') }}</span>
+            </div>
+        @endif
     @endif
 </div>

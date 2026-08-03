@@ -175,6 +175,7 @@ new #[Layout('layouts.panels')] class extends Component
                         @if ($current->sales_cap !== null)
                             <div>{{ __('general.sales_cap') }}: {{ number_format($current->sales_cap) }}</div>
                         @endif
+                        <div>{{ __('app.stock') }}: {{ number_format((int) $item->stock) }}</div>
                     </div>
                 @endif
 
