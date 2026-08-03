@@ -23,6 +23,7 @@ new #[Layout('layouts.panels')] class extends Component
         $this->item = $item->load(['brand', 'category', 'media']);
         $this->activeType = PriceTypeEnum::Cash->value;
         $this->form->setType($this->activeType);
+        $this->form->setStockFromItem($this->item);
     }
 
     public function selectType(string $type): void
@@ -36,7 +37,9 @@ new #[Layout('layouts.panels')] class extends Component
     {
         $this->form->price_type = $this->activeType;
         $this->form->store($this->item);
+        $this->item->refresh();
         $this->form->setType($this->activeType);
+        $this->form->setStockFromItem($this->item);
 
         Toaster::success(__('general.saved'));
         unset($this->activePrices, $this->priceHistory);
@@ -213,6 +216,19 @@ new #[Layout('layouts.panels')] class extends Component
                             dir="ltr"
                         />
                         @error('form.sales_cap')
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <x-fwb.input
+                            wire:model="form.stock"
+                            :label="__('app.stock')"
+                            type="number"
+                            min="0"
+                            dir="ltr"
+                        />
+                        @error('form.stock')
                             <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
                         @enderror
                     </div>

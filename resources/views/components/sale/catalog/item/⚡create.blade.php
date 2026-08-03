@@ -79,6 +79,7 @@ new class extends Component
         $this->form->is_main = true;
         $this->form->is_active = true;
         $this->form->is_purchasable = true;
+        $this->form->stock = 0;
         $this->form->tags = [];
         $this->currentImageUrl = null;
     }

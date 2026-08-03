@@ -18,6 +18,8 @@ class ItemPriceForm extends Form
 
     public string|int|null $sales_cap = null;
 
+    public string|int $stock = 0;
+
     public bool $is_active = true;
 
     public function setType(PriceTypeEnum|string $type): void
@@ -27,6 +29,11 @@ class ItemPriceForm extends Form
         $this->sale_price = '';
         $this->sales_cap = null;
         $this->is_active = true;
+    }
+
+    public function setStockFromItem(Item $item): void
+    {
+        $this->stock = (int) $item->stock;
     }
 
     /**
@@ -39,6 +46,7 @@ class ItemPriceForm extends Form
             'price' => ['required', 'numeric', 'min:0'],
             'sale_price' => ['required', 'numeric', 'min:0'],
             'sales_cap' => ['nullable', 'integer', 'min:0'],
+            'stock' => ['required', 'integer', 'min:0'],
             'is_active' => ['boolean'],
         ];
     }
@@ -53,6 +61,7 @@ class ItemPriceForm extends Form
             'price' => __('general.price'),
             'sale_price' => __('general.sale_price'),
             'sales_cap' => __('general.sales_cap'),
+            'stock' => __('app.stock'),
             'is_active' => __('general.active'),
         ];
     }
@@ -71,9 +80,15 @@ class ItemPriceForm extends Form
             $this->sale_price = $this->price;
         }
 
+        if ($this->stock === '' || $this->stock === null) {
+            $this->stock = 0;
+        }
+
         $this->validate();
 
-        return ItemPrice::query()->create([
+        $stock = (int) $this->stock;
+
+        $price = ItemPrice::query()->create([
             'item_id' => $item->id,
             'price_type' => $this->price_type,
             'price' => $this->price,
@@ -81,5 +96,12 @@ class ItemPriceForm extends Form
             'sales_cap' => $this->sales_cap,
             'is_active' => $this->is_active,
         ]);
+
+        $item->update([
+            'stock' => $stock,
+            'is_purchasable' => $stock > 0,
+        ]);
+
+        return $price;
     }
 }

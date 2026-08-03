@@ -59,6 +59,18 @@
     <x-fwb.checkbox wire:model="form.is_purchasable" :label="__('app.is_purchasable')" />
 </div>
 <div>
+    <x-fwb.input
+        wire:model="form.stock"
+        :label="__('app.stock')"
+        type="number"
+        min="0"
+        dir="ltr"
+    />
+    @error('form.stock')
+        <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+    @enderror
+</div>
+<div>
     <x-fwb.checkbox wire:model="form.is_contact_price" :label="__('app.is_contact_price')" />
 </div>
 

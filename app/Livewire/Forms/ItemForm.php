@@ -29,6 +29,8 @@ class ItemForm extends Form
 
     public bool $is_purchasable = true;
 
+    public int|string $stock = 0;
+
     public bool $is_contact_price = false;
 
     public string $title = '';
@@ -74,6 +76,7 @@ class ItemForm extends Form
         $this->is_main = (bool) $item->is_main;
         $this->is_active = (bool) $item->is_active;
         $this->is_purchasable = (bool) $item->is_purchasable;
+        $this->stock = (int) $item->stock;
         $this->is_contact_price = (bool) $item->is_contact_price;
         $this->title = $item->title;
         $this->slug = $item->slug;
@@ -180,6 +183,7 @@ class ItemForm extends Form
             'is_main' => ['boolean'],
             'is_active' => ['boolean'],
             'is_purchasable' => ['boolean'],
+            'stock' => ['required', 'integer', 'min:0'],
             'is_contact_price' => ['boolean'],
             'title' => ['required', 'string', 'max:255'],
             'slug' => [
@@ -224,6 +228,7 @@ class ItemForm extends Form
             'is_main' => __('general.is_main'),
             'is_active' => __('app.is_active'),
             'is_purchasable' => __('app.is_purchasable'),
+            'stock' => __('app.stock'),
             'is_contact_price' => __('app.is_contact_price'),
             'title' => __('general.title'),
             'slug' => __('general.slug'),
@@ -245,6 +250,7 @@ class ItemForm extends Form
     {
         $this->normalizeNullableFields();
         $this->prepareSlug();
+        $this->syncPurchasableFromStock();
         $this->validate();
 
         $item = Item::query()->create([
@@ -255,6 +261,7 @@ class ItemForm extends Form
             'is_main' => $this->is_main,
             'is_active' => $this->is_active,
             'is_purchasable' => $this->is_purchasable,
+            'stock' => (int) $this->stock,
             'is_contact_price' => $this->is_contact_price,
             'title' => $this->title,
             'slug' => $this->slug,
@@ -281,6 +288,7 @@ class ItemForm extends Form
         $this->item = $item;
         $this->normalizeNullableFields();
         $this->prepareSlug();
+        $this->syncPurchasableFromStock();
         $this->validate();
 
         $item->update([
@@ -291,6 +299,7 @@ class ItemForm extends Form
             'is_main' => $this->is_main,
             'is_active' => $this->is_active,
             'is_purchasable' => $this->is_purchasable,
+            'stock' => (int) $this->stock,
             'is_contact_price' => $this->is_contact_price,
             'title' => $this->title,
             'slug' => $this->slug,
@@ -314,10 +323,14 @@ class ItemForm extends Form
 
     protected function normalizeNullableFields(): void
     {
-        foreach (['brand_id', 'category_id', 'group_id', 'weight', 'length', 'width', 'height'] as $field) {
+        foreach (['brand_id', 'category_id', 'group_id', 'weight', 'length', 'width', 'height', 'stock'] as $field) {
             if ($this->{$field} === '') {
                 $this->{$field} = null;
             }
+        }
+
+        if ($this->stock === null) {
+            $this->stock = 0;
         }
 
         if ($this->group_id === 0) {
@@ -328,6 +341,13 @@ class ItemForm extends Form
             if ($this->{$field} === '') {
                 $this->{$field} = null;
             }
+        }
+    }
+
+    protected function syncPurchasableFromStock(): void
+    {
+        if ((int) $this->stock === 0) {
+            $this->is_purchasable = false;
         }
     }
 
