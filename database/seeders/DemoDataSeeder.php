@@ -23,17 +23,18 @@ class DemoDataSeeder extends Seeder
         $this->media = app(DemoMediaDownloader::class);
 
         User::query()->firstOrCreate(
-            ['mobile' => '09120000000'],
+            ['mobile' => '09177886099'],
             [
-                'email' => 'demo@pcshiraz.ir',
+                'email' => 'admin@pcshiraz.ir',
                 'password' => 'password',
             ]
         );
 
         $categories = $this->seedCategories();
-        $brands = $this->seedBrands();
-        $this->seedItems($categories, $brands);
-        $this->seedItemImages();
+        // Skip brands and items as requested
+        // $brands = $this->seedBrands();
+        // $this->seedItems($categories, $brands);
+        // $this->seedItemImages();
 
         app(CategoryMenuService::class)->forget();
     }
@@ -45,39 +46,19 @@ class DemoDataSeeder extends Seeder
     {
         $titles = [
             ['موبایل', 'mobile'],
-            ['قطعات موبایل', 'mobile-parts'],
-            ['لپ‌تاپ', 'laptop'],
-            ['تبلت', 'tablet'],
-            ['شارژر موبایل', 'phone-charger'],
-            ['کیف و قاب', 'case-cover'],
-            ['هدفون و هندزفری', 'headphones'],
-            ['ساعت و مچ‌بند', 'smartwatch'],
-            ['کابل و تبدیل', 'cable-adapter'],
-            ['هاب', 'hub'],
-            ['اسپیکر', 'speaker'],
-            ['ذخیره‌سازی اطلاعات', 'storage'],
-            ['کنسول بازی', 'game-console'],
-            ['پاوربانک', 'power-bank'],
-            ['نگهدارنده‌ی موبایل', 'phone-holder'],
-            ['کیبورد و موس', 'keyboard-mouse'],
-            ['مانیتور', 'monitor'],
-            ['محافظ و مبدل برق', 'power-protector'],
-            ['گجت خانگی', 'home-gadget'],
-            ['لوازم خانگی', 'home-appliance'],
-            ['گلس', 'glass-protector'],
-            ['تجهیزات کامپیوتر', 'computer-gear'],
-            ['مودم و شبکه', 'modem-network'],
-            ['خانه هوشمند', 'smart-home'],
-            ['دوربین تحت شبکه', 'network-camera'],
-            ['کامپیوتر', 'computer'],
-            ['اندروید باکس', 'android-box'],
-            ['لوازم جانبی موبایل', 'mobile-accessories'],
-            ['تگ هوشمند', 'smart-tag'],
-            ['سایر محصولات', 'other'],
+            ['نوت بوک', 'notebook'],
+            ['موبایل شارژ', 'mobile-charge'],
+            ['پاور بانک', 'power-bank'],
+            ['سیستم آماده', 'pre-built-system'],
         ];
 
         $categories = [];
         $assetsDir = database_path('seeders/assets/categories');
+
+        // Ensure directory exists
+        if (!is_dir($assetsDir)) {
+            mkdir($assetsDir, 0755, true);
+        }
 
         foreach ($titles as $index => [$title, $slug]) {
             $category = Category::query()->updateOrCreate(
@@ -88,31 +69,33 @@ class DemoDataSeeder extends Seeder
                     'title' => $title,
                     'seo_title' => $title,
                     'sort_order' => $index + 1,
-                    'show_on_home' => $index < 4,
+                    'show_on_home' => true,
                 ]
             );
 
-            $this->attachCategoryLogo($category, $assetsDir, $slug);
+            $this->createAndAttachSvgLogo($category, $assetsDir, $slug, $title);
             $categories[] = $category;
         }
 
         return $categories;
     }
 
-    protected function attachCategoryLogo(Category $category, string $assetsDir, string $slug): void
+    protected function createAndAttachSvgLogo(Category $category, string $assetsDir, string $slug, string $title): void
     {
-        $webp = $assetsDir.DIRECTORY_SEPARATOR.$slug.'.webp';
-        $svg = $assetsDir.DIRECTORY_SEPARATOR.$slug.'.svg';
+        $svgPath = $assetsDir.DIRECTORY_SEPARATOR.$slug.'.svg';
 
-        if (is_file($webp)) {
-            $this->media->attachFromPath($category, $webp, 'logo_image', $slug.'.webp');
+        // Simple placeholder SVG with the first letter of the title
+        $firstLetter = mb_substr($title, 0, 1);
+        $svgContent = <<<SVG
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <rect width="100" height="100" fill="#f3f4f6"/>
+    <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="50" fill="#4b5563">$firstLetter</text>
+</svg>
+SVG;
 
-            return;
-        }
+        file_put_contents($svgPath, $svgContent);
 
-        if (is_file($svg)) {
-            $this->media->attachFromPath($category, $svg, 'logo_image', $slug.'.svg');
-        }
+        $this->media->attachFromPath($category, $svgPath, 'logo_image', $slug.'.svg');
     }
 
     /**
