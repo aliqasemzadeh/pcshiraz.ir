@@ -233,6 +233,7 @@
         wire:model="form.product_image"
         :label="__('general.product_image')"
         accept="image/jpeg,image/png,image/webp,image/avif"
+        dropzone
         :preview="!empty($currentImageUrl) ? $currentImageUrl : (!empty($form->remote_image_url) ? $form->remote_image_url : null)"
     />
     @error('form.product_image')

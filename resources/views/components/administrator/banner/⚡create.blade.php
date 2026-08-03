@@ -93,6 +93,7 @@ new class extends Component
                     wire:model="form.image"
                     :label="__('general.image')"
                     accept="image/jpeg,image/png,image/webp,image/avif"
+                    dropzone
                 />
                 @error('form.image')
                     <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>

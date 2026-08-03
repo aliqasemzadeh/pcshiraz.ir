@@ -127,6 +127,7 @@ new class extends Component
                     wire:model="form.logo"
                     :label="__('general.logo')"
                     accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
+                    dropzone
                     :preview="$currentLogoUrl"
                 />
                 @error('form.logo')

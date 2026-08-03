@@ -96,6 +96,7 @@
         wire:model="form.image"
         :label="__('general.image')"
         accept="image/jpeg,image/png,image/webp,image/avif"
+        dropzone
         :preview="$currentImageUrl"
     />
     @error('form.image')
