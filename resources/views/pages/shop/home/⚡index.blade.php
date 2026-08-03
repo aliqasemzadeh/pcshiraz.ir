@@ -19,8 +19,6 @@ new #[Layout('layouts.app')] class extends Component
 ?>
 
 <div class="space-y-10">
-    <livewire:pages::shop.home.tags :key="'home-tags'" />
-
     <livewire:pages::shop.home.categories :key="'home-categories'" />
 
     @forelse ($this->homeCategoryIds as $categoryId)
