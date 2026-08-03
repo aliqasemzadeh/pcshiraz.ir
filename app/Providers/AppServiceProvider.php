@@ -8,6 +8,7 @@ use App\Settings\GeneralSettings;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -25,6 +26,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Vite::usePreloadTagAttributes(function (string $src, string $url, ?array $chunk, ?array $manifest) {
+            if (str_ends_with($url, '.css')) {
+                return false;
+            }
+
+            return [];
+        });
+
         Notification::extend('text-message', function ($app) {
             return $app->make(TextMessageChannel::class);
         });
