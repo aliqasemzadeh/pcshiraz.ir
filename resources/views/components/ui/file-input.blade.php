@@ -73,10 +73,9 @@
         />
     @endif
 
-    {{-- Preview --}}
     @if ($wireModel)
         @php
-            $file = $this->get($wireModel);
+            $file = data_get($this, $wireModel);
             $files = $multiple ? (is_array($file) ? $file : ($file ? [$file] : [])) : ($file ? [$file] : []);
         @endphp
 
@@ -104,7 +103,7 @@
 
                             <button
                                 type="button"
-                                wire:click="$set('{{ $wireModel }}', {{ $multiple ? 'array_diff('.$wireModel.', [\''.$f->getFilename().'\'])' : 'null' }})"
+                                wire:click="$set('{{ $wireModel }}', {{ $multiple ? '[]' : 'null' }})"
                                 class="absolute top-1 right-1 hidden rounded-full bg-red-600 p-1 text-white hover:bg-red-700 group-hover:block"
                             >
                                 <x-lucide-x class="h-3 w-3" />
