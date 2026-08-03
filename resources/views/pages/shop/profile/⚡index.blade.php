@@ -93,7 +93,7 @@ new #[Layout('layouts.app')] class extends Component
                             dir="ltr"
                             inputmode="numeric"
                             :readonly="$this->identityVerified"
-                            :disabled="$this->identityVerified"
+                            @class(['opacity-70' => $this->identityVerified])
                         />
                         @error('form.mobile')
                             <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
@@ -107,7 +107,7 @@ new #[Layout('layouts.app')] class extends Component
                                 :label="__('general.first_name')"
                                 type="text"
                                 :readonly="$this->identityVerified"
-                                :disabled="$this->identityVerified"
+                                @class(['opacity-70' => $this->identityVerified])
                             />
                             @error('form.first_name')
                                 <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
@@ -120,7 +120,7 @@ new #[Layout('layouts.app')] class extends Component
                                 :label="__('general.last_name')"
                                 type="text"
                                 :readonly="$this->identityVerified"
-                                :disabled="$this->identityVerified"
+                                @class(['opacity-70' => $this->identityVerified])
                             />
                             @error('form.last_name')
                                 <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
@@ -137,7 +137,7 @@ new #[Layout('layouts.app')] class extends Component
                             inputmode="numeric"
                             maxlength="10"
                             :readonly="$this->identityVerified"
-                            :disabled="$this->identityVerified"
+                            @class(['opacity-70' => $this->identityVerified])
                         />
                         @error('form.national_code')
                             <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
@@ -151,12 +151,10 @@ new #[Layout('layouts.app')] class extends Component
                             type="text"
                             dir="ltr"
                             placeholder="1400/01/01"
-                            data-jdp
-                            data-jdp-only-date
                             autocomplete="off"
                             :readonly="$this->identityVerified"
-                            :disabled="$this->identityVerified"
-                            @if ($this->identityVerified) data-jdp-disabled @endif
+                            @class(['opacity-70' => $this->identityVerified])
+                            @if (! $this->identityVerified) data-jdp data-jdp-only-date @endif
                         />
                         @error('form.birth_date')
                             <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
@@ -170,7 +168,7 @@ new #[Layout('layouts.app')] class extends Component
                             type="email"
                             dir="ltr"
                             :readonly="$this->identityVerified"
-                            :disabled="$this->identityVerified"
+                            @class(['opacity-70' => $this->identityVerified])
                         />
                         @error('form.email')
                             <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>

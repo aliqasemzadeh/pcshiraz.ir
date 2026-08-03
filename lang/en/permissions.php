@@ -2,14 +2,6 @@
 
 return [
     'administrator' => [
-        'banner_view' => 'View banners',
-        'banner_create' => 'Create banner',
-        'banner_edit' => 'Edit banner',
-        'banner_delete' => 'Delete banner',
-        'article_view' => 'View articles',
-        'article_create' => 'Create article',
-        'article_edit' => 'Edit article',
-        'article_delete' => 'Delete article',
     ],
     'sale' => [
         'category_view' => 'View categories',
@@ -24,5 +16,13 @@ return [
         'item_create' => 'Create item',
         'item_edit' => 'Edit item',
         'item_delete' => 'Delete item',
+        'banner_view' => 'View banners',
+        'banner_create' => 'Create banner',
+        'banner_edit' => 'Edit banner',
+        'banner_delete' => 'Delete banner',
+        'article_view' => 'View articles',
+        'article_create' => 'Create article',
+        'article_edit' => 'Edit article',
+        'article_delete' => 'Delete article',
     ],
 ];
