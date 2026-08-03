@@ -37,7 +37,7 @@ class CustomOneTimePasswordNotification extends OneTimePasswordNotification
             'app_url' => parse_url((string) config('app.url'), PHP_URL_HOST) ?: config('app.url'),
         ]);
 
-        SendSmsMessageJob::dispatchSync(
+        SendSmsMessageJob::dispatch(
             $notifiable->mobile,
             $message
         );
