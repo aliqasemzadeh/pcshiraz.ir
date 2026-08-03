@@ -51,9 +51,8 @@
                     @if ($multiple) multiple @endif
                     @if ($disabled) disabled @endif
                     @if ($required) required @endif
-                    {{ $attributes->merge([
-                        'x-bind:disabled' => 'Boolean($store.ui?.busy) && !uploading',
-                    ]) }}
+                    {{ $attributes->whereDoesntStartWith('class') }}
+                    x-bind:disabled="Boolean($store.ui?.busy) && !uploading"
                 />
             </label>
         </div>
@@ -67,9 +66,8 @@
             :required="$required"
             :dropzone="false"
             :id="$inputId"
-            :attributes="$attributes->merge([
-                'x-bind:disabled' => 'Boolean($store.ui?.busy) && !uploading',
-            ])"
+            {{ $attributes->whereDoesntStartWith('class') }}
+            x-bind:disabled="Boolean($store.ui?.busy) && !uploading"
         />
     @endif
 
