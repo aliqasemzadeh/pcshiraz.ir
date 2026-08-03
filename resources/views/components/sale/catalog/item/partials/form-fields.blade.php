@@ -180,7 +180,7 @@
                     {{ $tag }}
                     <button
                         type="button"
-                        wire:click="removeTag(@js($tag))"
+                        wire:click="removeTag('{{ $tag }}')"
                         class="text-fg-danger-strong hover:opacity-80"
                     >
                         ×
@@ -228,31 +228,12 @@
     @enderror
 </div>
 
-@if (! empty($currentImageUrl))
-    <div class="flex items-center gap-3 rounded-lg border border-default bg-neutral-secondary-soft p-3">
-        <img
-            src="{{ $currentImageUrl }}"
-            alt="{{ $form->title }}"
-            class="h-16 w-16 rounded object-contain"
-        >
-        <span class="text-sm text-body">{{ __('general.product_image') }}</span>
-    </div>
-@elseif (! empty($form->remote_image_url))
-    <div class="flex items-center gap-3 rounded-lg border border-default bg-neutral-secondary-soft p-3">
-        <img
-            src="{{ $form->remote_image_url }}"
-            alt="{{ $form->title }}"
-            class="h-16 w-16 rounded object-contain"
-        >
-        <span class="text-sm text-body">{{ __('general.product_image') }}</span>
-    </div>
-@endif
-
 <div>
     <x-ui.file-input
         wire:model="form.product_image"
         :label="__('general.product_image')"
         accept="image/jpeg,image/png,image/webp,image/avif"
+        :preview="!empty($currentImageUrl) ? $currentImageUrl : (!empty($form->remote_image_url) ? $form->remote_image_url : null)"
     />
     @error('form.product_image')
         <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
