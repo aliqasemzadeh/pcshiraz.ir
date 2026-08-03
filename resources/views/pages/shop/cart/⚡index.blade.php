@@ -31,17 +31,28 @@ new #[Layout('layouts.app')] class extends Component
             return null;
         }
 
-        return app(CartService::class)->getOrCreateCart($user)->load(['items.item.media']);
+        return app(CartService::class)->getOrCreateCart($user)->load(['items.item.media', 'items.itemPrice']);
+    }
+
+    #[Computed]
+    public function breakdown(): array
+    {
+        if ($this->cart === null) {
+            return [
+                'subtotal' => '0.0000',
+                'cash_only_subtotal' => '0.0000',
+                'installment_subtotal' => '0.0000',
+                'cash_only_count' => 0,
+            ];
+        }
+
+        return app(CartService::class)->breakdown($this->cart);
     }
 
     #[Computed]
     public function subtotal(): string
     {
-        if ($this->cart === null) {
-            return '0.0000';
-        }
-
-        return app(CartService::class)->subtotal($this->cart);
+        return $this->breakdown['subtotal'];
     }
 
     #[Computed]
@@ -51,13 +62,21 @@ new #[Layout('layouts.app')] class extends Component
             return collect();
         }
 
+        if (bccomp($this->breakdown['installment_subtotal'], '0', 4) <= 0) {
+            return collect();
+        }
+
         $organization = \App\Models\Organization::query()->find($this->organizationId);
 
         if ($organization === null) {
             return collect();
         }
 
-        return app(InstallmentPlanMatcher::class)->eligiblePlans($organization, $this->subtotal);
+        return app(InstallmentPlanMatcher::class)->eligiblePlans(
+            $organization,
+            $this->breakdown['installment_subtotal'],
+            $this->breakdown['cash_only_subtotal'],
+        );
     }
 
     public function mount(): void
@@ -86,11 +105,13 @@ new #[Layout('layouts.app')] class extends Component
             return;
         }
 
-        unset($this->cart, $this->subtotal, $this->eligiblePlans);
+        unset($this->cart, $this->breakdown, $this->subtotal, $this->eligiblePlans);
         $this->resetPlanSelection();
 
         if ($result['removed'] > 0) {
             Toaster::warning(__('app.items_removed_no_price', ['count' => $result['removed']]));
+        } elseif (($result['cash_only'] ?? 0) > 0) {
+            Toaster::warning(__('app.cash_items_kept_as_down_payment', ['count' => $result['cash_only']]));
         } else {
             Toaster::success(__('app.sale_type_switched'));
         }
@@ -109,7 +130,7 @@ new #[Layout('layouts.app')] class extends Component
         }
 
         app(CartService::class)->updateQuantity($cartItem, max(1, (int) $quantity));
-        unset($this->cart, $this->subtotal, $this->eligiblePlans);
+        unset($this->cart, $this->breakdown, $this->subtotal, $this->eligiblePlans);
         $this->resetPlanSelection();
     }
 
@@ -126,7 +147,7 @@ new #[Layout('layouts.app')] class extends Component
         }
 
         app(CartService::class)->removeItem($cartItem);
-        unset($this->cart, $this->subtotal, $this->eligiblePlans);
+        unset($this->cart, $this->breakdown, $this->subtotal, $this->eligiblePlans);
         $this->resetPlanSelection();
         Toaster::success(__('general.deleted'));
     }
@@ -216,6 +237,11 @@ new #[Layout('layouts.app')] class extends Component
 
 <x-slot name="title">{{ __('general.cart') }} - {{ config('app.name') }}</x-slot>
 
+@php
+    $cartService = app(CartService::class);
+    $breakdown = $this->breakdown;
+@endphp
+
 <div class="mx-auto max-w-5xl space-y-6 px-4 py-8">
     <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ __('general.cart') }}</h1>
 
@@ -243,12 +269,42 @@ new #[Layout('layouts.app')] class extends Component
             <p class="mt-2 text-sm text-gray-500">{{ __('app.cash_checkout_hint') }}</p>
         </div>
 
+        @if ($this->cart->sale_type === PriceTypeEnum::Installment && bccomp($breakdown['cash_only_subtotal'], '0', 4) > 0)
+            <div class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
+                {{ __('app.cash_items_as_down_payment', ['amount' => number_format((float) $breakdown['cash_only_subtotal'])]) }}
+            </div>
+        @endif
+
+        @if ($this->cart->sale_type === PriceTypeEnum::Installment && bccomp($breakdown['installment_subtotal'], '0', 4) <= 0)
+            <div class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
+                {{ __('app.no_installmentable_items_hint') }}
+            </div>
+        @endif
+
         <div class="space-y-4">
             @foreach ($this->cart->items as $cartItem)
+                @php
+                    $isCashOnly = $cartService->lineIsCashOnly($this->cart, $cartItem);
+                    $linePriceType = $cartService->linePriceType($this->cart, $cartItem);
+                @endphp
                 <div class="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <div class="font-medium text-gray-900 dark:text-white">{{ $cartItem->item?->title }}</div>
-                        <div class="text-sm text-gray-500">{{ number_format((float) $cartItem->unit_price) }}</div>
+                    <div class="space-y-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <div class="font-medium text-gray-900 dark:text-white">{{ $cartItem->item?->title }}</div>
+                            @if ($this->cart->sale_type === PriceTypeEnum::Installment)
+                                <span @class([
+                                    'rounded-full px-2 py-0.5 text-xs font-medium',
+                                    'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200' => $isCashOnly,
+                                    'bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-200' => ! $isCashOnly,
+                                ])>
+                                    {{ $isCashOnly ? __('app.cash_only_badge') : __('app.installment_badge') }}
+                                </span>
+                            @endif
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            {{ number_format((float) $cartItem->unit_price) }}
+                            <span class="text-xs">({{ $linePriceType->label() }})</span>
+                        </div>
                     </div>
                     <div class="flex items-center gap-3">
                         <input
@@ -267,6 +323,19 @@ new #[Layout('layouts.app')] class extends Component
         </div>
 
         <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+            @if ($this->cart->sale_type === PriceTypeEnum::Installment)
+                <div class="mb-3 space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                    <div class="flex justify-between">
+                        <span>{{ __('app.installment_subtotal') }}</span>
+                        <span>{{ number_format((float) $breakdown['installment_subtotal']) }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>{{ __('app.cash_only_subtotal') }}</span>
+                        <span>{{ number_format((float) $breakdown['cash_only_subtotal']) }}</span>
+                    </div>
+                </div>
+            @endif
+
             <div class="mb-4 flex justify-between text-lg font-semibold">
                 <span>{{ __('general.subtotal') }}</span>
                 <span>{{ number_format((float) $this->subtotal) }}</span>
@@ -295,22 +364,27 @@ new #[Layout('layouts.app')] class extends Component
                         <div class="space-y-3">
                             <h2 class="font-semibold text-gray-900 dark:text-white">{{ __('general.select_installment_plan') }}</h2>
 
-                            @forelse ($this->eligiblePlans as $row)
-                                <label class="flex cursor-pointer gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-700 has-[:checked]:border-brand has-[:checked]:ring-1 has-[:checked]:ring-brand">
-                                    <input type="radio" wire:model="installment_plan_id" value="{{ $row['plan']->id }}" class="mt-1" />
-                                    <div class="space-y-1 text-sm">
-                                        <div class="font-medium text-gray-900 dark:text-white">{{ $row['plan']->title }}</div>
-                                        <div class="text-gray-500">
-                                            {{ __('general.term_months') }}: {{ $row['plan']->term_months }}
-                                            · {{ __('general.down_payment') }}: {{ number_format((float) $row['preview']['down_payment_amount']) }}
-                                            · {{ __('general.monthly_payment') }}: {{ number_format((float) $row['preview']['monthly_payment']) }}
-                                            · {{ __('general.total_payable') }}: {{ number_format((float) $row['preview']['total_payable']) }}
+                            @if (bccomp($breakdown['installment_subtotal'], '0', 4) <= 0)
+                                <p class="text-sm text-amber-600">{{ __('app.no_installmentable_items_hint') }}</p>
+                            @else
+                                @forelse ($this->eligiblePlans as $row)
+                                    <label class="flex cursor-pointer gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-700 has-[:checked]:border-brand has-[:checked]:ring-1 has-[:checked]:ring-brand">
+                                        <input type="radio" wire:model="installment_plan_id" value="{{ $row['plan']->id }}" class="mt-1" />
+                                        <div class="space-y-1 text-sm">
+                                            <div class="font-medium text-gray-900 dark:text-white">{{ $row['plan']->title }}</div>
+                                            <div class="text-gray-500">
+                                                {{ __('general.term_months') }}: {{ $row['plan']->term_months }}
+                                                · {{ __('general.down_payment') }}: {{ number_format((float) $row['preview']['down_payment_amount']) }}
+                                                · {{ __('app.plan_down_payment_amount') }}: {{ number_format((float) $row['preview']['plan_down_payment_amount']) }}
+                                                · {{ __('general.monthly_payment') }}: {{ number_format((float) $row['preview']['monthly_payment']) }}
+                                                · {{ __('general.total_payable') }}: {{ number_format((float) $row['preview']['total_payable']) }}
+                                            </div>
                                         </div>
-                                    </div>
-                                </label>
-                            @empty
-                                <p class="text-sm text-amber-600">{{ __('general.no_eligible_installment_plans') }}</p>
-                            @endforelse
+                                    </label>
+                                @empty
+                                    <p class="text-sm text-amber-600">{{ __('general.no_eligible_installment_plans') }}</p>
+                                @endforelse
+                            @endif
 
                             @error('installment_plan_id')
                                 <p class="text-sm text-red-600">{{ $message }}</p>

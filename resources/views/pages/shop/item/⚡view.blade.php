@@ -19,8 +19,8 @@ new #[Layout('layouts.app')] class extends Component
             abort(404);
         }
 
-        $this->item = $item->load(['brand', 'category', 'media', 'tags', 'activeCashPrice', 'groupVariants' => function ($q) {
-            $q->active()->with(['media', 'activeCashPrice']);
+        $this->item = $item->load(['brand', 'category', 'media', 'tags', 'activeCashPrice', 'activeInstallmentPrice', 'groupVariants' => function ($q) {
+            $q->active()->with(['media', 'activeCashPrice', 'activeInstallmentPrice']);
         }]);
 
         $item->increment('views_count');
@@ -47,6 +47,7 @@ new #[Layout('layouts.app')] class extends Component
 
 @php
     $cash = $item->activeCashPrice;
+    $installment = $item->activeInstallmentPrice;
     $hasDiscount = $cash && (float) $cash->sale_price < (float) $cash->price;
     $media = $item->getFirstMedia('product_image');
     $imageUrl = $media ? ($media->getUrl('optimized') ?: $media->getUrl()) : null;
