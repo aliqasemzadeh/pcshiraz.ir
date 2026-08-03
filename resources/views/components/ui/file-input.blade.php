@@ -11,17 +11,69 @@
 ])
 
 @php
-    $inputId = $id ?: 'file-input-'.uniqid();
     $wireModel = $attributes->wire('model')->value();
+    $livewireId = \Livewire\Livewire::current()?->getId() ?? 'x';
+    $inputId = $id ?: 'file-input-'.$livewireId.'-'.str_replace(['.', '[', ']'], '-', (string) ($wireModel ?: 'file'));
+    $uploadErrorMessage = __('general.error');
 @endphp
 
 <div
-    x-data="{ uploading: false, progress: 0 }"
-    x-on:livewire-upload-start="uploading = true; progress = 0; $store.ui.start()"
-    x-on:livewire-upload-finish="uploading = false; progress = 0; $store.ui.end()"
-    x-on:livewire-upload-cancel="uploading = false; progress = 0; $store.ui.reset()"
-    x-on:livewire-upload-error="uploading = false; progress = 0; $store.ui.reset(); alert('{{ __('general.error') }}');"
-    x-on:livewire-upload-progress="progress = $event.detail.progress"
+    x-data="{
+        uploading: false,
+        progress: 0,
+        property: @js($wireModel),
+        busyStarted: false,
+        matches(e) {
+            return this.property && e.detail?.property === this.property;
+        },
+        start() {
+            this.uploading = true;
+            this.progress = 0;
+            if (! this.busyStarted) {
+                this.busyStarted = true;
+                this.$store.ui.start();
+            }
+        },
+        done() {
+            this.uploading = false;
+            this.progress = 0;
+            if (this.busyStarted) {
+                this.busyStarted = false;
+                this.$store.ui.end();
+            }
+        },
+        fail(showAlert = false) {
+            this.uploading = false;
+            this.progress = 0;
+            if (this.busyStarted) {
+                this.busyStarted = false;
+                this.$store.ui.reset();
+            }
+            if (showAlert) {
+                alert(@js($uploadErrorMessage));
+            }
+        },
+        unwatch: null,
+        init() {
+            if (! this.property) {
+                return;
+            }
+
+            this.unwatch = this.$wire.$watch(this.property, (value) => {
+                if (this.uploading && value) {
+                    this.done();
+                }
+            });
+        },
+        destroy() {
+            this.unwatch?.();
+        },
+    }"
+    x-on:livewire-upload-start.window="matches($event) && start()"
+    x-on:livewire-upload-finish.window="matches($event) && done()"
+    x-on:livewire-upload-cancel.window="matches($event) && fail()"
+    x-on:livewire-upload-error.window="matches($event) && fail(true)"
+    x-on:livewire-upload-progress.window="matches($event) && (progress = $event.detail.progress)"
 >
     @if ($dropzone)
         <div>
