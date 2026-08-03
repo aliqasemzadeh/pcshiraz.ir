@@ -1,12 +1,17 @@
 <?php
 
 use App\Models\Item;
+use App\Services\Sale\CartService;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Masmerise\Toaster\Toaster;
 
 new #[Layout('layouts.app')] class extends Component
 {
     public Item $item;
+
+    public int $quantity = 1;
 
     public function mount(Item $item): void
     {
@@ -19,6 +24,23 @@ new #[Layout('layouts.app')] class extends Component
         }]);
 
         $item->increment('views_count');
+    }
+
+    public function addToCart(CartService $cartService): void
+    {
+        if (! Auth::check()) {
+            $this->redirect(route('login'), navigate: true);
+
+            return;
+        }
+
+        $this->validate([
+            'quantity' => ['required', 'integer', 'min:1'],
+        ]);
+
+        $cartService->addItem(Auth::user(), $this->item, $this->quantity);
+
+        Toaster::success(__('general.added_to_cart'));
     }
 };
 ?>
@@ -74,6 +96,21 @@ new #[Layout('layouts.app')] class extends Component
                 <p class="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:bg-rose-950/40 dark:text-rose-300">
                     {{ __('app.not_purchasable') }}
                 </p>
+            @elseif (! $item->is_contact_price)
+                <div class="flex flex-wrap items-end gap-3">
+                    <div class="w-28">
+                        <x-fwb.input
+                            type="number"
+                            min="1"
+                            wire:model="quantity"
+                            :label="__('general.quantity')"
+                        />
+                    </div>
+                    <x-ui.button type="button" color="green" target="addToCart" wire:click="addToCart">
+                        <x-lucide-shopping-cart class="me-2 h-4 w-4" />
+                        {{ __('general.add_to_cart') }}
+                    </x-ui.button>
+                </div>
             @endif
 
             @if ($item->color_name)

@@ -14,6 +14,34 @@
 </li>
 <li>
     <a
+        href="{{ route('panels.sale.order.index') }}"
+        wire:navigate
+        @class([
+            'group flex items-center rounded-lg p-2 hover:bg-sidebar-hover hover:text-white',
+            'bg-sidebar-active text-sidebar-fg-active' => request()->routeIs('panels.sale.order.*'),
+            'text-sidebar-fg' => ! request()->routeIs('panels.sale.order.*'),
+        ])
+    >
+        <x-lucide-shopping-bag @class(['h-5 w-5 group-hover:text-white', 'text-sidebar-fg-active' => request()->routeIs('panels.sale.order.*'), 'text-sidebar-fg' => ! request()->routeIs('panels.sale.order.*')]) />
+        <span class="ms-3">{{ __('general.orders') }}</span>
+    </a>
+</li>
+<li>
+    <a
+        href="{{ route('panels.sale.installment-plan.index') }}"
+        wire:navigate
+        @class([
+            'group flex items-center rounded-lg p-2 hover:bg-sidebar-hover hover:text-white',
+            'bg-sidebar-active text-sidebar-fg-active' => request()->routeIs('panels.sale.installment-plan.*'),
+            'text-sidebar-fg' => ! request()->routeIs('panels.sale.installment-plan.*'),
+        ])
+    >
+        <x-lucide-calendar-range @class(['h-5 w-5 group-hover:text-white', 'text-sidebar-fg-active' => request()->routeIs('panels.sale.installment-plan.*'), 'text-sidebar-fg' => ! request()->routeIs('panels.sale.installment-plan.*')]) />
+        <span class="ms-3">{{ __('general.installment_plans') }}</span>
+    </a>
+</li>
+<li>
+    <a
         href="{{ route('panels.sale.catalog.brand.index') }}"
         wire:navigate
         @class([

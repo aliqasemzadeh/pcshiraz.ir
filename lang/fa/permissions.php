@@ -2,6 +2,10 @@
 
 return [
     'administrator' => [
+        'organization_view' => 'مشاهده سازمان‌ها',
+        'organization_create' => 'ایجاد سازمان',
+        'organization_edit' => 'ویرایش سازمان',
+        'organization_delete' => 'حذف سازمان',
     ],
     'sale' => [
         'category_view' => 'مشاهده دسته‌ها',
@@ -24,5 +28,16 @@ return [
         'article_create' => 'ایجاد مقاله',
         'article_edit' => 'ویرایش مقاله',
         'article_delete' => 'حذف مقاله',
+        'order_view' => 'مشاهده سفارش‌ها',
+        'order_edit' => 'ویرایش سفارش‌ها',
+        'installment_plan_view' => 'مشاهده پلن‌های اقساط',
+        'installment_plan_create' => 'ایجاد پلن اقساط',
+        'installment_plan_edit' => 'ویرایش پلن اقساط',
+        'installment_plan_delete' => 'حذف پلن اقساط',
+    ],
+    'organization' => [
+        'order_view' => 'مشاهده سفارش‌های سازمان',
+        'order_approve' => 'تایید سفارش سازمان',
+        'order_reject' => 'رد سفارش سازمان',
     ],
 ];

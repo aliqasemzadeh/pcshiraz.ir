@@ -24,7 +24,15 @@
             <x-lucide-list class="mb-1 h-5 w-5" />
             <span class="text-xs">{{ __('general.price_list') }}</span>
         </a>
-        <a href="{{ route('home') }}" wire:navigate class="inline-flex flex-col items-center justify-center px-5 text-slate-500 transition duration-200 hover:bg-brand-softer dark:text-slate-400">
+        <a
+            href="{{ route('cart') }}"
+            wire:navigate
+            @class([
+                'inline-flex flex-col items-center justify-center px-5 transition duration-200 hover:bg-brand-softer',
+                'text-brand' => request()->routeIs('cart'),
+                'text-slate-500 dark:text-slate-400' => ! request()->routeIs('cart'),
+            ])
+        >
             <x-lucide-shopping-cart class="mb-1 h-5 w-5" />
             <span class="text-xs">{{ __('general.cart') }}</span>
         </a>

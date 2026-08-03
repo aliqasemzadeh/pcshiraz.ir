@@ -2,6 +2,10 @@
 
 return [
     'administrator' => [
+        'organization_view' => 'View organizations',
+        'organization_create' => 'Create organization',
+        'organization_edit' => 'Edit organization',
+        'organization_delete' => 'Delete organization',
     ],
     'sale' => [
         'category_view' => 'View categories',
@@ -24,5 +28,16 @@ return [
         'article_create' => 'Create article',
         'article_edit' => 'Edit article',
         'article_delete' => 'Delete article',
+        'order_view' => 'View orders',
+        'order_edit' => 'Edit orders',
+        'installment_plan_view' => 'View installment plans',
+        'installment_plan_create' => 'Create installment plan',
+        'installment_plan_edit' => 'Edit installment plan',
+        'installment_plan_delete' => 'Delete installment plan',
+    ],
+    'organization' => [
+        'order_view' => 'View organization orders',
+        'order_approve' => 'Approve organization orders',
+        'order_reject' => 'Reject organization orders',
     ],
 ];

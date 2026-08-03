@@ -28,6 +28,20 @@
 </li>
 <li>
     <a
+        href="{{ route('panels.administrator.organization.index') }}"
+        wire:navigate
+        @class([
+            'group flex items-center rounded-lg p-2 hover:bg-sidebar-hover hover:text-white',
+            'bg-sidebar-active text-sidebar-fg-active' => request()->routeIs('panels.administrator.organization.*'),
+            'text-sidebar-fg' => ! request()->routeIs('panels.administrator.organization.*'),
+        ])
+    >
+        <x-lucide-building-2 @class(['h-5 w-5 group-hover:text-white', 'text-sidebar-fg-active' => request()->routeIs('panels.administrator.organization.*'), 'text-sidebar-fg' => ! request()->routeIs('panels.administrator.organization.*')]) />
+        <span class="ms-3">{{ __('general.organizations') }}</span>
+    </a>
+</li>
+<li>
+    <a
         href="{{ route('panels.administrator.role.index') }}"
         wire:navigate
         @class([
