@@ -46,6 +46,7 @@ class Article extends Model implements HasMedia
     public function registerMediaConversions(?Media $media = null): void
     {
         $this->addMediaConversion('thumb')
+            ->format('webp')
             ->width(400)
             ->height(225)
             ->sharpen(10)

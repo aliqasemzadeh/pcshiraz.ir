@@ -31,7 +31,7 @@
                     @if (! empty($siteLogoUrl))
                         <img src="{{ $siteLogoUrl }}" alt="{{ $siteName ?? config('app.name') }}" class="h-8 w-auto max-w-[140px] object-contain">
                     @endif
-                    <span class="self-center text-xl font-semibold whitespace-nowrap text-ink">{{ $siteName ?? config('app.name') }}</span>
+                    <span class="hidden self-center text-xl font-semibold whitespace-nowrap text-ink md:inline">{{ $siteName ?? config('app.name') }}</span>
                 </a>
             </div>
             <div class="flex items-center gap-3">

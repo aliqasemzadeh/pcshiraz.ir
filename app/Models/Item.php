@@ -163,6 +163,7 @@ class Item extends Model implements HasMedia
     public function registerMediaConversions(?Media $media = null): void
     {
         $this->addMediaConversion('thumb')
+            ->format('webp')
             ->width(300)
             ->height(300)
             ->sharpen(10)

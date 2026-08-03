@@ -73,6 +73,7 @@ class Category extends Model implements HasMedia
         }
 
         $this->addMediaConversion('thumb')
+            ->format('webp')
             ->width(300)
             ->height(300)
             ->sharpen(10)

@@ -19,7 +19,7 @@
                 @if (! empty($siteLogoUrl))
                     <img src="{{ $siteLogoUrl }}" alt="{{ $siteName ?? config('app.name') }}" class="h-10 w-auto max-w-[160px] object-contain">
                 @endif
-                <span>{{ $siteName ?? config('app.name') }}</span>
+                <span class="hidden md:inline">{{ $siteName ?? config('app.name') }}</span>
             </a>
         </div>
 
