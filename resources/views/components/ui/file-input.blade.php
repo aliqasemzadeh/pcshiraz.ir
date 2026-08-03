@@ -7,10 +7,12 @@
     'required' => false,
     'dropzone' => false,
     'id' => null,
+    'preview' => null,
 ])
 
 @php
     $inputId = $id ?: 'file-input-'.uniqid();
+    $wireModel = $attributes->wire('model')->value();
 @endphp
 
 <div
@@ -30,7 +32,7 @@
             <label
                 for="{{ $inputId }}"
                 @class([
-                    'flex w-full cursor-pointer flex-col items-center justify-center rounded-base border-2 border-dashed border-default-medium bg-neutral-secondary-soft hover:bg-neutral-secondary-medium',
+                    'relative flex w-full cursor-pointer flex-col items-center justify-center rounded-base border-2 border-dashed border-default-medium bg-neutral-secondary-soft hover:bg-neutral-secondary-medium',
                     'pointer-events-none opacity-60' => $disabled,
                     'h-48' => true,
                 ])
@@ -69,6 +71,49 @@
             {{ $attributes->whereDoesntStartWith('class') }}
             x-bind:disabled="Boolean($store.ui?.busy) && !uploading"
         />
+    @endif
+
+    {{-- Preview --}}
+    @if ($wireModel)
+        @php
+            $file = $this->get($wireModel);
+            $files = $multiple ? (is_array($file) ? $file : ($file ? [$file] : [])) : ($file ? [$file] : []);
+        @endphp
+
+        @if (!empty($files) || $preview)
+            <div class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+                {{-- Existing Preview (from URL) --}}
+                @if ($preview && empty($files))
+                    <div class="group relative aspect-square overflow-hidden rounded-lg border border-default bg-neutral-secondary-soft">
+                        <img src="{{ $preview }}" class="h-full w-full object-cover">
+                    </div>
+                @endif
+
+                {{-- Uploaded Files Previews --}}
+                @foreach ($files as $f)
+                    @if ($f instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
+                        <div class="group relative aspect-square overflow-hidden rounded-lg border border-default bg-neutral-secondary-soft">
+                            @if (str_starts_with($f->getMimeType(), 'image/'))
+                                <img src="{{ $f->temporaryUrl() }}" class="h-full w-full object-cover">
+                            @else
+                                <div class="flex h-full w-full flex-col items-center justify-center p-2 text-center">
+                                    <x-lucide-file class="mb-1 h-8 w-8 text-body" />
+                                    <span class="truncate text-[10px] text-body">{{ $f->getClientOriginalName() }}</span>
+                                </div>
+                            @endif
+
+                            <button
+                                type="button"
+                                wire:click="$set('{{ $wireModel }}', {{ $multiple ? 'array_diff('.$wireModel.', [\''.$f->getFilename().'\'])' : 'null' }})"
+                                class="absolute top-1 right-1 hidden rounded-full bg-red-600 p-1 text-white hover:bg-red-700 group-hover:block"
+                            >
+                                <x-lucide-x class="h-3 w-3" />
+                            </button>
+                        </div>
+                    @endif
+                @endforeach
+            </div>
+        @endif
     @endif
 
     <div x-show="uploading" x-cloak class="mt-3 space-y-1" aria-live="polite">

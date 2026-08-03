@@ -132,22 +132,12 @@ new class extends Component
                 @enderror
             </div>
 
-            @if ($currentLogoUrl)
-                <div class="flex items-center gap-3 rounded-lg border border-default bg-neutral-secondary-soft p-3">
-                    <img
-                        src="{{ $currentLogoUrl }}"
-                        alt="{{ $form->title }}"
-                        class="h-12 w-12 rounded object-contain"
-                    >
-                    <span class="text-sm text-body">{{ __('general.logo') }}</span>
-                </div>
-            @endif
-
             <div>
                 <x-ui.file-input
                     wire:model="form.logo"
                     :label="__('general.logo')"
                     accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
+                    :preview="$currentLogoUrl"
                 />
                 @error('form.logo')
                     <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
