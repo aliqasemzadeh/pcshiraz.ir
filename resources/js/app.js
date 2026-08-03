@@ -4,8 +4,8 @@ import smoothscroll from 'smoothscroll-polyfill';
 import { Chart, registerables } from 'chart.js';
 import './../../vendor/power-components/livewire-powergrid/dist/powergrid';
 import '../../vendor/masmerise/livewire-toaster/resources/js';
-import 'jalalidatepicker/dist/jalalidatepicker.min.css';
-import 'jalalidatepicker/dist/jalalidatepicker.min.js';
+import '../css/jalalidatepicker.min.css';
+import './vendor/jalalidatepicker/jalalidatepicker.min.js';
 
 Chart.register(...registerables);
 window.Chart = Chart;

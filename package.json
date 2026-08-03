@@ -16,7 +16,6 @@
     "dependencies": {
         "chart.js": "^4.5.1",
         "flowbite": "^4.0.2",
-        "jalalidatepicker": "^0.6.0",
         "smoothscroll-polyfill": "^0.4.4",
         "vazirmatn": "^33.0.3"
     }
