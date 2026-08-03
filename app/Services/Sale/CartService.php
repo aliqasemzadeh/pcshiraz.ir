@@ -13,12 +13,84 @@ use Illuminate\Validation\ValidationException;
 
 class CartService
 {
-    public function getOrCreateCart(User $user): Cart
+    /**
+     * @return list<PriceTypeEnum>
+     */
+    public function allowedSaleTypes(): array
     {
-        return Cart::query()->firstOrCreate(['user_id' => $user->id]);
+        return [
+            PriceTypeEnum::Cash,
+            PriceTypeEnum::Installment,
+        ];
     }
 
-    public function addItem(User $user, Item $item, int $quantity = 1, ?PriceTypeEnum $priceType = null): CartItem
+    public function getOrCreateCart(User $user): Cart
+    {
+        return Cart::query()->firstOrCreate(
+            ['user_id' => $user->id],
+            ['sale_type' => PriceTypeEnum::Cash],
+        );
+    }
+
+    /**
+     * @return array{removed: int}
+     */
+    public function setSaleType(Cart $cart, PriceTypeEnum $saleType): array
+    {
+        if (! in_array($saleType, $this->allowedSaleTypes(), true)) {
+            throw ValidationException::withMessages([
+                'sale_type' => __('app.invalid_sale_type'),
+            ]);
+        }
+
+        if ($cart->sale_type === $saleType) {
+            return ['removed' => 0];
+        }
+
+        return DB::transaction(function () use ($cart, $saleType) {
+            $cart->update(['sale_type' => $saleType]);
+
+            return $this->repriceCart($cart->fresh(['items.item']));
+        });
+    }
+
+    /**
+     * @return array{removed: int}
+     */
+    public function repriceCart(Cart $cart): array
+    {
+        $cart->loadMissing('items.item');
+        $removed = 0;
+
+        foreach ($cart->items as $cartItem) {
+            $item = $cartItem->item;
+
+            if ($item === null) {
+                $cartItem->delete();
+                $removed++;
+
+                continue;
+            }
+
+            $itemPrice = $this->resolvePrice($item, $cart->sale_type);
+
+            if ($itemPrice === null) {
+                $cartItem->delete();
+                $removed++;
+
+                continue;
+            }
+
+            $cartItem->update([
+                'item_price_id' => $itemPrice->id,
+                'unit_price' => $itemPrice->sale_price,
+            ]);
+        }
+
+        return ['removed' => $removed];
+    }
+
+    public function addItem(User $user, Item $item, int $quantity = 1): CartItem
     {
         if (! $item->is_active || ! $item->is_purchasable || $item->is_contact_price) {
             throw ValidationException::withMessages([
@@ -26,13 +98,8 @@ class CartService
             ]);
         }
 
-        $priceType ??= PriceTypeEnum::Corporate;
-        $itemPrice = $this->resolvePrice($item, $priceType);
-
-        if ($itemPrice === null) {
-            $itemPrice = $this->resolvePrice($item, PriceTypeEnum::Installment)
-                ?? $this->resolvePrice($item, PriceTypeEnum::Cash);
-        }
+        $cart = $this->getOrCreateCart($user);
+        $itemPrice = $this->resolvePrice($item, $cart->sale_type);
 
         if ($itemPrice === null) {
             throw ValidationException::withMessages([
@@ -41,7 +108,6 @@ class CartService
         }
 
         $quantity = max(1, $quantity);
-        $cart = $this->getOrCreateCart($user);
 
         return DB::transaction(function () use ($cart, $item, $itemPrice, $quantity) {
             $existing = CartItem::query()

@@ -5,6 +5,7 @@ namespace App\Services\Sale;
 use App\Enums\OrderInstallmentStatusEnum;
 use App\Enums\OrderStatusEnum;
 use App\Enums\PriceTypeEnum;
+use App\Models\Cart;
 use App\Models\InstallmentPlan;
 use App\Models\Order;
 use App\Models\Organization;
@@ -38,8 +39,7 @@ class CheckoutService
     public function placeOrder(
         User $user,
         string $organizationCode,
-        int $installmentPlanId,
-        PriceTypeEnum $saleType = PriceTypeEnum::Installment,
+        ?int $installmentPlanId = null,
     ): Order {
         $organization = $this->findActiveOrganizationByCode($organizationCode);
 
@@ -57,7 +57,71 @@ class CheckoutService
             ]);
         }
 
+        $saleType = $cart->sale_type ?? PriceTypeEnum::Cash;
+
+        if (! in_array($saleType, $this->cartService->allowedSaleTypes(), true)) {
+            throw ValidationException::withMessages([
+                'sale_type' => __('app.invalid_sale_type'),
+            ]);
+        }
+
         $subtotal = $this->cartService->subtotal($cart);
+
+        if ($saleType === PriceTypeEnum::Installment) {
+            return $this->placeInstallmentOrder($user, $organization, $cart, $subtotal, $installmentPlanId);
+        }
+
+        return $this->placeCashOrder($user, $organization, $cart, $subtotal);
+    }
+
+    protected function placeCashOrder(
+        User $user,
+        Organization $organization,
+        Cart $cart,
+        string $subtotal,
+    ): Order {
+        return DB::transaction(function () use ($user, $organization, $cart, $subtotal) {
+            $order = Order::query()->create([
+                'order_number' => $this->generateOrderNumber(),
+                'organization_id' => $organization->id,
+                'user_id' => $user->id,
+                'installment_plan_id' => null,
+                'sale_type' => PriceTypeEnum::Cash,
+                'status' => OrderStatusEnum::PendingApproval,
+                'subtotal' => $subtotal,
+                'discount' => 0,
+                'total_amount' => $subtotal,
+                'plan_term_months' => null,
+                'plan_down_payment_percent' => null,
+                'plan_monthly_interest_percent' => null,
+                'plan_max_financiable_amount' => null,
+                'down_payment_amount' => 0,
+                'financed_amount' => 0,
+                'total_interest' => 0,
+                'total_payable' => $subtotal,
+                'outstanding_balance' => $subtotal,
+                'submitted_at' => now(),
+            ]);
+
+            $this->createOrderItems($order, $cart);
+            $this->cartService->clear($cart);
+
+            return $order->load(['items', 'installments', 'organization']);
+        });
+    }
+
+    protected function placeInstallmentOrder(
+        User $user,
+        Organization $organization,
+        Cart $cart,
+        string $subtotal,
+        ?int $installmentPlanId,
+    ): Order {
+        if ($installmentPlanId === null) {
+            throw ValidationException::withMessages([
+                'installment_plan_id' => __('app.installment_requires_eligible_plan'),
+            ]);
+        }
 
         $eligible = $this->matcher->eligiblePlans($organization, $subtotal);
         $selected = $eligible->first(fn (array $row) => $row['plan']->id === $installmentPlanId);
@@ -72,13 +136,13 @@ class CheckoutService
         $plan = $selected['plan'];
         $preview = $selected['preview'];
 
-        return DB::transaction(function () use ($user, $organization, $cart, $plan, $preview, $subtotal, $saleType) {
+        return DB::transaction(function () use ($user, $organization, $cart, $plan, $preview, $subtotal) {
             $order = Order::query()->create([
                 'order_number' => $this->generateOrderNumber(),
                 'organization_id' => $organization->id,
                 'user_id' => $user->id,
                 'installment_plan_id' => $plan->id,
-                'sale_type' => $saleType,
+                'sale_type' => PriceTypeEnum::Installment,
                 'status' => OrderStatusEnum::PendingApproval,
                 'subtotal' => $subtotal,
                 'discount' => 0,
@@ -95,16 +159,7 @@ class CheckoutService
                 'submitted_at' => now(),
             ]);
 
-            foreach ($cart->items as $cartItem) {
-                $order->items()->create([
-                    'item_id' => $cartItem->item_id,
-                    'item_price_id' => $cartItem->item_price_id,
-                    'title' => $cartItem->item?->title ?? __('general.item'),
-                    'quantity' => $cartItem->quantity,
-                    'unit_price' => $cartItem->unit_price,
-                    'line_total' => bcmul((string) $cartItem->unit_price, (string) $cartItem->quantity, 4),
-                ]);
-            }
+            $this->createOrderItems($order, $cart);
 
             foreach ($preview['schedule'] as $row) {
                 $order->installments()->create([
@@ -124,10 +179,24 @@ class CheckoutService
         });
     }
 
+    protected function createOrderItems(Order $order, Cart $cart): void
+    {
+        foreach ($cart->items as $cartItem) {
+            $order->items()->create([
+                'item_id' => $cartItem->item_id,
+                'item_price_id' => $cartItem->item_price_id,
+                'title' => $cartItem->item?->title ?? __('general.item'),
+                'quantity' => $cartItem->quantity,
+                'unit_price' => $cartItem->unit_price,
+                'line_total' => bcmul((string) $cartItem->unit_price, (string) $cartItem->quantity, 4),
+            ]);
+        }
+    }
+
     protected function generateOrderNumber(): string
     {
         do {
-            $number = 'ORG-'.now()->format('ymd').'-'.Str::upper(Str::random(6));
+            $number = 'ORD-'.now()->format('ymd').'-'.Str::upper(Str::random(6));
         } while (Order::query()->where('order_number', $number)->exists());
 
         return $number;

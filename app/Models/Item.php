@@ -127,6 +127,11 @@ class Item extends Model implements HasMedia
         return $this->latestPriceByType(PriceTypeEnum::Cash);
     }
 
+    public function activeInstallmentPrice(): HasOne
+    {
+        return $this->latestPriceByType(PriceTypeEnum::Installment);
+    }
+
     public function getLatestPrice(?PriceTypeEnum $type = null): ?string
     {
         $type ??= config('main.default_price_type');

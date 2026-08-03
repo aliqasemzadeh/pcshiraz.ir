@@ -131,4 +131,11 @@ return [
     'function_already_running' => 'A command is already running. Please wait.',
     'function_artisan_empty' => 'Please enter a command.',
     'function_artisan_forbidden' => 'This command is not allowed for security reasons.',
+
+    'select_sale_type' => 'Select sale type',
+    'sale_type_switched' => 'Sale type updated',
+    'items_removed_no_price' => ':count item(s) were removed because they have no price for this sale type',
+    'cash_checkout_hint' => 'An organization code is required to place an order.',
+    'installment_requires_eligible_plan' => 'An eligible installment plan must be selected for installment orders',
+    'invalid_sale_type' => 'Invalid sale type',
 ];

@@ -1,10 +1,12 @@
 <?php
 
+use App\Enums\PriceTypeEnum;
 use App\Services\Sale\CartService;
 use App\Services\Sale\CheckoutService;
 use App\Services\Sale\InstallmentPlanMatcher;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -45,7 +47,7 @@ new #[Layout('layouts.app')] class extends Component
     #[Computed]
     public function eligiblePlans()
     {
-        if (! $this->codeValidated || $this->organizationId === null) {
+        if (! $this->codeValidated || $this->organizationId === null || ! $this->isInstallmentSale()) {
             return collect();
         }
 
@@ -62,6 +64,35 @@ new #[Layout('layouts.app')] class extends Component
     {
         if (! Auth::check()) {
             $this->redirect(route('login'), navigate: true);
+        }
+    }
+
+    public function setSaleType(string $saleType): void
+    {
+        if ($this->cart === null) {
+            return;
+        }
+
+        try {
+            $type = PriceTypeEnum::from($saleType);
+            $result = app(CartService::class)->setSaleType($this->cart, $type);
+        } catch (ValidationException $e) {
+            Toaster::error(collect($e->errors())->flatten()->first() ?? __('app.invalid_sale_type'));
+
+            return;
+        } catch (\ValueError) {
+            Toaster::error(__('app.invalid_sale_type'));
+
+            return;
+        }
+
+        unset($this->cart, $this->subtotal, $this->eligiblePlans);
+        $this->resetPlanSelection();
+
+        if ($result['removed'] > 0) {
+            Toaster::warning(__('app.items_removed_no_price', ['count' => $result['removed']]));
+        } else {
+            Toaster::success(__('app.sale_type_switched'));
         }
     }
 
@@ -144,19 +175,36 @@ new #[Layout('layouts.app')] class extends Component
             return;
         }
 
-        $this->validate([
-            'installment_plan_id' => ['required', 'integer'],
-        ]);
+        if ($this->isInstallmentSale()) {
+            $this->validate([
+                'installment_plan_id' => ['required', 'integer'],
+            ]);
+        }
 
-        $order = $checkoutService->placeOrder(
-            Auth::user(),
-            $this->organization_code,
-            (int) $this->installment_plan_id,
-        );
+        try {
+            $order = $checkoutService->placeOrder(
+                Auth::user(),
+                $this->organization_code,
+                $this->isInstallmentSale() ? (int) $this->installment_plan_id : null,
+            );
+        } catch (ValidationException $e) {
+            foreach ($e->errors() as $field => $messages) {
+                foreach ($messages as $message) {
+                    $this->addError($field, $message);
+                }
+            }
+
+            return;
+        }
 
         Toaster::success(__('general.order_submitted'));
 
         $this->redirect(route('shop.order.success', $order), navigate: true);
+    }
+
+    protected function isInstallmentSale(): bool
+    {
+        return $this->cart?->sale_type === PriceTypeEnum::Installment;
     }
 
     protected function resetPlanSelection(): void
@@ -176,6 +224,25 @@ new #[Layout('layouts.app')] class extends Component
             {{ __('general.cart_is_empty') }}
         </div>
     @else
+        <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+            <h2 class="mb-3 font-semibold text-gray-900 dark:text-white">{{ __('app.select_sale_type') }}</h2>
+            <div class="flex flex-wrap gap-3">
+                @foreach ([PriceTypeEnum::Cash, PriceTypeEnum::Installment] as $saleType)
+                    <label class="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm dark:border-gray-700 has-[:checked]:border-brand has-[:checked]:ring-1 has-[:checked]:ring-brand">
+                        <input
+                            type="radio"
+                            name="sale_type"
+                            value="{{ $saleType->value }}"
+                            @checked($this->cart->sale_type === $saleType)
+                            wire:click="setSaleType('{{ $saleType->value }}')"
+                        />
+                        <span>{{ $saleType->label() }}</span>
+                    </label>
+                @endforeach
+            </div>
+            <p class="mt-2 text-sm text-gray-500">{{ __('app.cash_checkout_hint') }}</p>
+        </div>
+
         <div class="space-y-4">
             @foreach ($this->cart->items as $cartItem)
                 <div class="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex-row sm:items-center sm:justify-between">
@@ -224,34 +291,43 @@ new #[Layout('layouts.app')] class extends Component
                 </x-ui.button>
 
                 @if ($this->codeValidated)
-                    <div class="space-y-3">
-                        <h2 class="font-semibold text-gray-900 dark:text-white">{{ __('general.select_installment_plan') }}</h2>
+                    @if ($this->cart->sale_type === PriceTypeEnum::Installment)
+                        <div class="space-y-3">
+                            <h2 class="font-semibold text-gray-900 dark:text-white">{{ __('general.select_installment_plan') }}</h2>
 
-                        @forelse ($this->eligiblePlans as $row)
-                            <label class="flex cursor-pointer gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-700 has-[:checked]:border-brand has-[:checked]:ring-1 has-[:checked]:ring-brand">
-                                <input type="radio" wire:model="installment_plan_id" value="{{ $row['plan']->id }}" class="mt-1" />
-                                <div class="space-y-1 text-sm">
-                                    <div class="font-medium text-gray-900 dark:text-white">{{ $row['plan']->title }}</div>
-                                    <div class="text-gray-500">
-                                        {{ __('general.term_months') }}: {{ $row['plan']->term_months }}
-                                        · {{ __('general.down_payment') }}: {{ number_format((float) $row['preview']['down_payment_amount']) }}
-                                        · {{ __('general.monthly_payment') }}: {{ number_format((float) $row['preview']['monthly_payment']) }}
-                                        · {{ __('general.total_payable') }}: {{ number_format((float) $row['preview']['total_payable']) }}
+                            @forelse ($this->eligiblePlans as $row)
+                                <label class="flex cursor-pointer gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-700 has-[:checked]:border-brand has-[:checked]:ring-1 has-[:checked]:ring-brand">
+                                    <input type="radio" wire:model="installment_plan_id" value="{{ $row['plan']->id }}" class="mt-1" />
+                                    <div class="space-y-1 text-sm">
+                                        <div class="font-medium text-gray-900 dark:text-white">{{ $row['plan']->title }}</div>
+                                        <div class="text-gray-500">
+                                            {{ __('general.term_months') }}: {{ $row['plan']->term_months }}
+                                            · {{ __('general.down_payment') }}: {{ number_format((float) $row['preview']['down_payment_amount']) }}
+                                            · {{ __('general.monthly_payment') }}: {{ number_format((float) $row['preview']['monthly_payment']) }}
+                                            · {{ __('general.total_payable') }}: {{ number_format((float) $row['preview']['total_payable']) }}
+                                        </div>
                                     </div>
-                                </div>
-                            </label>
-                        @empty
-                            <p class="text-sm text-amber-600">{{ __('general.no_eligible_installment_plans') }}</p>
-                        @endforelse
+                                </label>
+                            @empty
+                                <p class="text-sm text-amber-600">{{ __('general.no_eligible_installment_plans') }}</p>
+                            @endforelse
 
-                        @error('installment_plan_id')
-                            <p class="text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                            @error('installment_plan_id')
+                                <p class="text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
 
-                    <x-ui.button type="button" color="green" target="placeOrder" wire:click="placeOrder" class="w-full" wire:confirm="{{ __('general.are_you_sure') }}">
-                        {{ __('general.submit_order') }}
-                    </x-ui.button>
+                        @if ($this->eligiblePlans->isNotEmpty())
+                            <x-ui.button type="button" color="green" target="placeOrder" wire:click="placeOrder" class="w-full" wire:confirm="{{ __('general.are_you_sure') }}">
+                                {{ __('general.submit_order') }}
+                            </x-ui.button>
+                        @endif
+                    @else
+                        <p class="text-sm text-gray-500">{{ __('app.cash_checkout_hint') }}</p>
+                        <x-ui.button type="button" color="green" target="placeOrder" wire:click="placeOrder" class="w-full" wire:confirm="{{ __('general.are_you_sure') }}">
+                            {{ __('general.submit_order') }}
+                        </x-ui.button>
+                    @endif
                 @endif
             </div>
         </div>

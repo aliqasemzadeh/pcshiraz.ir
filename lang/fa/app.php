@@ -131,4 +131,11 @@ return [
     'function_already_running' => 'یک دستور در حال اجراست. لطفاً صبر کنید.',
     'function_artisan_empty' => 'لطفاً یک دستور وارد کنید.',
     'function_artisan_forbidden' => 'این دستور به دلایل امنیتی مجاز نیست.',
+
+    'select_sale_type' => 'انتخاب نوع سفارش',
+    'sale_type_switched' => 'نوع سفارش تغییر کرد',
+    'items_removed_no_price' => ':count کالا به‌دلیل نبود قیمت برای این نوع سفارش از سبد حذف شد',
+    'cash_checkout_hint' => 'برای ثبت سفارش، وارد کردن کد سازمان الزامی است.',
+    'installment_requires_eligible_plan' => 'برای سفارش اقساطی باید یک پلن اقساط واجد شرایط انتخاب شود',
+    'invalid_sale_type' => 'نوع سفارش نامعتبر است',
 ];
