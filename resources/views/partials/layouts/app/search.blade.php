@@ -2,21 +2,6 @@
     <div class="flex items-stretch">
         @include('partials.layouts.app.search-category-mega')
 
-        <div class="relative w-full self-stretch">
-            <input
-                type="search"
-                id="shop-search-input"
-                class="box-border block h-10 w-full border border-slate-300 bg-surface px-3 text-sm text-ink placeholder:text-slate-500 focus:border-indigo-500 focus:ring-indigo-500 dark:border-slate-700 dark:placeholder:text-slate-500"
-                placeholder="{{ __('general.search_products') }}"
-            >
-        </div>
-
-        <button
-            type="button"
-            class="box-border inline-flex h-10 shrink-0 items-center rounded-e-lg border border-brand bg-brand px-3 text-sm font-medium text-white hover:bg-brand-strong focus:ring-4 focus:ring-brand/30 focus:outline-none"
-        >
-            <x-lucide-search class="h-4 w-4 sm:me-1.5" />
-            <span class="hidden sm:inline">{{ __('general.search') }}</span>
-        </button>
+        <livewire:shop.navbar-search :key="'shop-navbar-search'" />
     </div>
 </form>

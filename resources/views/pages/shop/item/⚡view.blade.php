@@ -84,11 +84,33 @@ new #[Layout('layouts.app')] class extends Component
                 <p class="text-2xl font-bold text-amber-600 dark:text-amber-400">
                     {{ __('app.contact_for_price') }}
                 </p>
-            @elseif ($cash)
-                <div class="flex flex-wrap items-baseline gap-3">
-                    <span class="text-3xl font-bold text-brand">{{ number_format((float) $cash->sale_price) }}</span>
-                    @if ($hasDiscount)
-                        <span class="text-lg text-gray-400 line-through">{{ number_format((float) $cash->price) }}</span>
+            @else
+                <div class="space-y-3">
+                    @if ($cash)
+                        <div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('app.cash_price') }}</div>
+                            <div class="flex flex-wrap items-baseline gap-3">
+                                <span class="text-3xl font-bold text-brand">{{ number_format((float) $cash->sale_price) }}</span>
+                                @if ($hasDiscount)
+                                    <span class="text-lg text-gray-400 line-through">{{ number_format((float) $cash->price) }}</span>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+
+                    @if ($installment)
+                        <div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('app.installment_price') }}</div>
+                            <div class="text-2xl font-bold text-sky-700 dark:text-sky-300">
+                                {{ number_format((float) $installment->sale_price) }}
+                            </div>
+                        </div>
+                    @elseif ($cash)
+                        <p class="text-sm text-amber-700 dark:text-amber-300">{{ __('app.cash_only_product_hint') }}</p>
+                    @endif
+
+                    @if ($cash || $installment)
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('app.product_installment_hint') }}</p>
                     @endif
                 </div>
             @endif

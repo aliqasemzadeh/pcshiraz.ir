@@ -39,7 +39,7 @@ class CartCheckoutSaleTypeTest extends TestCase
     }
 
     #[Test]
-    public function set_sale_type_reprices_items_and_removes_unavailable(): void
+    public function set_sale_type_reprices_items_and_keeps_cash_only_as_fallback(): void
     {
         [$user, $itemWithBoth] = $this->createUserWithPricedItem(
             cashPrice: '1000000',
@@ -55,12 +55,25 @@ class CartCheckoutSaleTypeTest extends TestCase
         $cart = $cartService->getOrCreateCart($user);
         $result = $cartService->setSaleType($cart, PriceTypeEnum::Installment);
 
-        $cart->refresh()->load('items');
+        $cart->refresh()->load(['items.itemPrice']);
 
         $this->assertSame(PriceTypeEnum::Installment, $cart->sale_type);
-        $this->assertSame(1, $result['removed']);
-        $this->assertCount(1, $cart->items);
-        $this->assertSame('1200000.0000', (string) $cart->items->first()->unit_price);
+        $this->assertSame(0, $result['removed']);
+        $this->assertSame(1, $result['cash_only']);
+        $this->assertCount(2, $cart->items);
+
+        $installmentLine = $cart->items->firstWhere('item_id', $itemWithBoth->id);
+        $cashLine = $cart->items->firstWhere('item_id', $itemCashOnly->id);
+
+        $this->assertSame('1200000.0000', (string) $installmentLine->unit_price);
+        $this->assertSame(PriceTypeEnum::Installment, $installmentLine->itemPrice->price_type);
+        $this->assertSame('500000.0000', (string) $cashLine->unit_price);
+        $this->assertSame(PriceTypeEnum::Cash, $cashLine->itemPrice->price_type);
+
+        $breakdown = $cartService->breakdown($cart);
+        $this->assertSame('1200000.0000', $breakdown['installment_subtotal']);
+        $this->assertSame('500000.0000', $breakdown['cash_only_subtotal']);
+        $this->assertSame('1700000.0000', $breakdown['subtotal']);
     }
 
     #[Test]
@@ -83,6 +96,7 @@ class CartCheckoutSaleTypeTest extends TestCase
         $this->assertSame('1000000.0000', (string) $order->total_payable);
         $this->assertCount(0, $order->installments);
         $this->assertCount(1, $order->items);
+        $this->assertSame(PriceTypeEnum::Cash, $order->items->first()->price_type);
         $this->assertSame(0, CartItem::query()->count());
     }
 
@@ -139,6 +153,86 @@ class CartCheckoutSaleTypeTest extends TestCase
         $this->assertSame($plan->id, $order->installment_plan_id);
         $this->assertGreaterThan(0, $order->installments->count());
         $this->assertSame(OrderStatusEnum::PendingApproval, $order->status);
+    }
+
+    #[Test]
+    public function mixed_installment_checkout_adds_cash_only_to_down_payment(): void
+    {
+        [$user, $installmentItem] = $this->createUserWithPricedItem(
+            cashPrice: '1000000',
+            installmentPrice: '1000000',
+        );
+        $cashOnlyItem = $this->createItemWithPrices(cashPrice: '500000', installmentPrice: null);
+
+        $organization = Organization::query()->create([
+            'code' => 'ORGMIXED1234567',
+            'is_active' => true,
+        ]);
+
+        $plan = InstallmentPlan::query()->create([
+            'title' => '10 months 10%',
+            'organization_id' => $organization->id,
+            'term_months' => 10,
+            'down_payment_percent' => 10,
+            'monthly_interest_percent' => 0,
+            'max_financiable_amount' => 50000000,
+            'down_payment_required_above' => null,
+            'min_down_payment_percent' => 0,
+            'min_order_amount' => 0,
+            'priority' => 1,
+            'is_active' => true,
+        ]);
+
+        $cartService = app(CartService::class);
+        $cart = $cartService->getOrCreateCart($user);
+        $cartService->setSaleType($cart, PriceTypeEnum::Installment);
+        $cartService->addItem($user, $installmentItem->fresh(), 1);
+        $cartService->addItem($user, $cashOnlyItem, 1);
+
+        $order = app(CheckoutService::class)->placeOrder($user, $organization->code, $plan->id);
+
+        $this->assertSame('500000.0000', (string) $order->cash_only_subtotal);
+        $this->assertSame('1000000.0000', (string) $order->installment_subtotal);
+        $this->assertSame('100000.0000', (string) $order->plan_down_payment_amount);
+        $this->assertSame('600000.0000', (string) $order->down_payment_amount);
+        $this->assertSame('900000.0000', (string) $order->financed_amount);
+
+        $priceTypes = $order->items->pluck('price_type')->map(fn ($type) => $type->value)->sort()->values()->all();
+        $this->assertSame(['cash', 'installment'], $priceTypes);
+
+        $downPaymentRow = $order->installments->firstWhere('sequence', 0);
+        $this->assertNotNull($downPaymentRow);
+        $this->assertSame('600000.0000', (string) $downPaymentRow->total_amount);
+    }
+
+    #[Test]
+    public function all_cash_only_installment_cart_cannot_checkout(): void
+    {
+        $user = User::factory()->create();
+        $cashOnlyItem = $this->createItemWithPrices(cashPrice: '500000', installmentPrice: null);
+        $organization = Organization::query()->create([
+            'code' => 'ORGCASHONLY1234',
+            'is_active' => true,
+        ]);
+
+        $plan = InstallmentPlan::query()->create([
+            'title' => 'Plan',
+            'organization_id' => $organization->id,
+            'term_months' => 10,
+            'down_payment_percent' => 0,
+            'monthly_interest_percent' => 0,
+            'max_financiable_amount' => 50000000,
+            'is_active' => true,
+        ]);
+
+        $cartService = app(CartService::class);
+        $cart = $cartService->getOrCreateCart($user);
+        $cartService->setSaleType($cart, PriceTypeEnum::Installment);
+        $cartService->addItem($user, $cashOnlyItem, 1);
+
+        $this->expectException(ValidationException::class);
+
+        app(CheckoutService::class)->placeOrder($user, $organization->code, $plan->id);
     }
 
     /**

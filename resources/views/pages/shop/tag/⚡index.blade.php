@@ -40,7 +40,7 @@ new #[Layout('layouts.app')] class extends Component
         return Item::query()
             ->active()
             ->withAnyTags([$this->tagName])
-            ->with(['brand', 'media', 'activeCashPrice'])
+            ->with(['brand', 'media', 'activeCashPrice', 'activeInstallmentPrice'])
             ->orderByDesc('id')
             ->paginate(config('main.per_page', 24));
     }

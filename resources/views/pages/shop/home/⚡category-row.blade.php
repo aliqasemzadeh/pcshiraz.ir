@@ -34,7 +34,7 @@ new #[Lazy] class extends Component
             ? collect()
             : Item::query()
                 ->active()
-                ->with(['brand', 'media', 'activeCashPrice'])
+                ->with(['brand', 'media', 'activeCashPrice', 'activeInstallmentPrice'])
                 ->whereIn('id', $itemIds)
                 ->get()
                 ->keyBy('id');

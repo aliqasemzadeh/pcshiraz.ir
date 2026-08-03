@@ -8,6 +8,9 @@
     $media = $item->getFirstMedia('product_image');
     $imageUrl = $media ? ($media->getUrl('thumb') ?: $media->getUrl()) : null;
     $cash = $item->relationLoaded('activeCashPrice') ? $item->activeCashPrice : $item->activeCashPrice()->first();
+    $installment = $item->relationLoaded('activeInstallmentPrice')
+        ? $item->activeInstallmentPrice
+        : $item->activeInstallmentPrice()->first();
     $hasDiscount = $cash && (float) $cash->sale_price < (float) $cash->price;
 @endphp
 
@@ -52,7 +55,7 @@
             {{ $item->title }}
         </h3>
 
-        <div class="mt-auto pt-2">
+        <div class="mt-auto space-y-1 pt-2">
             @if ($item->is_contact_price)
                 <span class="text-sm font-semibold text-amber-600 dark:text-amber-400">
                     {{ __('general.contact_price') }}
@@ -68,6 +71,12 @@
                         </span>
                     @endif
                 </div>
+                @if ($installment)
+                    <div class="text-xs text-sky-700 dark:text-sky-300">
+                        {{ __('app.installment_price') }}:
+                        {{ number_format((float) $installment->sale_price) }}
+                    </div>
+                @endif
             @else
                 <span class="text-sm text-gray-400">—</span>
             @endif

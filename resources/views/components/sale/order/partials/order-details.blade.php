@@ -1,6 +1,7 @@
 @props(['order'])
 
 @php
+    use App\Enums\PriceTypeEnum;
     use Morilog\Jalali\Jalalian;
 @endphp
 
@@ -30,6 +31,32 @@
             <div class="text-body">{{ __('general.total_payable') }}</div>
             <div class="font-medium text-heading">{{ number_format((float) $order->total_payable) }}</div>
         </div>
+        @if ($order->sale_type === PriceTypeEnum::Installment)
+            <div>
+                <div class="text-body">{{ __('app.installment_subtotal') }}</div>
+                <div class="font-medium text-heading">{{ number_format((float) $order->installment_subtotal) }}</div>
+            </div>
+            <div>
+                <div class="text-body">{{ __('app.cash_only_subtotal') }}</div>
+                <div class="font-medium text-heading">{{ number_format((float) $order->cash_only_subtotal) }}</div>
+            </div>
+            <div>
+                <div class="text-body">{{ __('app.plan_down_payment_amount') }}</div>
+                <div class="font-medium text-heading">{{ number_format((float) $order->plan_down_payment_amount) }}</div>
+            </div>
+            <div>
+                <div class="text-body">{{ __('general.down_payment') }}</div>
+                <div class="font-medium text-heading">{{ number_format((float) $order->down_payment_amount) }}</div>
+            </div>
+            <div>
+                <div class="text-body">{{ __('general.financed_amount') }}</div>
+                <div class="font-medium text-heading">{{ number_format((float) $order->financed_amount) }}</div>
+            </div>
+            <div>
+                <div class="text-body">{{ __('general.total_interest') }}</div>
+                <div class="font-medium text-heading">{{ number_format((float) $order->total_interest) }}</div>
+            </div>
+        @endif
     </div>
 
     <div>
@@ -39,6 +66,7 @@
                 <thead class="bg-neutral-secondary-soft">
                     <tr>
                         <th class="px-3 py-2 text-start">{{ __('general.title') }}</th>
+                        <th class="px-3 py-2 text-start">{{ __('app.price_type') }}</th>
                         <th class="px-3 py-2 text-start">{{ __('general.quantity') }}</th>
                         <th class="px-3 py-2 text-start">{{ __('general.unit_price') }}</th>
                         <th class="px-3 py-2 text-start">{{ __('general.line_total') }}</th>
@@ -48,6 +76,7 @@
                     @foreach ($order->items as $item)
                         <tr class="border-t border-default">
                             <td class="px-3 py-2">{{ $item->title }}</td>
+                            <td class="px-3 py-2">{{ $item->price_type?->label() ?? '—' }}</td>
                             <td class="px-3 py-2">{{ $item->quantity }}</td>
                             <td class="px-3 py-2">{{ number_format((float) $item->unit_price) }}</td>
                             <td class="px-3 py-2">{{ number_format((float) $item->line_total) }}</td>

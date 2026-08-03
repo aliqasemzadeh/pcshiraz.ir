@@ -80,7 +80,7 @@ new #[Layout('layouts.app')] class extends Component
         $query = Item::query()
             ->active()
             ->where('items.category_id', $this->category->id)
-            ->with(['brand', 'media', 'activeCashPrice'])
+            ->with(['brand', 'media', 'activeCashPrice', 'activeInstallmentPrice'])
             ->leftJoin('item_prices as cash_prices', function ($join) {
                 $join->on('cash_prices.item_id', '=', 'items.id')
                     ->where('cash_prices.price_type', PriceTypeEnum::Cash->value)
