@@ -87,12 +87,9 @@ new #[Layout('layouts.auth')] class extends Component
                 @enderror
             </div>
 
-            <button
-                type="submit"
-                class="w-full rounded-lg bg-accent px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-accent-strong focus:ring-4 focus:ring-accent/30 focus:outline-none"
-            >
+            <x-ui.button type="submit" color="blue" target="sendOtp" class="w-full">
                 {{ __('general.send_otp') }}
-            </button>
+            </x-ui.button>
         </form>
     @else
         <form wire:submit="login" class="space-y-6">
@@ -124,31 +121,20 @@ new #[Layout('layouts.auth')] class extends Component
             </div>
 
             <div class="space-y-2">
-                <button
-                    type="submit"
-                    class="w-full rounded-lg bg-accent px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-accent-strong focus:ring-4 focus:ring-accent/30 focus:outline-none"
-                >
+                <x-ui.button type="submit" color="blue" target="login" class="w-full">
                     {{ __('general.verify_and_login') }}
-                </button>
+                </x-ui.button>
 
                 <div class="flex justify-between gap-2">
-                    <button
-                        type="button"
-                        wire:click="resetForm"
-                        class="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                    >
+                    <x-ui.button type="button" color="light" outline size="sm" :loading="false" wire:click="resetForm">
                         <x-lucide-pencil class="h-4 w-4" />
                         {{ __('general.change_mobile') }}
-                    </button>
+                    </x-ui.button>
 
-                    <button
-                        type="button"
-                        wire:click="sendOtp"
-                        class="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                    >
+                    <x-ui.button type="button" color="light" outline size="sm" target="sendOtp" wire:click="sendOtp">
                         <x-lucide-refresh-cw class="h-4 w-4" />
                         {{ __('general.resend_otp') }}
-                    </button>
+                    </x-ui.button>
                 </div>
             </div>
         </form>
