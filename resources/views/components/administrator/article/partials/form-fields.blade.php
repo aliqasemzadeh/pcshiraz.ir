@@ -91,22 +91,12 @@
     @enderror
 </div>
 
-@if ($currentImageUrl)
-    <div class="flex items-center gap-3 rounded-lg border border-default bg-neutral-secondary-soft p-3">
-        <img
-            src="{{ $currentImageUrl }}"
-            alt="{{ $form->title }}"
-            class="h-16 w-28 rounded object-cover"
-        >
-        <span class="text-sm text-body">{{ __('general.image') }}</span>
-    </div>
-@endif
-
 <div>
     <x-ui.file-input
         wire:model="form.image"
         :label="__('general.image')"
         accept="image/jpeg,image/png,image/webp,image/avif"
+        :preview="$currentImageUrl"
     />
     @error('form.image')
         <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>

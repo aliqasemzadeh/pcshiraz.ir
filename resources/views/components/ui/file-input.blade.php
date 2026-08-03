@@ -76,40 +76,57 @@
     @if ($wireModel)
         @php
             $file = data_get($this, $wireModel);
-            $files = $multiple ? (is_array($file) ? $file : ($file ? [$file] : [])) : ($file ? [$file] : []);
+            $rawFiles = $multiple
+                ? (is_array($file) ? $file : ($file ? [$file] : []))
+                : ($file ? [$file] : []);
+            $files = array_values(array_filter(
+                $rawFiles,
+                fn ($f) => $f instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile
+            ));
         @endphp
 
-        @if (!empty($files) || $preview)
+        @if ($files !== [] || $preview)
             <div class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-                {{-- Existing Preview (from URL) --}}
-                @if ($preview && empty($files))
+                @if ($preview && $files === [])
                     <div class="group relative aspect-square overflow-hidden rounded-lg border border-default bg-neutral-secondary-soft">
-                        <img src="{{ $preview }}" class="h-full w-full object-cover">
+                        <img src="{{ $preview }}" alt="" class="h-full w-full object-cover">
                     </div>
                 @endif
 
-                {{-- Uploaded Files Previews --}}
                 @foreach ($files as $f)
-                    @if ($f instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
-                        <div class="group relative aspect-square overflow-hidden rounded-lg border border-default bg-neutral-secondary-soft">
-                            @if (str_starts_with($f->getMimeType(), 'image/'))
-                                <img src="{{ $f->temporaryUrl() }}" class="h-full w-full object-cover">
-                            @else
-                                <div class="flex h-full w-full flex-col items-center justify-center p-2 text-center">
-                                    <x-lucide-file class="mb-1 h-8 w-8 text-body" />
-                                    <span class="truncate text-[10px] text-body">{{ $f->getClientOriginalName() }}</span>
-                                </div>
-                            @endif
+                    @php
+                        $previewUrl = null;
+                        $originalName = $f->getClientOriginalName();
 
-                            <button
-                                type="button"
-                                wire:click="$set('{{ $wireModel }}', {{ $multiple ? '[]' : 'null' }})"
-                                class="absolute top-1 right-1 hidden rounded-full bg-red-600 p-1 text-white hover:bg-red-700 group-hover:block"
-                            >
-                                <x-lucide-x class="h-3 w-3" />
-                            </button>
-                        </div>
-                    @endif
+                        try {
+                            $mime = $f->getMimeType();
+
+                            if (is_string($mime) && str_starts_with($mime, 'image/')) {
+                                $previewUrl = $f->temporaryUrl();
+                            }
+                        } catch (\Throwable) {
+                            $previewUrl = null;
+                        }
+                    @endphp
+
+                    <div class="group relative aspect-square overflow-hidden rounded-lg border border-default bg-neutral-secondary-soft">
+                        @if ($previewUrl)
+                            <img src="{{ $previewUrl }}" alt="" class="h-full w-full object-cover">
+                        @else
+                            <div class="flex h-full w-full flex-col items-center justify-center p-2 text-center">
+                                <x-lucide-file class="mb-1 h-8 w-8 text-body" />
+                                <span class="truncate text-[10px] text-body">{{ $originalName }}</span>
+                            </div>
+                        @endif
+
+                        <button
+                            type="button"
+                            wire:click="$set('{{ $wireModel }}', {{ $multiple ? '[]' : 'null' }})"
+                            class="absolute top-1 right-1 hidden rounded-full bg-red-600 p-1 text-white hover:bg-red-700 group-hover:block"
+                        >
+                            <x-lucide-x class="h-3 w-3" />
+                        </button>
+                    </div>
                 @endforeach
             </div>
         @endif

@@ -103,28 +103,20 @@ new #[Layout('layouts.panels')] class extends Component
 
     public function logoPreviewUrl(): ?string
     {
-        if ($this->generalForm->logo) {
-            return $this->generalForm->logo->temporaryUrl();
+        if (! $this->generalForm->logo_path) {
+            return null;
         }
 
-        if ($this->generalForm->logo_path) {
-            return Storage::disk('public')->url($this->generalForm->logo_path);
-        }
-
-        return null;
+        return Storage::disk('public')->url($this->generalForm->logo_path);
     }
 
     public function faviconPreviewUrl(): ?string
     {
-        if ($this->generalForm->favicon) {
-            return $this->generalForm->favicon->temporaryUrl();
+        if (! $this->generalForm->favicon_path) {
+            return null;
         }
 
-        if ($this->generalForm->favicon_path) {
-            return Storage::disk('public')->url($this->generalForm->favicon_path);
-        }
-
-        return null;
+        return Storage::disk('public')->url($this->generalForm->favicon_path);
     }
 
     /**
@@ -294,17 +286,13 @@ new #[Layout('layouts.panels')] class extends Component
                     <div class="grid gap-4 md:grid-cols-2">
                         <div>
                             <p class="mb-2 text-xs text-body">{{ __('app.site_logo_help') }}</p>
-                            @if ($this->logoPreviewUrl())
-                                <div class="mb-3 flex items-center gap-3 rounded-lg border border-default bg-neutral-secondary-soft p-3">
-                                    <img src="{{ $this->logoPreviewUrl() }}" alt="{{ __('app.site_logo') }}" class="h-12 w-auto max-w-[160px] object-contain">
-                                </div>
-                            @endif
                             <x-ui.file-input
                                 wire:model="generalForm.logo"
                                 :label="__('app.site_logo')"
                                 :helper="__('app.logo_file_help')"
                                 accept="image/jpeg,image/png,image/webp,image/svg+xml"
                                 dropzone
+                                :preview="$this->logoPreviewUrl()"
                             />
                             @error('generalForm.logo')
                                 <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
@@ -313,17 +301,13 @@ new #[Layout('layouts.panels')] class extends Component
 
                         <div>
                             <p class="mb-2 text-xs text-body">{{ __('app.favicon_help') }}</p>
-                            @if ($this->faviconPreviewUrl())
-                                <div class="mb-3 flex items-center gap-3 rounded-lg border border-default bg-neutral-secondary-soft p-3">
-                                    <img src="{{ $this->faviconPreviewUrl() }}" alt="{{ __('app.favicon') }}" class="h-8 w-8 object-contain">
-                                </div>
-                            @endif
                             <x-ui.file-input
                                 wire:model="generalForm.favicon"
                                 :label="__('app.favicon')"
                                 :helper="__('app.favicon_file_help')"
                                 accept="image/png,image/x-icon,image/jpeg,image/webp"
                                 dropzone
+                                :preview="$this->faviconPreviewUrl()"
                             />
                             @error('generalForm.favicon')
                                 <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
