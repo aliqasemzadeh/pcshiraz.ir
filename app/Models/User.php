@@ -19,6 +19,7 @@ use Spatie\Permission\Traits\HasRoles;
     'last_name',
     'national_code',
     'birth_date',
+    'identity_verified_at',
     'email',
     'password',
 ])]
@@ -35,6 +36,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'identity_verified_at' => 'datetime',
             'password' => 'hashed',
             'birth_date' => 'date',
         ];
@@ -43,5 +45,10 @@ class User extends Authenticatable
     public function getFullNameAttribute(): string
     {
         return trim(($this->first_name ?? '').' '.($this->last_name ?? ''));
+    }
+
+    public function isIdentityVerified(): bool
+    {
+        return $this->identity_verified_at !== null;
     }
 }
