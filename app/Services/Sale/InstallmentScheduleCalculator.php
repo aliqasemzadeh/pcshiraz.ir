@@ -11,6 +11,8 @@ class InstallmentScheduleCalculator
     /**
      * @return array{
      *     effective_down_payment_percent: float,
+     *     plan_down_payment_amount: string,
+     *     mandatory_down_payment_amount: string,
      *     down_payment_amount: string,
      *     financed_amount: string,
      *     total_interest: string,
@@ -25,16 +27,25 @@ class InstallmentScheduleCalculator
      *     }>
      * }
      */
-    public function calculate(InstallmentPlan $plan, string|float $orderTotal, ?Carbon $startDate = null): array
-    {
-        $total = $this->normalize($orderTotal);
+    public function calculate(
+        InstallmentPlan $plan,
+        string|float $financedBase,
+        string|float $mandatoryDownPayment = 0,
+        ?Carbon $startDate = null,
+    ): array {
+        $base = $this->normalize($financedBase);
+        $mandatory = $this->normalize($mandatoryDownPayment);
         $startDate ??= now()->startOfDay();
 
-        if (bccomp($total, '0', 4) <= 0) {
-            throw new InvalidArgumentException('Order total must be greater than zero.');
+        if (bccomp($base, '0', 4) <= 0) {
+            throw new InvalidArgumentException('Financed base must be greater than zero.');
         }
 
-        if ($plan->min_order_amount !== null && bccomp($total, (string) $plan->min_order_amount, 4) < 0) {
+        if (bccomp($mandatory, '0', 4) < 0) {
+            throw new InvalidArgumentException('Mandatory down payment cannot be negative.');
+        }
+
+        if ($plan->min_order_amount !== null && bccomp($base, (string) $plan->min_order_amount, 4) < 0) {
             throw new InvalidArgumentException(__('general.order_below_plan_minimum'));
         }
 
@@ -42,14 +53,15 @@ class InstallmentScheduleCalculator
 
         if (
             $plan->down_payment_required_above !== null
-            && bccomp($total, (string) $plan->down_payment_required_above, 4) > 0
+            && bccomp($base, (string) $plan->down_payment_required_above, 4) > 0
             && $effectiveDownPercent <= 0
         ) {
             $effectiveDownPercent = (float) $plan->min_down_payment_percent;
         }
 
-        $downPayment = $this->percentOf($total, $effectiveDownPercent);
-        $financed = bcsub($total, $downPayment, 4);
+        $planDownPayment = $this->percentOf($base, $effectiveDownPercent);
+        $financed = bcsub($base, $planDownPayment, 4);
+        $totalDownPayment = bcadd($planDownPayment, $mandatory, 4);
 
         if (
             $plan->max_financiable_amount !== null
@@ -65,13 +77,13 @@ class InstallmentScheduleCalculator
 
         $schedule = [];
 
-        if (bccomp($downPayment, '0', 4) > 0) {
+        if (bccomp($totalDownPayment, '0', 4) > 0) {
             $schedule[] = [
                 'sequence' => 0,
                 'due_date' => $startDate->copy(),
-                'principal_amount' => $downPayment,
+                'principal_amount' => $totalDownPayment,
                 'interest_amount' => '0.0000',
-                'total_amount' => $downPayment,
+                'total_amount' => $totalDownPayment,
             ];
         }
 
@@ -108,7 +120,9 @@ class InstallmentScheduleCalculator
 
         return [
             'effective_down_payment_percent' => $effectiveDownPercent,
-            'down_payment_amount' => $downPayment,
+            'plan_down_payment_amount' => $planDownPayment,
+            'mandatory_down_payment_amount' => $mandatory,
+            'down_payment_amount' => $totalDownPayment,
             'financed_amount' => $financed,
             'total_interest' => $totalInterest,
             'total_payable' => $totalPayable,
@@ -117,10 +131,13 @@ class InstallmentScheduleCalculator
         ];
     }
 
-    public function isEligible(InstallmentPlan $plan, string|float $orderTotal): bool
-    {
+    public function isEligible(
+        InstallmentPlan $plan,
+        string|float $financedBase,
+        string|float $mandatoryDownPayment = 0,
+    ): bool {
         try {
-            $this->calculate($plan, $orderTotal);
+            $this->calculate($plan, $financedBase, $mandatoryDownPayment);
 
             return true;
         } catch (InvalidArgumentException) {

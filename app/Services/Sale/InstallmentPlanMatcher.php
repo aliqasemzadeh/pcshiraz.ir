@@ -15,14 +15,25 @@ class InstallmentPlanMatcher
     /**
      * @return Collection<int, array{plan: InstallmentPlan, preview: array<string, mixed>}>
      */
-    public function eligiblePlans(Organization $organization, string|float $orderTotal): Collection
-    {
+    public function eligiblePlans(
+        Organization $organization,
+        string|float $financedBase,
+        string|float $mandatoryDownPayment = 0,
+    ): Collection {
         return $this->candidatePlans($organization)
-            ->filter(fn (array $row) => $this->calculator->isEligible($row['plan'], $orderTotal))
-            ->map(function (array $row) use ($orderTotal) {
+            ->filter(fn (array $row) => $this->calculator->isEligible(
+                $row['plan'],
+                $financedBase,
+                $mandatoryDownPayment,
+            ))
+            ->map(function (array $row) use ($financedBase, $mandatoryDownPayment) {
                 return [
                     'plan' => $row['plan'],
-                    'preview' => $this->calculator->calculate($row['plan'], $orderTotal),
+                    'preview' => $this->calculator->calculate(
+                        $row['plan'],
+                        $financedBase,
+                        $mandatoryDownPayment,
+                    ),
                     'priority' => $row['priority'],
                 ];
             })

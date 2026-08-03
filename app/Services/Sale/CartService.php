@@ -33,7 +33,7 @@ class CartService
     }
 
     /**
-     * @return array{removed: int}
+     * @return array{removed: int, cash_only: int}
      */
     public function setSaleType(Cart $cart, PriceTypeEnum $saleType): array
     {
@@ -44,7 +44,7 @@ class CartService
         }
 
         if ($cart->sale_type === $saleType) {
-            return ['removed' => 0];
+            return ['removed' => 0, 'cash_only' => 0];
         }
 
         return DB::transaction(function () use ($cart, $saleType) {
@@ -55,12 +55,13 @@ class CartService
     }
 
     /**
-     * @return array{removed: int}
+     * @return array{removed: int, cash_only: int}
      */
     public function repriceCart(Cart $cart): array
     {
         $cart->loadMissing('items.item');
         $removed = 0;
+        $cashOnly = 0;
 
         foreach ($cart->items as $cartItem) {
             $item = $cartItem->item;
@@ -72,7 +73,7 @@ class CartService
                 continue;
             }
 
-            $itemPrice = $this->resolvePrice($item, $cart->sale_type);
+            $itemPrice = $this->resolvePriceForSaleType($item, $cart->sale_type);
 
             if ($itemPrice === null) {
                 $cartItem->delete();
@@ -85,9 +86,16 @@ class CartService
                 'item_price_id' => $itemPrice->id,
                 'unit_price' => $itemPrice->sale_price,
             ]);
+
+            if (
+                $cart->sale_type === PriceTypeEnum::Installment
+                && $itemPrice->price_type === PriceTypeEnum::Cash
+            ) {
+                $cashOnly++;
+            }
         }
 
-        return ['removed' => $removed];
+        return ['removed' => $removed, 'cash_only' => $cashOnly];
     }
 
     public function addItem(User $user, Item $item, int $quantity = 1): CartItem
@@ -99,7 +107,7 @@ class CartService
         }
 
         $cart = $this->getOrCreateCart($user);
-        $itemPrice = $this->resolvePrice($item, $cart->sale_type);
+        $itemPrice = $this->resolvePriceForSaleType($item, $cart->sale_type);
 
         if ($itemPrice === null) {
             throw ValidationException::withMessages([
@@ -158,15 +166,81 @@ class CartService
 
     public function subtotal(Cart $cart): string
     {
-        $cart->loadMissing('items');
+        return $this->breakdown($cart)['subtotal'];
+    }
 
-        $total = '0.0000';
+    /**
+     * @return array{
+     *     subtotal: string,
+     *     cash_only_subtotal: string,
+     *     installment_subtotal: string,
+     *     cash_only_count: int
+     * }
+     */
+    public function breakdown(Cart $cart): array
+    {
+        $cart->loadMissing(['items.itemPrice', 'sale_type']);
 
-        foreach ($cart->items as $item) {
-            $total = bcadd($total, bcmul((string) $item->unit_price, (string) $item->quantity, 4), 4);
+        $subtotal = '0.0000';
+        $cashOnlySubtotal = '0.0000';
+        $installmentSubtotal = '0.0000';
+        $cashOnlyCount = 0;
+
+        foreach ($cart->items as $cartItem) {
+            $lineTotal = bcmul((string) $cartItem->unit_price, (string) $cartItem->quantity, 4);
+            $subtotal = bcadd($subtotal, $lineTotal, 4);
+
+            if ($this->lineIsCashOnly($cart, $cartItem)) {
+                $cashOnlySubtotal = bcadd($cashOnlySubtotal, $lineTotal, 4);
+                $cashOnlyCount++;
+            } else {
+                $installmentSubtotal = bcadd($installmentSubtotal, $lineTotal, 4);
+            }
         }
 
-        return $total;
+        return [
+            'subtotal' => $subtotal,
+            'cash_only_subtotal' => $cashOnlySubtotal,
+            'installment_subtotal' => $installmentSubtotal,
+            'cash_only_count' => $cashOnlyCount,
+        ];
+    }
+
+    public function lineIsCashOnly(Cart $cart, CartItem $cartItem): bool
+    {
+        if ($cart->sale_type !== PriceTypeEnum::Installment) {
+            return false;
+        }
+
+        $cartItem->loadMissing('itemPrice');
+
+        return $cartItem->itemPrice?->price_type === PriceTypeEnum::Cash;
+    }
+
+    public function linePriceType(Cart $cart, CartItem $cartItem): PriceTypeEnum
+    {
+        if ($this->lineIsCashOnly($cart, $cartItem)) {
+            return PriceTypeEnum::Cash;
+        }
+
+        $cartItem->loadMissing('itemPrice');
+
+        return $cartItem->itemPrice?->price_type ?? $cart->sale_type ?? PriceTypeEnum::Cash;
+    }
+
+    protected function resolvePriceForSaleType(Item $item, PriceTypeEnum $type): ?ItemPrice
+    {
+        $primary = $this->resolvePrice($item, $type);
+
+        if ($primary !== null) {
+            return $primary;
+        }
+
+        if ($type === PriceTypeEnum::Installment) {
+            return $this->resolvePrice($item, PriceTypeEnum::Cash);
+        }
+
+        return null;
     }
 
     protected function resolvePrice(Item $item, PriceTypeEnum $type): ?ItemPrice
