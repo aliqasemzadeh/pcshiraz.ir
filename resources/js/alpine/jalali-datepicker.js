@@ -26,8 +26,12 @@ export default (config = {}) => ({
     init() {
         this.minDate = this.resolveBoundary(config.minDate);
         this.maxDate = this.resolveBoundary(config.maxDate);
-        this.syncFromInput();
         this.resetView();
+
+        this.$nextTick(() => {
+            this.syncFromInput();
+            this.resetView();
+        });
 
         if (this.wireProperty) {
             this.$wire.$watch(this.wireProperty, (next) => {
