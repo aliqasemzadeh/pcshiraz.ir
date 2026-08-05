@@ -4,6 +4,7 @@ namespace App\Livewire\Forms;
 
 use App\Enums\ItemTypeEnum;
 use App\Models\Item;
+use App\Services\Sale\Catalog\ItemColorService;
 use App\Services\Shop\CatalogCache;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -103,12 +104,22 @@ class ItemForm extends Form
      *     seo_title?: ?string,
      *     meta_description?: ?string,
      *     image_url?: ?string,
+     *     brand_id?: int,
+     *     category_id?: int,
      *     color_name?: ?string,
      *     color_code?: ?string
      * }  $data
      */
     public function fillFromImport(array $data): void
     {
+        if (isset($data['brand_id'])) {
+            $this->brand_id = $data['brand_id'];
+        }
+
+        if (isset($data['category_id'])) {
+            $this->category_id = $data['category_id'];
+        }
+
         $this->title = $data['title'] ?? $this->title;
         $this->slug = $data['slug'] ?? $this->slug;
         $this->description = $data['description'] ?? $this->description;
@@ -116,6 +127,16 @@ class ItemForm extends Form
         $this->meta_description = $data['meta_description'] ?? $this->meta_description;
         $this->color_name = $data['color_name'] ?? $this->color_name;
         $this->color_code = $data['color_code'] ?? $this->color_code;
+
+        if (($this->color_code === null || $this->color_code === '') && $this->color_name !== null && $this->color_name !== '') {
+            $resolved = app(ItemColorService::class)->resolveByName($this->color_name);
+
+            if ($resolved !== null) {
+                $this->color_name = $resolved['name'];
+                $this->color_code = $resolved['code'];
+            }
+        }
+
         $this->remote_image_url = $data['image_url'] ?? null;
         $this->product_image = null;
     }

@@ -108,30 +108,7 @@
     @enderror
 </div>
 
-<div class="grid grid-cols-2 gap-3">
-    <div>
-        <x-fwb.input
-            wire:model="form.color_name"
-            :label="__('general.color_name')"
-            type="text"
-        />
-        @error('form.color_name')
-            <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
-        @enderror
-    </div>
-    <div>
-        <x-fwb.input
-            wire:model="form.color_code"
-            :label="__('general.color_code')"
-            type="text"
-            dir="ltr"
-            placeholder="#000000"
-        />
-        @error('form.color_code')
-            <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
-        @enderror
-    </div>
-</div>
+<x-ui.color-picker :existing-colors="$existingColors" />
 
 <div class="grid grid-cols-2 gap-3">
     <div>

@@ -5,6 +5,7 @@ use App\Livewire\Forms\ItemForm;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Item;
+use App\Services\Sale\Catalog\ItemColorService;
 use App\Services\Shop\CategoryMenuService;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
@@ -20,6 +21,8 @@ new class extends Component
     public ItemForm $form;
 
     public ?string $selectedExistingTag = null;
+
+    public ?string $selectedExistingColor = null;
 
     public ?string $currentImageUrl = null;
 
@@ -60,6 +63,19 @@ new class extends Component
         }
 
         $this->selectedExistingTag = null;
+    }
+
+    public function applyExistingColor(ItemColorService $colorService): void
+    {
+        $parsed = $colorService->parseSelectKey($this->selectedExistingColor);
+
+        if ($parsed === null) {
+            return;
+        }
+
+        $this->form->color_name = $parsed['name'];
+        $this->form->color_code = $parsed['code'];
+        $this->selectedExistingColor = null;
     }
 
     public function save(CategoryMenuService $categoryMenuService): void
@@ -146,6 +162,12 @@ new class extends Component
 
         return $options;
     }
+
+    #[Computed]
+    public function existingColors(): array
+    {
+        return app(ItemColorService::class)->optionsForSelect();
+    }
 };
 ?>
 
@@ -165,6 +187,7 @@ new class extends Component
                 'itemTypes' => $this->itemTypes,
                 'groups' => $this->groups,
                 'existingTags' => $this->existingTags,
+                'existingColors' => $this->existingColors,
                 'currentImageUrl' => $currentImageUrl,
             ])
 
