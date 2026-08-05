@@ -145,16 +145,12 @@ new #[Layout('layouts.app')] class extends Component
                     </div>
 
                     <div>
-                        <x-fwb.input
+                        <x-ui.jalali-datepicker
                             wire:model="form.birth_date"
                             :label="__('general.birth_date')"
-                            type="text"
-                            dir="ltr"
-                            placeholder="1400/01/01"
-                            autocomplete="off"
+                            max-date="today"
                             :readonly="$this->identityVerified"
                             @class(['opacity-70' => $this->identityVerified])
-                            @if (! $this->identityVerified) data-jdp data-jdp-only-date @endif
                         />
                         @error('form.birth_date')
                             <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>

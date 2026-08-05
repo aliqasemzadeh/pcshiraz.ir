@@ -51,7 +51,7 @@
 <div
     x-data="jalaliDatepicker(@js($alpineConfig))"
     x-on:keydown.escape.window="open && close()"
-    {{ $attributes->only('class') }}
+    @class($attributes->get('class'))
 >
     @if ($label)
         <label for="{{ $inputId }}" class="mb-2 block text-sm font-medium text-heading">{{ $label }}</label>
