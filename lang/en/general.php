@@ -110,6 +110,8 @@ return [
     'color' => 'Color',
     'color_code' => 'Color code',
     'color_name' => 'Color name',
+    'select_existing_color' => 'Select existing color',
+    'apply_color' => 'Apply color',
     'is_main' => 'Main item in group',
     'group' => 'Item group',
     'no_group' => 'No group (new group)',

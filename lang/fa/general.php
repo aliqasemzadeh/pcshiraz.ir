@@ -110,6 +110,8 @@ return [
     'color' => 'رنگ',
     'color_code' => 'کد رنگ',
     'color_name' => 'نام رنگ',
+    'select_existing_color' => 'انتخاب رنگ موجود',
+    'apply_color' => 'اعمال رنگ',
     'is_main' => 'کالای اصلی گروه',
     'group' => 'گروه کالا',
     'no_group' => 'بدون گروه (گروه جدید)',
