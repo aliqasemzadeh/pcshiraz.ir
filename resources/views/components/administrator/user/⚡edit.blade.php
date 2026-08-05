@@ -74,7 +74,7 @@ new class extends Component
             </div>
 
             <div>
-                <x-fwb.input wire:model="form.birth_date" :label="__('general.birth_date')" type="text" dir="ltr" placeholder="1400/01/01" />
+                <x-ui.jalali-datepicker wire:model="form.birth_date" :label="__('general.birth_date')" max-date="today" />
                 @error('form.birth_date')
                     <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
                 @enderror
