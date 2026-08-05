@@ -70,7 +70,7 @@
             dir="ltr"
             autocomplete="off"
             placeholder="{{ $placeholder }}"
-            class="block w-full rounded-base border border-default-medium bg-neutral-primary px-3 py-2.5 text-sm text-heading placeholder:text-body focus:border-brand focus:ring-brand disabled:cursor-not-allowed disabled:opacity-60 read-only:cursor-default read-only:opacity-70"
+            class="block w-full rounded-base border border-default-medium bg-neutral-primary py-2.5 ps-3 pe-10 text-left text-sm text-heading placeholder:text-body focus:border-brand focus:ring-brand disabled:cursor-not-allowed disabled:opacity-60 read-only:cursor-default read-only:opacity-70"
             x-bind:value="displayValue"
             x-bind:readonly="readonly || disabled"
             x-bind:disabled="disabled"
@@ -80,7 +80,7 @@
 
         <button
             type="button"
-            class="absolute inset-y-0 end-0 flex items-center pe-3 text-body hover:text-heading disabled:pointer-events-none"
+            class="absolute inset-y-0 start-0 flex items-center ps-3 text-body hover:text-heading disabled:pointer-events-none"
             x-bind:disabled="disabled || readonly"
             x-on:click.stop="toggle()"
             tabindex="-1"
