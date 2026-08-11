@@ -32,15 +32,7 @@
             <span>{{ __('general.price_list') }}</span>
         </a>
 
-        <a
-            href="{{ route('cart') }}"
-            wire:navigate
-            class="inline-flex shrink-0 items-center justify-center rounded-lg p-2.5 text-navbar-fg transition duration-200 hover:bg-brand-softer hover:text-brand focus:ring-2 focus:ring-brand/30 focus:outline-none"
-            title="{{ __('general.cart') }}"
-        >
-            <x-lucide-shopping-cart class="h-5 w-5" />
-            <span class="sr-only">{{ __('general.cart') }}</span>
-        </a>
+        <livewire:shop.cart-badge variant="navbar" :key="'shop-cart-badge-navbar'" />
 
         @auth
             <a

@@ -164,6 +164,21 @@ class CartService
         $cart->items()->delete();
     }
 
+    public function itemsCount(?User $user): int
+    {
+        if ($user === null) {
+            return 0;
+        }
+
+        $cart = Cart::query()->where('user_id', $user->id)->first();
+
+        if ($cart === null) {
+            return 0;
+        }
+
+        return (int) $cart->items()->sum('quantity');
+    }
+
     public function subtotal(Cart $cart): string
     {
         return $this->breakdown($cart)['subtotal'];

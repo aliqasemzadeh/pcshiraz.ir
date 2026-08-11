@@ -107,6 +107,7 @@ new #[Layout('layouts.app')] class extends Component
 
         unset($this->cart, $this->breakdown, $this->subtotal, $this->eligiblePlans);
         $this->resetPlanSelection();
+        $this->dispatch('shop.cart.updated');
 
         if ($result['removed'] > 0) {
             Toaster::warning(__('app.items_removed_no_price', ['count' => $result['removed']]));
@@ -132,6 +133,7 @@ new #[Layout('layouts.app')] class extends Component
         app(CartService::class)->updateQuantity($cartItem, max(1, (int) $quantity));
         unset($this->cart, $this->breakdown, $this->subtotal, $this->eligiblePlans);
         $this->resetPlanSelection();
+        $this->dispatch('shop.cart.updated');
     }
 
     public function removeItem(int $cartItemId): void
@@ -149,6 +151,7 @@ new #[Layout('layouts.app')] class extends Component
         app(CartService::class)->removeItem($cartItem);
         unset($this->cart, $this->breakdown, $this->subtotal, $this->eligiblePlans);
         $this->resetPlanSelection();
+        $this->dispatch('shop.cart.updated');
         Toaster::success(__('general.deleted'));
     }
 

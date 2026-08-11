@@ -41,6 +41,7 @@ new #[Layout('layouts.app')] class extends Component
         $cartService->addItem(Auth::user(), $this->item, $this->quantity);
 
         Toaster::success(__('general.added_to_cart'));
+        $this->dispatch('shop.cart.updated');
     }
 };
 ?>
