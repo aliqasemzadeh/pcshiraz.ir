@@ -15,7 +15,6 @@ Route::livewire('/order/{order}/success', 'pages::shop.order.success')->name('sh
 
 Route::livewire('/category/{category:slug}', 'pages::shop.category.index')->name('shop.category');
 Route::livewire('/category/{category:slug}/{brand:slug}', 'pages::shop.category.brand')->name('shop.category.brand');
-Route::livewire('/price-list/{category:slug?}', 'pages::shop.price-list.index')->name('shop.price-list');
 Route::livewire('/items', 'pages::shop.item.index')->name('shop.items');
 Route::livewire('/item/{item:slug}', 'pages::shop.item.view')->name('shop.item');
 Route::livewire('/tag/{tag}', 'pages::shop.tag.index')->name('shop.tag');

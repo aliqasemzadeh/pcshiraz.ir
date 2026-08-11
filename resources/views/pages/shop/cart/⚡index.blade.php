@@ -311,13 +311,30 @@ new #[Layout('layouts.app')] class extends Component
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
-                        <input
-                            type="number"
-                            min="1"
-                            class="w-24 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-900"
-                            value="{{ $cartItem->quantity }}"
-                            wire:change="updateQuantity({{ $cartItem->id }}, $event.target.value)"
-                        />
+                        <div class="flex items-center gap-2">
+                            <x-ui.button
+                                type="button"
+                                size="icon"
+                                color="zinc"
+                                :loading="false"
+                                :disabled="$cartItem->quantity <= 1"
+                                wire:click="updateQuantity({{ $cartItem->id }}, {{ $cartItem->quantity - 1 }})"
+                                title="{{ __('app.decrease_quantity') }}"
+                            >
+                                <x-lucide-minus class="h-4 w-4" />
+                            </x-ui.button>
+                            <span class="min-w-8 text-center text-sm font-medium text-gray-900 dark:text-white">{{ $cartItem->quantity }}</span>
+                            <x-ui.button
+                                type="button"
+                                size="icon"
+                                color="teal"
+                                :loading="false"
+                                wire:click="updateQuantity({{ $cartItem->id }}, {{ $cartItem->quantity + 1 }})"
+                                title="{{ __('app.increase_quantity') }}"
+                            >
+                                <x-lucide-plus class="h-4 w-4" />
+                            </x-ui.button>
+                        </div>
                         <x-ui.button type="button" color="red" size="sm" :loading="false" wire:click="removeItem({{ $cartItem->id }})">
                             <x-lucide-trash-2 class="h-4 w-4" />
                         </x-ui.button>
@@ -329,20 +346,35 @@ new #[Layout('layouts.app')] class extends Component
         <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
             @if ($this->cart->sale_type === PriceTypeEnum::Installment)
                 <div class="mb-3 space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                    <div class="flex justify-between">
+                    <div class="flex justify-between gap-4">
                         <span>{{ __('app.installment_subtotal') }}</span>
-                        <span>{{ number_format((float) $breakdown['installment_subtotal']) }}</span>
+                        <div class="text-end">
+                            <div>{{ number_format((float) $breakdown['installment_subtotal']) }}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                {{ PersianNumberToWords::convert($breakdown['installment_subtotal']) }} {{ __('app.rial') }}
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex justify-between">
+                    <div class="flex justify-between gap-4">
                         <span>{{ __('app.cash_only_subtotal') }}</span>
-                        <span>{{ number_format((float) $breakdown['cash_only_subtotal']) }}</span>
+                        <div class="text-end">
+                            <div>{{ number_format((float) $breakdown['cash_only_subtotal']) }}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                {{ PersianNumberToWords::convert($breakdown['cash_only_subtotal']) }} {{ __('app.rial') }}
+                            </div>
+                        </div>
                     </div>
                 </div>
             @endif
 
-            <div class="mb-4 flex justify-between text-lg font-semibold">
+            <div class="mb-4 flex justify-between gap-4 text-lg font-semibold">
                 <span>{{ __('general.subtotal') }}</span>
-                <span>{{ number_format((float) $this->subtotal) }}</span>
+                <div class="text-end">
+                    <div>{{ number_format((float) $this->subtotal) }}</div>
+                    <div class="text-sm font-normal text-gray-500 dark:text-gray-400">
+                        {{ PersianNumberToWords::convert($this->subtotal) }} {{ __('app.rial') }}
+                    </div>
+                </div>
             </div>
 
             <div class="space-y-4">
