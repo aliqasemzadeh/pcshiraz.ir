@@ -17,6 +17,11 @@
         atBeginning: true,
         atEnd: true,
         resizeObserver: null,
+        dragging: false,
+        dragPointerId: null,
+        dragStartX: 0,
+        dragStartScroll: 0,
+        dragMoved: false,
         isRtl() {
             return getComputedStyle(this.$refs.slider).direction === 'rtl'
         },
@@ -25,6 +30,9 @@
                 this.updateEdgeState()
                 this.resizeObserver = new ResizeObserver(() => this.updateEdgeState())
                 this.resizeObserver.observe(this.$refs.slider)
+                if (this.$refs.slider.firstElementChild) {
+                    this.resizeObserver.observe(this.$refs.slider.firstElementChild)
+                }
             })
         },
         destroy() {
@@ -49,29 +57,54 @@
         updateEdgeState() {
             let slider = this.$refs.slider
             if (! slider) return
-            let first = slider.firstElementChild
-            let last = slider.lastElementChild
-            if (! first || ! last) {
+
+            let eps = 2
+            let max = slider.scrollWidth - slider.clientWidth
+
+            if (max <= eps) {
                 this.atBeginning = true
                 this.atEnd = true
                 return
             }
-            let eps = 4
-            if (slider.scrollWidth <= slider.clientWidth + eps) {
-                this.atBeginning = true
-                this.atEnd = true
-                return
-            }
-            let sr = slider.getBoundingClientRect()
-            let fr = first.getBoundingClientRect()
-            let lr = last.getBoundingClientRect()
-            if (this.isRtl()) {
-                this.atBeginning = fr.right >= sr.right - eps
-                this.atEnd = lr.left <= sr.left + eps
-            } else {
-                this.atBeginning = fr.left >= sr.left - eps
-                this.atEnd = lr.right <= sr.right + eps
-            }
+
+            // Modern RTL engines: scrollLeft goes from 0 toward -max
+            let position = Math.abs(slider.scrollLeft)
+            this.atBeginning = position <= eps
+            this.atEnd = position >= max - eps
+        },
+        onPointerDown(event) {
+            if (event.pointerType === 'touch' || event.button !== 0) return
+
+            this.dragPointerId = event.pointerId
+            this.dragStartX = event.clientX
+            this.dragStartScroll = this.$refs.slider.scrollLeft
+            this.dragMoved = false
+            this.dragging = true
+            this.$refs.slider.setPointerCapture(event.pointerId)
+        },
+        onPointerMove(event) {
+            if (! this.dragging || event.pointerId !== this.dragPointerId) return
+
+            let delta = event.clientX - this.dragStartX
+            if (Math.abs(delta) > 5) this.dragMoved = true
+
+            this.$refs.slider.scrollLeft = this.dragStartScroll - delta
+            event.preventDefault()
+        },
+        onPointerUp(event) {
+            if (! this.dragging) return
+
+            this.$refs.slider.releasePointerCapture?.(event.pointerId)
+            this.dragging = false
+            this.dragPointerId = null
+            this.updateEdgeState()
+        },
+        onClickCapture(event) {
+            if (! this.dragMoved) return
+
+            event.preventDefault()
+            event.stopPropagation()
+            this.dragMoved = false
         },
         onKeydown(event) {
             if (event.key === 'ArrowRight') {
@@ -129,10 +162,18 @@
         <ul
             x-ref="slider"
             x-on:scroll.passive="updateEdgeState"
+            x-on:pointerdown="onPointerDown($event)"
+            x-on:pointermove="onPointerMove($event)"
+            x-on:pointerup="onPointerUp($event)"
+            x-on:pointercancel="onPointerUp($event)"
+            x-on:click.capture="onClickCapture($event)"
+            x-on:dragstart.prevent
+            :style="dragging ? 'scroll-snap-type: none' : null"
+            :class="dragging ? 'cursor-grabbing select-none' : 'cursor-grab'"
             tabindex="0"
             role="listbox"
             aria-labelledby="{{ $contentLabelId }}"
-            class="flex w-full snap-x snap-mandatory gap-3 overflow-x-auto px-10 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            class="flex w-full snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-10 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
             {{ $slot }}
         </ul>
