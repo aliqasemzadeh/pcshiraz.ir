@@ -5,29 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
-    'user_id',
-    'title',
-    'postal_code',
     'province_id',
-    'city_id',
-    'address',
+    'name',
 ])]
-class UserAddress extends Model
+class City extends Model
 {
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
-
     public function province(): BelongsTo
     {
         return $this->belongsTo(Province::class);
     }
 
-    public function city(): BelongsTo
+    public function addresses(): HasMany
     {
-        return $this->belongsTo(City::class);
+        return $this->hasMany(UserAddress::class);
     }
 }
