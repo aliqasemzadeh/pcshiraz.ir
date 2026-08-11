@@ -185,4 +185,8 @@ return [
     'product_specifications' => 'Specifications',
     'last_products_left' => 'Only :count left',
     'go_to_cart' => 'Go to cart',
+    'continue_shopping' => 'Continue shopping',
+    'finalize_order' => 'Finalize order',
+    'cart_items_count' => ':count item(s) in cart',
 ];
+

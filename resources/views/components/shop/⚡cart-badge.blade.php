@@ -21,13 +21,24 @@ new class extends Component
     {
         unset($this->count);
     }
+
+    public function openCart(): void
+    {
+        if (! Auth::check()) {
+            $this->redirect(route('login'), navigate: true);
+
+            return;
+        }
+
+        $this->dispatch('modal-open', modal: 'shop.cart-slideover');
+    }
 };
 ?>
 
 @if ($variant === 'bottom')
-    <a
-        href="{{ route('cart') }}"
-        wire:navigate
+    <button
+        type="button"
+        wire:click="openCart"
         @class([
             'relative inline-flex flex-col items-center justify-center px-5 transition duration-200 hover:bg-brand-softer',
             'text-brand' => request()->routeIs('cart'),
@@ -43,11 +54,11 @@ new class extends Component
             @endif
         </span>
         <span class="text-xs">{{ __('general.cart') }}</span>
-    </a>
+    </button>
 @else
-    <a
-        href="{{ route('cart') }}"
-        wire:navigate
+    <button
+        type="button"
+        wire:click="openCart"
         class="relative inline-flex shrink-0 items-center justify-center rounded-lg p-2.5 text-navbar-fg transition duration-200 hover:bg-brand-softer hover:text-brand focus:ring-2 focus:ring-brand/30 focus:outline-none"
         title="{{ __('general.cart') }}"
     >
@@ -58,5 +69,5 @@ new class extends Component
                 {{ $this->count > 99 ? '99+' : $this->count }}
             </span>
         @endif
-    </a>
+    </button>
 @endif

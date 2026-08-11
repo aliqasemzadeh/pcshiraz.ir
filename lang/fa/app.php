@@ -185,4 +185,8 @@ return [
     'product_specifications' => 'مشخصات فنی',
     'last_products_left' => 'فقط :count عدد باقی مانده',
     'go_to_cart' => 'رفتن به سبد خرید',
+    'continue_shopping' => 'ادامه خرید',
+    'finalize_order' => 'نهایی کردن خرید',
+    'cart_items_count' => ':count کالا در سبد',
 ];
+

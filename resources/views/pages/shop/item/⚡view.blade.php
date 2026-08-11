@@ -61,7 +61,7 @@ new #[Layout('layouts.app')] class extends Component
         unset($this->cartItem);
         $this->dispatch('shop.cart.updated');
         Toaster::success(__('general.added_to_cart'));
-        $this->redirect(route('cart'), navigate: true);
+        $this->dispatch('modal-open', modal: 'shop.cart-slideover');
     }
 
     public function updateQuantity(mixed $quantity, CartService $cartService): void
@@ -387,13 +387,13 @@ new #[Layout('layouts.app')] class extends Component
                                 <x-ui.button type="button" color="red" size="sm" :loading="false" wire:click="removeFromCart">
                                     <x-lucide-trash-2 class="h-4 w-4" />
                                 </x-ui.button>
-                                <a
-                                    href="{{ route('cart') }}"
-                                    wire:navigate
+                                <button
+                                    type="button"
                                     class="text-sm font-medium text-brand underline hover:no-underline"
+                                    x-on:click="Livewire.dispatch('modal-open', { modal: 'shop.cart-slideover' })"
                                 >
                                     {{ __('app.go_to_cart') }}
-                                </a>
+                                </button>
                             </div>
                         @else
                             <x-ui.button type="button" color="green" target="addToCart" wire:click="addToCart" class="w-full">
@@ -473,12 +473,12 @@ new #[Layout('layouts.app')] class extends Component
                             <x-lucide-plus class="h-4 w-4" />
                         </x-ui.button>
                         <x-ui.button
-                            :href="route('cart')"
+                            type="button"
                             color="blue"
                             size="sm"
                             :loading="false"
                             class="ms-1"
-                            wire:navigate
+                            x-on:click="Livewire.dispatch('modal-open', { modal: 'shop.cart-slideover' })"
                         >
                             {{ __('app.go_to_cart') }}
                         </x-ui.button>
