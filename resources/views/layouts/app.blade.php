@@ -12,14 +12,24 @@
     })();
 </script>
 
-@include('partials.layouts.app.navbar')
+<script type="application/json" id="shop-category-menu-data">
+    {!! json_encode($shopCategoryMenu ?? [], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}
+</script>
+
+@persist('shop-navbar')
+    @include('partials.layouts.app.navbar')
+@endpersist
 
 <main class="mx-auto max-w-screen-2xl px-6 pt-20 pb-24 md:pb-8">
     {{ $slot }}
 </main>
 
 @include('partials.layouts.app.bottom-nav')
-@include('partials.layouts.app.mobile-category-modal')
+
+@persist('shop-mobile-categories')
+    @include('partials.layouts.app.mobile-category-modal')
+@endpersist
+
 @include('partials.layouts.foot')
 </body>
 </html>

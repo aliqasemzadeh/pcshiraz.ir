@@ -1,6 +1,7 @@
 @php
     $menuCategories = $shopCategoryMenu ?? [];
-    $homeUrl = route('home');
+    $categoryUrlTemplate = route('shop.category', ['category' => '__CATEGORY__']);
+    $brandUrlTemplate = route('shop.category.brand', ['category' => '__CATEGORY__', 'brand' => '__BRAND__']);
 @endphp
 
 <div
@@ -8,7 +9,10 @@
         open: false,
         query: '',
         activeId: {{ $menuCategories[0]['id'] ?? 'null' }},
-        categories: @js($menuCategories),
+        categories: (() => {
+            const el = document.getElementById('shop-category-menu-data');
+            return el ? JSON.parse(el.textContent) : [];
+        })(),
         get filteredCategories() {
             const q = this.query.trim().toLowerCase();
             if (!q) return this.categories;
@@ -30,11 +34,17 @@
         },
         goCategory(category) {
             this.closeMenu();
-            window.location.href = '/category/' + encodeURIComponent(category.slug);
+            window.Alpine.navigate(
+                @js($categoryUrlTemplate).replace('__CATEGORY__', encodeURIComponent(category.slug))
+            );
         },
         goBrand(category, brand) {
             this.closeMenu();
-            window.location.href = '/category/' + encodeURIComponent(category.slug) + '/' + encodeURIComponent(brand.slug);
+            window.Alpine.navigate(
+                @js($brandUrlTemplate)
+                    .replace('__CATEGORY__', encodeURIComponent(category.slug))
+                    .replace('__BRAND__', encodeURIComponent(brand.slug))
+            );
         }
     }"
     @shop-mobile-category-open.window="openMenu()"

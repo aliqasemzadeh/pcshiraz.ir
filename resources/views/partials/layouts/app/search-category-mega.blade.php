@@ -1,6 +1,8 @@
 @php
     $menuCategories = $shopCategoryMenu ?? [];
     $homeUrl = route('home');
+    $categoryUrlTemplate = route('shop.category', ['category' => '__CATEGORY__']);
+    $brandUrlTemplate = route('shop.category.brand', ['category' => '__CATEGORY__', 'brand' => '__BRAND__']);
 @endphp
 
 <div
@@ -9,14 +11,17 @@
         open: false,
         activeId: {{ $menuCategories[0]['id'] ?? 'null' }},
         selectedLabel: @js(__('general.all_categories')),
-        categories: @js($menuCategories),
+        categories: (() => {
+            const el = document.getElementById('shop-category-menu-data');
+            return el ? JSON.parse(el.textContent) : [];
+        })(),
         get activeCategory() {
             return this.categories.find(c => c.id === this.activeId) || null;
         },
         selectAll() {
             this.selectedLabel = @js(__('general.all_categories'));
             this.open = false;
-            window.location.href = @js($homeUrl);
+            window.Alpine.navigate(@js($homeUrl));
         },
         selectCategory(category) {
             this.activeId = category.id;
@@ -24,12 +29,18 @@
         goCategory(category) {
             this.selectedLabel = category.title;
             this.open = false;
-            window.location.href = '/category/' + encodeURIComponent(category.slug);
+            window.Alpine.navigate(
+                @js($categoryUrlTemplate).replace('__CATEGORY__', encodeURIComponent(category.slug))
+            );
         },
         goBrand(category, brand) {
             this.selectedLabel = brand.title;
             this.open = false;
-            window.location.href = '/category/' + encodeURIComponent(category.slug) + '/' + encodeURIComponent(brand.slug);
+            window.Alpine.navigate(
+                @js($brandUrlTemplate)
+                    .replace('__CATEGORY__', encodeURIComponent(category.slug))
+                    .replace('__BRAND__', encodeURIComponent(brand.slug))
+            );
         },
         initial(title) {
             return (title || '?').trim().charAt(0).toUpperCase();
