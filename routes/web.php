@@ -7,9 +7,12 @@ use Illuminate\Support\Facades\Route;
 Route::livewire('/login', 'pages::auth.login')->name('login');
 Route::livewire('/', 'pages::shop.home.index')->name('home');
 Route::livewire('/profile', 'pages::shop.profile.index')->name('profile');
-Route::livewire('/profile/addresses', 'pages::shop.profile.address')
-    ->middleware('auth')
-    ->name('profile.addresses');
+Route::middleware('auth')->group(function () {
+    Route::livewire('/profile/addresses', 'pages::shop.profile.address')->name('profile.addresses');
+    Route::livewire('/profile/orders', 'pages::shop.profile.order')->name('profile.orders');
+    Route::livewire('/profile/orders/{order}', 'pages::shop.profile.order-show')->name('profile.orders.show');
+    Route::livewire('/profile/cards', 'pages::shop.profile.card')->name('profile.cards');
+});
 Route::livewire('/cart', 'pages::shop.cart.index')->name('cart');
 Route::livewire('/order/{order}/success', 'pages::shop.order.success')->name('shop.order.success');
 

@@ -18,8 +18,8 @@
             wire:navigate
             @class([
                 'inline-flex flex-col items-center justify-center px-5 transition duration-200 hover:bg-brand-softer',
-                'text-brand' => request()->routeIs('profile'),
-                'text-slate-500 dark:text-slate-400' => ! request()->routeIs('profile'),
+                'text-brand' => request()->routeIs('profile*'),
+                'text-slate-500 dark:text-slate-400' => ! request()->routeIs('profile*'),
             ])
         >
             <x-lucide-user class="mb-1 h-5 w-5" />
