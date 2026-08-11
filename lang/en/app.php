@@ -161,4 +161,7 @@ return [
     'product_installment_hint' => 'In the cart you can choose cash or installment checkout. Items without an installment program use the cash price and count toward the down payment.',
     'cash_only_product_hint' => 'This product has no installment program yet and can only be purchased in cash.',
     'price_type' => 'Price type',
+    'rial' => 'Rial',
+    'increase_quantity' => 'Increase quantity',
+    'decrease_quantity' => 'Decrease quantity',
 ];
