@@ -4,9 +4,10 @@ use App\Enums\PriceTypeEnum;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Item;
+use App\Services\Shop\CatalogCache;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
-use App\Services\Shop\CatalogCache;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
@@ -36,7 +37,8 @@ new #[Layout('layouts.app')] class extends Component
     {
         $this->category = $category;
         $this->perPage = (int) config('main.per_page', 30);
-        $category->increment('views_count');
+
+        defer(fn () => DB::table('categories')->where('id', $category->id)->increment('views_count'));
     }
 
     public function updatedSort(): void
@@ -66,13 +68,13 @@ new #[Layout('layouts.app')] class extends Component
         }
 
         $this->perPage += (int) config('main.per_page', 30);
-        unset($this->items, $this->hasMore);
+        unset($this->fetchedItems, $this->items, $this->hasMore);
     }
 
     protected function resetListing(): void
     {
         $this->perPage = (int) config('main.per_page', 30);
-        unset($this->items, $this->hasMore);
+        unset($this->fetchedItems, $this->items, $this->hasMore);
     }
 
     protected function itemsQuery(): Builder
@@ -147,15 +149,21 @@ new #[Layout('layouts.app')] class extends Component
     }
 
     #[Computed]
+    public function fetchedItems()
+    {
+        return $this->itemsQuery()->limit($this->perPage + 1)->get();
+    }
+
+    #[Computed]
     public function items()
     {
-        return $this->itemsQuery()->limit($this->perPage)->get();
+        return $this->fetchedItems->take($this->perPage)->values();
     }
 
     #[Computed]
     public function hasMore(): bool
     {
-        return $this->itemsQuery()->count() > $this->perPage;
+        return $this->fetchedItems->count() > $this->perPage;
     }
 };
 ?>

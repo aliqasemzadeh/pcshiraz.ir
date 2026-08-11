@@ -4,7 +4,10 @@ use App\Enums\PriceTypeEnum;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Item;
+use App\Services\Shop\CatalogCache;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
@@ -44,8 +47,10 @@ new #[Layout('layouts.app')] class extends Component
             abort(404);
         }
 
-        $category->increment('views_count');
-        $brand->increment('views_count');
+        defer(function () use ($category, $brand): void {
+            DB::table('categories')->where('id', $category->id)->increment('views_count');
+            DB::table('brands')->where('id', $brand->id)->increment('views_count');
+        });
     }
 
     public function updatedSort(): void
@@ -70,13 +75,13 @@ new #[Layout('layouts.app')] class extends Component
         }
 
         $this->perPage += (int) config('main.per_page', 30);
-        unset($this->items, $this->hasMore);
+        unset($this->fetchedItems, $this->items, $this->hasMore);
     }
 
     protected function resetListing(): void
     {
         $this->perPage = (int) config('main.per_page', 30);
-        unset($this->items, $this->hasMore);
+        unset($this->fetchedItems, $this->items, $this->hasMore);
     }
 
     protected function itemsQuery(): Builder
@@ -111,34 +116,46 @@ new #[Layout('layouts.app')] class extends Component
     #[Computed]
     public function colorOptions(): array
     {
-        return Item::query()
-            ->active()
-            ->where('category_id', $this->category->id)
-            ->where('brand_id', $this->brand->id)
-            ->whereNotNull('color_name')
-            ->where('color_name', '!=', '')
-            ->select('color_name', 'color_code')
-            ->distinct()
-            ->orderBy('color_name')
-            ->get()
-            ->map(fn ($row) => [
-                'name' => $row->color_name,
-                'code' => $row->color_code,
-            ])
-            ->values()
-            ->all();
+        return Cache::remember(
+            CatalogCache::categoryBrandColors($this->category->id, $this->brand->id),
+            CatalogCache::TTL,
+            function () {
+                return Item::query()
+                    ->active()
+                    ->where('category_id', $this->category->id)
+                    ->where('brand_id', $this->brand->id)
+                    ->whereNotNull('color_name')
+                    ->where('color_name', '!=', '')
+                    ->select('color_name', 'color_code')
+                    ->distinct()
+                    ->orderBy('color_name')
+                    ->get()
+                    ->map(fn ($row) => [
+                        'name' => $row->color_name,
+                        'code' => $row->color_code,
+                    ])
+                    ->values()
+                    ->all();
+            },
+        );
+    }
+
+    #[Computed]
+    public function fetchedItems()
+    {
+        return $this->itemsQuery()->limit($this->perPage + 1)->get();
     }
 
     #[Computed]
     public function items()
     {
-        return $this->itemsQuery()->limit($this->perPage)->get();
+        return $this->fetchedItems->take($this->perPage)->values();
     }
 
     #[Computed]
     public function hasMore(): bool
     {
-        return $this->itemsQuery()->count() > $this->perPage;
+        return $this->fetchedItems->count() > $this->perPage;
     }
 };
 ?>
@@ -151,7 +168,7 @@ new #[Layout('layouts.app')] class extends Component
                 <span class="text-gray-400">/</span>
                 {{ $brand->title }}
             </h1>
-            <a href="{{ route('shop.category', $category) }}" wire:navigate class="mt-1 inline-block text-sm text-brand hover:underline">
+            <a href="{{ route('shop.category', $category) }}" wire:navigate.hover class="mt-1 inline-block text-sm text-brand hover:underline">
                 {{ __('general.view_all_in_category') }}
             </a>
         </div>

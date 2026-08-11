@@ -4,6 +4,7 @@ use App\Models\CartItem;
 use App\Models\Item;
 use App\Services\Sale\CartService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -16,15 +17,18 @@ new #[Layout('layouts.app')] class extends Component
 
     public function mount(Item $item): void
     {
-        if (! $item->is_active) {
-            abort(404);
-        }
+        abort_unless($item->is_active, 404);
 
-        $this->item = $item->load(['brand', 'category', 'media', 'tags', 'activeCashPrice', 'activeInstallmentPrice', 'groupVariants' => function ($q) {
-            $q->active()->with(['media', 'activeCashPrice', 'activeInstallmentPrice']);
-        }]);
+        $this->item = $item->load([
+            'brand',
+            'category',
+            'media',
+            'tags',
+            'activeCashPrice',
+            'activeInstallmentPrice',
+        ]);
 
-        $item->increment('views_count');
+        defer(fn () => DB::table('items')->where('id', $item->id)->increment('views_count'));
     }
 
     #[Computed]
@@ -130,7 +134,7 @@ new #[Layout('layouts.app')] class extends Component
         <a href="{{ route('home') }}" wire:navigate class="hover:text-brand">{{ __('general.home') }}</a>
         <span class="mx-1">/</span>
         @if ($item->category)
-            <a href="{{ route('shop.category', $item->category) }}" wire:navigate class="hover:text-brand">{{ $item->category->title }}</a>
+            <a href="{{ route('shop.category', $item->category) }}" wire:navigate.hover class="hover:text-brand">{{ $item->category->title }}</a>
             <span class="mx-1">/</span>
         @endif
         <span class="text-gray-800 dark:text-gray-200">{{ $item->title }}</span>
@@ -278,7 +282,7 @@ new #[Layout('layouts.app')] class extends Component
                 @if ($item->brand)
                     <a
                         href="{{ route('shop.category.brand', [$item->category, $item->brand]) }}"
-                        wire:navigate
+                        wire:navigate.hover
                         class="text-sm font-medium text-brand hover:underline"
                     >
                         {{ $item->brand->title }}
@@ -421,16 +425,11 @@ new #[Layout('layouts.app')] class extends Component
         </div>
     </section>
 
-    @if ($item->groupVariants->where('id', '!=', $item->id)->isNotEmpty())
-        <section class="space-y-4">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('general.group') }}</h2>
-            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-                @foreach ($item->groupVariants->where('id', '!=', $item->id) as $variant)
-                    <x-shop.item-card :item="$variant" />
-                @endforeach
-            </div>
-        </section>
-    @endif
+    <livewire:shop.item-variants
+        :item-id="$item->id"
+        :group-id="$item->group_id"
+        :key="'item-variants-'.$item->id"
+    />
 
     @if ($showStickyCart)
         <div class="fixed inset-x-0 bottom-16 z-30 border-t border-gray-200 bg-white/95 p-3 shadow-lg backdrop-blur md:hidden dark:border-gray-700 dark:bg-gray-900/95">

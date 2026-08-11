@@ -66,7 +66,7 @@ new #[Lazy] class extends Component
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ $this->category->title }}</h2>
                 <a
                     href="{{ route('shop.category', $this->category) }}"
-                    wire:navigate
+                    wire:navigate.hover
                     class="text-sm font-medium text-brand hover:underline"
                 >
                     {{ __('general.view_all_in_category') }}

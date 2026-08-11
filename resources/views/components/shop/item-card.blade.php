@@ -16,7 +16,7 @@
 
 <a
     href="{{ route('shop.item', $item) }}"
-    wire:navigate
+    wire:navigate.hover
     class="group flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition hover:border-brand/40 hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
 >
     <div class="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-900">

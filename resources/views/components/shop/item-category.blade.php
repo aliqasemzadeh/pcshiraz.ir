@@ -22,7 +22,7 @@
 
 <a
     href="{{ route('shop.category', $category) }}"
-    wire:navigate
+    wire:navigate.hover
     {{ $attributes->class('group flex flex-col items-center text-center') }}
 >
     <div class="mx-auto mb-3 flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-gray-200 bg-white text-gray-900 transition group-hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white group-hover:dark:bg-gray-700">
