@@ -3,6 +3,9 @@
 use App\Jobs\System\RunArtisanCommandsJob;
 use App\Jobs\System\UpdateProjectJob;
 use App\Support\SystemCommandProgress;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -40,6 +43,18 @@ new #[Layout('layouts.panels')] class extends Component
         'env:encrypt',
         'env:decrypt',
         'key:generate',
+    ];
+
+    /** @var list<string> */
+    private const SUGGESTED_COMMANDS = [
+        'cache:clear',
+        'route:clear',
+        'view:clear',
+        'config:clear',
+        'optimize',
+        'optimize:clear',
+        'migrate',
+        'queue:restart',
     ];
 
     public function mount(): void
@@ -134,10 +149,52 @@ new #[Layout('layouts.panels')] class extends Component
         $this->dispatchArtisanCommands([$command]);
     }
 
+    public function runFromSearch(string $command): void
+    {
+        $this->artisanCommand = $command;
+        $this->runArtisan();
+    }
+
     #[Computed]
     public function isRunning(): bool
     {
         return $this->status === 'running';
+    }
+
+    /**
+     * @return Collection<int, array{title: string, value: string, description: string, category: string, default: bool}>
+     */
+    #[Computed]
+    public function availableCommands(): Collection
+    {
+        /** @var Collection<int, array{name: string, description: string}> $commands */
+        $commands = Cache::rememberForever('admin.artisan.commands', function () {
+            return collect(Artisan::all())
+                ->map(fn ($command, string $name) => [
+                    'name' => $name,
+                    'description' => $command->getDescription(),
+                ])
+                ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
+                ->values();
+        });
+
+        return $commands
+            ->reject(fn (array $cmd) => $this->isDangerousCommand($cmd['name']))
+            ->map(function (array $cmd) {
+                $name = $cmd['name'];
+                $category = str_contains($name, ':')
+                    ? strstr($name, ':', true) ?: 'general'
+                    : 'general';
+
+                return [
+                    'title' => $name,
+                    'value' => $name,
+                    'description' => $cmd['description'],
+                    'category' => $category,
+                    'default' => in_array($name, self::SUGGESTED_COMMANDS, true),
+                ];
+            })
+            ->values();
     }
 
     protected function dispatchUpdate(bool $runComposer): void
@@ -374,28 +431,85 @@ new #[Layout('layouts.panels')] class extends Component
                     <p class="mt-1 text-sm text-body">{{ __('app.function_artisan_help') }}</p>
                 </div>
 
-                <form wire:submit="runArtisan" class="flex flex-col gap-3 sm:flex-row">
-                    <x-fwb.input
-                        wire:model="artisanCommand"
-                        class="w-full"
-                        placeholder="{{ __('app.function_artisan_placeholder') }}"
-                        :disabled="$this->isRunning"
-                        x-on:keydown.enter.prevent="$el.form.requestSubmit()"
-                    />
+                <div
+                    wire:ignore
+                    x-data="artisanCommandPalette(@js($this->availableCommands))"
+                    x-init="init()"
+                    @keydown.down.prevent="commandItemActiveNext()"
+                    @keydown.up.prevent="commandItemActivePrevious()"
+                    @keydown.enter.prevent="commandConfirm()"
+                    class="w-full space-y-3"
+                    dir="ltr"
+                >
+                    <div class="flex w-full flex-col overflow-hidden rounded-lg border border-default bg-neutral-primary shadow-sm">
+                        <div class="flex items-center gap-2 border-b border-default px-3">
+                            <x-lucide-search class="h-4 w-4 shrink-0 text-body" />
+                            <input
+                                type="text"
+                                x-ref="commandInput"
+                                x-model="commandSearch"
+                                x-bind:disabled="$wire.status === 'running'"
+                                class="h-11 w-full border-0 bg-transparent px-1 text-sm text-heading outline-none placeholder:text-body focus:border-0 focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:opacity-50"
+                                placeholder="{{ __('app.function_artisan_placeholder') }}"
+                                autocomplete="off"
+                                autocorrect="off"
+                                spellcheck="false"
+                            >
+                        </div>
+
+                        <div x-ref="commandItemsList" class="max-h-80 overflow-x-hidden overflow-y-auto">
+                            <template x-if="commandItemsFiltered.length === 0">
+                                <p class="px-4 py-6 text-center text-sm text-body">
+                                    {{ __('app.function_artisan_no_match') }}
+                                </p>
+                            </template>
+
+                            <template x-for="(item, index) in commandItemsFiltered" :key="item.value">
+                                <div>
+                                    <template x-if="commandShowCategory(item, index)">
+                                        <div class="px-3 pt-2 pb-1 text-xs font-medium tracking-wide text-body uppercase" x-text="commandCategoryLabel(item.category)"></div>
+                                    </template>
+
+                                    <div class="px-1 pb-0.5">
+                                        <button
+                                            type="button"
+                                            :id="item.value + '-' + commandId"
+                                            @click="commandSelect(item)"
+                                            @mousemove="commandItemActive = item"
+                                            x-bind:disabled="$wire.status === 'running'"
+                                            :class="commandItemIsActive(item) ? 'bg-neutral-secondary-soft text-heading' : 'text-heading'"
+                                            class="relative flex w-full cursor-pointer select-none items-start gap-2 rounded-md px-2 py-2 text-start text-sm outline-none transition hover:bg-neutral-secondary-soft disabled:cursor-not-allowed disabled:opacity-50"
+                                        >
+                                            <x-lucide-terminal class="mt-0.5 h-4 w-4 shrink-0 text-body" />
+                                            <span class="min-w-0 flex-1">
+                                                <span class="block truncate font-mono text-sm" x-text="item.title"></span>
+                                                <span
+                                                    class="block truncate text-xs text-body"
+                                                    x-show="item.description"
+                                                    x-text="item.description"
+                                                ></span>
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
 
                     <x-ui.button
-                        type="submit"
+                        type="button"
                         color="blue"
-                        class="w-full sm:w-auto"
-                        target="runArtisan"
-                        :disabled="$this->isRunning"
+                        class="w-full"
+                        target="runArtisan,runFromSearch"
+                        x-on:click="commandRunFree()"
+                        x-bind:disabled="$wire.status === 'running'"
                     >
                         <x-slot:icon>
-                            <x-lucide-terminal class="h-4 w-4 me-2" />
+                            <x-lucide-play class="h-4 w-4 me-2" />
                         </x-slot:icon>
                         {{ __('app.function_run') }}
                     </x-ui.button>
-                </form>
+                </div>
             </div>
         </x-fwb.card>
 
