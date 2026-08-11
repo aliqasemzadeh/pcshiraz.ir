@@ -179,4 +179,8 @@ return [
     'rial' => 'ریال',
     'increase_quantity' => 'افزایش تعداد',
     'decrease_quantity' => 'کاهش تعداد',
+    'product_details' => 'جزئیات محصول',
+    'product_specifications' => 'مشخصات فنی',
+    'last_products_left' => 'فقط :count عدد باقی مانده',
+    'go_to_cart' => 'رفتن به سبد خرید',
 ];

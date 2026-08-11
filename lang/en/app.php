@@ -179,4 +179,8 @@ return [
     'rial' => 'Rial',
     'increase_quantity' => 'Increase quantity',
     'decrease_quantity' => 'Decrease quantity',
+    'product_details' => 'Product details',
+    'product_specifications' => 'Specifications',
+    'last_products_left' => 'Only :count left',
+    'go_to_cart' => 'Go to cart',
 ];
