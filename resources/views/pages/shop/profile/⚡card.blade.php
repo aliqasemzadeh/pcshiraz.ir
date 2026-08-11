@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\UserAddress;
+use App\Models\UserPaymentCard;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -20,59 +20,65 @@ new #[Layout('layouts.app')] class extends Component
     }
 
     #[Computed]
-    public function addresses()
+    public function cards()
     {
-        return UserAddress::query()
+        return UserPaymentCard::query()
             ->where('user_id', Auth::id())
-            ->with(['province', 'city'])
             ->latest('id')
             ->paginate(config('main.per_page', 30));
     }
 
-    #[On('shop.profile.address.saved')]
-    #[On('shop.profile.address.deleted')]
-    public function refreshAddresses(): void
+    #[On('shop.profile.card.saved')]
+    #[On('shop.profile.card.deleted')]
+    public function refreshCards(): void
     {
-        unset($this->addresses);
+        unset($this->cards);
         $this->resetPage();
     }
 };
 ?>
 
-<x-shop.profile-shell :title="__('app.my_addresses')">
+<x-shop.profile-shell :title="__('app.my_payment_cards')">
     <x-slot:actions>
         <x-ui.button
             type="button"
             color="green"
             :loading="false"
-            x-modal:open="{ modal: 'user-address.create' }"
+            x-modal:open="{ modal: 'user-payment-card.create' }"
         >
             <x-slot:icon>
                 <x-lucide-plus class="me-2 h-4 w-4" />
             </x-slot:icon>
-            {{ __('app.create_address') }}
+            {{ __('app.create_payment_card') }}
         </x-ui.button>
     </x-slot:actions>
 
     <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-        @if ($this->addresses->isEmpty())
+        @if ($this->cards->isEmpty())
             <div class="rounded-lg border border-dashed border-gray-300 p-8 text-center text-gray-500 dark:border-gray-600 dark:text-gray-400">
-                {{ __('app.no_addresses') }}
+                {{ __('app.no_payment_cards') }}
             </div>
         @else
             <div class="space-y-4">
-                @foreach ($this->addresses as $address)
-                    <div class="rounded-lg border border-gray-200 p-4 dark:border-gray-700" wire:key="user-address-{{ $address->id }}">
+                @foreach ($this->cards as $card)
+                    <div class="rounded-lg border border-gray-200 p-4 dark:border-gray-700" wire:key="user-payment-card-{{ $card->id }}">
                         <div class="flex items-start justify-between gap-3">
                             <div class="min-w-0 space-y-1">
-                                <h2 class="text-base font-semibold text-gray-900 dark:text-white">{{ $address->title }}</h2>
-                                <p class="text-sm text-gray-600 dark:text-gray-300">
-                                    {{ $address->province?->name }} / {{ $address->city?->name }}
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <h2 class="text-base font-semibold text-gray-900 dark:text-white">{{ $card->title }}</h2>
+                                    @if ($card->is_default)
+                                        <span class="inline-flex items-center rounded bg-brand/10 px-2 py-0.5 text-xs font-medium text-brand">
+                                            {{ __('app.default_payment_card') }}
+                                        </span>
+                                    @endif
+                                </div>
+                                <p class="text-sm text-gray-700 dark:text-gray-200">{{ $card->holder_name }}</p>
+                                <p class="font-mono text-sm text-gray-600 dark:text-gray-300" dir="ltr">
+                                    {{ $card->masked_card_number }}
                                 </p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400" dir="ltr">
-                                    {{ __('app.postal_code') }}: {{ $address->postal_code }}
-                                </p>
-                                <p class="text-sm text-gray-700 dark:text-gray-200">{{ $address->address }}</p>
+                                @if ($card->bank_name)
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $card->bank_name }}</p>
+                                @endif
                             </div>
 
                             <div class="flex shrink-0 items-center gap-2">
@@ -81,7 +87,7 @@ new #[Layout('layouts.app')] class extends Component
                                     size="icon"
                                     color="blue"
                                     :loading="false"
-                                    x-on:click="Livewire.dispatch('modal-open', { modal: 'user-address.edit', props: { addressId: {{ $address->id }} } })"
+                                    x-on:click="Livewire.dispatch('modal-open', { modal: 'user-payment-card.edit', props: { cardId: {{ $card->id }} } })"
                                     :title="__('general.edit')"
                                 >
                                     <x-lucide-pencil class="h-4 w-4" />
@@ -91,7 +97,7 @@ new #[Layout('layouts.app')] class extends Component
                                     size="icon"
                                     color="red"
                                     :loading="false"
-                                    x-on:click="Livewire.dispatch('modal-open', { modal: 'user-address.delete', props: { addressId: {{ $address->id }} } })"
+                                    x-on:click="Livewire.dispatch('modal-open', { modal: 'user-payment-card.delete', props: { cardId: {{ $card->id }} } })"
                                     :title="__('general.delete')"
                                 >
                                     <x-lucide-trash-2 class="h-4 w-4" />
@@ -103,7 +109,7 @@ new #[Layout('layouts.app')] class extends Component
             </div>
 
             <div class="mt-6">
-                {{ $this->addresses->links() }}
+                {{ $this->cards->links() }}
             </div>
         @endif
     </div>

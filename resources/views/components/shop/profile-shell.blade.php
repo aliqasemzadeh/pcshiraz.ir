@@ -9,7 +9,7 @@
             'route' => 'profile',
             'label' => __('general.profile_settings'),
             'icon' => 'user',
-            'active' => request()->routeIs('profile') && ! request()->routeIs('profile.*'),
+            'active' => request()->routeIs('profile'),
             'guest' => true,
         ],
         [
@@ -23,7 +23,7 @@
             'route' => 'profile.orders',
             'label' => __('app.my_orders'),
             'icon' => 'shopping-bag',
-            'active' => request()->routeIs('profile.orders', 'profile.orders.show'),
+            'active' => request()->routeIs('profile.orders*'),
             'guest' => false,
         ],
         [
