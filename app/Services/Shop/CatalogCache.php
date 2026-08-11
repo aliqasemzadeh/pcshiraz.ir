@@ -80,9 +80,13 @@ class CatalogCache
         return "shop.category.{$categoryId}.brand.{$brandId}.colors.v1";
     }
 
-    public static function forgetCategory(int $categoryId): void
+    public static function forgetCategory(int $categoryId, ?int $brandId = null): void
     {
         Cache::forget(self::categoryFilters($categoryId));
         Cache::forget("shop.category.{$categoryId}.filters");
+
+        if ($brandId !== null) {
+            Cache::forget(self::categoryBrandColors($categoryId, $brandId));
+        }
     }
 }

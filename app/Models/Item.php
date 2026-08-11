@@ -75,12 +75,12 @@ class Item extends Model implements HasMedia
             }
 
             CatalogCache::forgetAll();
-            CatalogCache::forgetCategory((int) $item->category_id);
+            CatalogCache::forgetCategory((int) $item->category_id, (int) $item->brand_id);
         });
 
         static::deleted(function (Item $item): void {
             CatalogCache::forgetAll();
-            CatalogCache::forgetCategory((int) $item->category_id);
+            CatalogCache::forgetCategory((int) $item->category_id, (int) $item->brand_id);
         });
     }
 
