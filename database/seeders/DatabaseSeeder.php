@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        $this->call(IranDataSeeder::class);
         $this->call(DemoDataSeeder::class);
     }
 }
