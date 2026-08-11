@@ -168,9 +168,17 @@ new #[Layout('layouts.app')] class extends Component
 
         RateLimiter::hit($key, 60);
 
-        $this->validate([
-            'organization_code' => ['required', 'string', 'min:8', 'max:32'],
-        ]);
+        $this->validate(
+            [
+                'organization_code' => ['required', 'string', 'min:8', 'max:32'],
+            ],
+            [
+                'organization_code.required' => __('general.organization_code_required'),
+            ],
+            [
+                'organization_code' => __('general.organization_code'),
+            ],
+        );
 
         $organization = $checkoutService->findActiveOrganizationByCode($this->organization_code);
 
@@ -201,9 +209,15 @@ new #[Layout('layouts.app')] class extends Component
         }
 
         if ($this->isInstallmentSale()) {
-            $this->validate([
-                'installment_plan_id' => ['required', 'integer'],
-            ]);
+            $this->validate(
+                [
+                    'installment_plan_id' => ['required', 'integer'],
+                ],
+                [],
+                [
+                    'installment_plan_id' => __('general.select_installment_plan'),
+                ],
+            );
         }
 
         try {
