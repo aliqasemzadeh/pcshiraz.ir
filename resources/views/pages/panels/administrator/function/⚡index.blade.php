@@ -168,15 +168,16 @@ new #[Layout('layouts.panels')] class extends Component
     public function availableCommands(): Collection
     {
         /** @var Collection<int, array{name: string, description: string}> $commands */
-        $commands = Cache::rememberForever('admin.artisan.commands', function () {
+        $commands = collect(Cache::rememberForever('admin.artisan.commands', function () {
             return collect(Artisan::all())
                 ->map(fn ($command, string $name) => [
                     'name' => $name,
                     'description' => $command->getDescription(),
                 ])
                 ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
-                ->values();
-        });
+                ->values()
+                ->all();
+        }));
 
         return $commands
             ->reject(fn (array $cmd) => $this->isDangerousCommand($cmd['name']))
@@ -433,8 +434,9 @@ new #[Layout('layouts.panels')] class extends Component
 
                 <div
                     wire:ignore
-                    x-data="artisanCommandPalette(@js($this->availableCommands))"
-                    x-init="init()"
+                    x-data="artisanCommandPalette(@js($this->availableCommands), {
+                        suggested: @js(__('app.function_artisan_suggested')),
+                    })"
                     @keydown.down.prevent="commandItemActiveNext()"
                     @keydown.up.prevent="commandItemActivePrevious()"
                     @keydown.enter.prevent="commandConfirm()"
@@ -448,7 +450,7 @@ new #[Layout('layouts.panels')] class extends Component
                                 type="text"
                                 x-ref="commandInput"
                                 x-model="commandSearch"
-                                x-bind:disabled="$wire.status === 'running'"
+                                x-bind:disabled="isRunning"
                                 class="h-11 w-full border-0 bg-transparent px-1 text-sm text-heading outline-none placeholder:text-body focus:border-0 focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:opacity-50"
                                 placeholder="{{ __('app.function_artisan_placeholder') }}"
                                 autocomplete="off"
@@ -473,10 +475,10 @@ new #[Layout('layouts.panels')] class extends Component
                                     <div class="px-1 pb-0.5">
                                         <button
                                             type="button"
-                                            :id="item.value + '-' + commandId"
+                                            :id="commandItemDomId(item)"
                                             @click="commandSelect(item)"
                                             @mousemove="commandItemActive = item"
-                                            x-bind:disabled="$wire.status === 'running'"
+                                            x-bind:disabled="isRunning"
                                             :class="commandItemIsActive(item) ? 'bg-neutral-secondary-soft text-heading' : 'text-heading'"
                                             class="relative flex w-full cursor-pointer select-none items-start gap-2 rounded-md px-2 py-2 text-start text-sm outline-none transition hover:bg-neutral-secondary-soft disabled:cursor-not-allowed disabled:opacity-50"
                                         >
@@ -502,7 +504,7 @@ new #[Layout('layouts.panels')] class extends Component
                         class="w-full"
                         target="runArtisan,runFromSearch"
                         x-on:click="commandRunFree()"
-                        x-bind:disabled="$wire.status === 'running'"
+                        x-bind:class="isRunning ? 'opacity-50 pointer-events-none' : ''"
                     >
                         <x-slot:icon>
                             <x-lucide-play class="h-4 w-4 me-2" />
@@ -576,3 +578,157 @@ new #[Layout('layouts.panels')] class extends Component
         </div>
     </div>
 </div>
+
+@script
+<script>
+    Alpine.data('artisanCommandPalette', (commands = [], labels = {}) => ({
+        commandItems: Array.isArray(commands) ? commands : [],
+        commandItemsFiltered: [],
+        commandItemActive: null,
+        commandId: null,
+        commandSearch: '',
+        labels: labels || {},
+
+        init() {
+            this.commandId = this.$id('command');
+            this.commandSearchItems();
+            this.$watch('commandSearch', () => this.commandSearchItems());
+        },
+
+        get isRunning() {
+            return this.$wire.status === 'running';
+        },
+
+        commandSearchIsEmpty() {
+            return this.commandSearch.trim().length === 0;
+        },
+
+        commandItemIsActive(item) {
+            return this.commandItemActive && this.commandItemActive.value === item.value;
+        },
+
+        commandItemDomId(item) {
+            return 'cmd-' + String(item.value).replaceAll(/[^a-zA-Z0-9_-]/g, '-') + '-' + this.commandId;
+        },
+
+        commandCategoryLabel(category) {
+            if (category === 'suggested') {
+                return this.labels.suggested || 'Suggestions';
+            }
+
+            return String(category || 'general');
+        },
+
+        commandShowCategory(item, index) {
+            if (index === 0) {
+                return true;
+            }
+
+            const previous = this.commandItemsFiltered[index - 1];
+
+            return ! previous || previous.category !== item.category;
+        },
+
+        commandSearchItems() {
+            if (this.commandSearchIsEmpty()) {
+                this.commandItemsFiltered = this.commandItems
+                    .filter((item) => item.default)
+                    .map((item) => ({
+                        ...item,
+                        category: 'suggested',
+                    }));
+            } else {
+                const term = this.commandSearch.replace(/\*/g, '').toLowerCase().trim();
+
+                this.commandItemsFiltered = this.commandItems.filter((item) => {
+                    const title = String(item.title || '').toLowerCase();
+                    const description = String(item.description || '').toLowerCase();
+
+                    return title.includes(term) || description.includes(term);
+                });
+            }
+
+            this.commandItemActive = this.commandItemsFiltered[0] ?? null;
+            this.$nextTick(() => this.commandScrollToActiveItem());
+        },
+
+        commandItemActiveNext() {
+            if (! this.commandItemsFiltered.length) {
+                return;
+            }
+
+            const index = this.commandItemsFiltered.findIndex(
+                (item) => item.value === this.commandItemActive?.value
+            );
+
+            if (index < this.commandItemsFiltered.length - 1) {
+                this.commandItemActive = this.commandItemsFiltered[index + 1];
+                this.commandScrollToActiveItem();
+            }
+        },
+
+        commandItemActivePrevious() {
+            if (! this.commandItemsFiltered.length) {
+                return;
+            }
+
+            const index = this.commandItemsFiltered.findIndex(
+                (item) => item.value === this.commandItemActive?.value
+            );
+
+            if (index > 0) {
+                this.commandItemActive = this.commandItemsFiltered[index - 1];
+                this.commandScrollToActiveItem();
+            }
+        },
+
+        commandScrollToActiveItem() {
+            if (! this.commandItemActive || ! this.$refs.commandItemsList) {
+                return;
+            }
+
+            const activeElement = document.getElementById(this.commandItemDomId(this.commandItemActive));
+
+            if (! activeElement) {
+                return;
+            }
+
+            const list = this.$refs.commandItemsList;
+            const newScrollPos = (activeElement.offsetTop + activeElement.offsetHeight) - list.offsetHeight;
+
+            list.scrollTop = newScrollPos > 0 ? newScrollPos : 0;
+        },
+
+        commandSelect(item) {
+            if (this.isRunning || ! item) {
+                return;
+            }
+
+            this.commandSearch = item.value;
+            this.$wire.runFromSearch(item.value);
+        },
+
+        commandConfirm() {
+            if (this.isRunning) {
+                return;
+            }
+
+            if (this.commandItemActive) {
+                this.commandSelect(this.commandItemActive);
+
+                return;
+            }
+
+            this.commandRunFree();
+        },
+
+        commandRunFree() {
+            if (this.isRunning) {
+                return;
+            }
+
+            this.$wire.runFromSearch(this.commandSearch.trim());
+        },
+    }));
+</script>
+@endscript
