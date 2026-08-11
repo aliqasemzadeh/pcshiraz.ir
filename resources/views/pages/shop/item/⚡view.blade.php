@@ -170,7 +170,11 @@ new #[Layout('layouts.app')] class extends Component
                     <div class="order-1 flex-1 lg:order-2">
                         <div class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900">
                             @foreach ($galleryImages as $index => $image)
-                                <div x-show="active === {{ $index }}" x-cloak class="px-4 py-6 sm:px-6">
+                                <div
+                                    x-show="active === {{ $index }}"
+                                    @if ($index > 0) x-cloak @endif
+                                    class="px-4 py-6 sm:px-6"
+                                >
                                     <img
                                         src="{{ $image['full'] }}"
                                         alt="{{ $item->title }}"
