@@ -79,6 +79,18 @@ new #[Layout('layouts.app')] class extends Component
                 </div>
             @endif
 
+            <a
+                href="{{ route('profile.addresses') }}"
+                wire:navigate
+                class="mt-4 flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 transition hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900/40 dark:text-white dark:hover:bg-gray-900"
+            >
+                <span class="inline-flex items-center gap-2">
+                    <x-lucide-map-pin class="h-4 w-4 text-brand" />
+                    {{ __('app.my_addresses') }}
+                </span>
+                <x-lucide-chevron-left class="h-4 w-4 text-gray-400 rtl:rotate-180" />
+            </a>
+
             <form wire:submit="save" class="mt-6 space-y-8">
                 <section class="space-y-4">
                     <div>

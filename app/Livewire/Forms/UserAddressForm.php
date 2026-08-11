@@ -15,9 +15,9 @@ class UserAddressForm extends Form
 
     public string $postal_code = '';
 
-    public ?int $province_id = null;
+    public int|string|null $province_id = null;
 
-    public ?int $city_id = null;
+    public int|string|null $city_id = null;
 
     public string $address = '';
 
