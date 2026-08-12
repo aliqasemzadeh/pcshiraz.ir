@@ -19,7 +19,7 @@
         "opcodesio/log-viewer": "^3.24",
         "power-components/livewire-powergrid": "^6.10",
         "sadegh19b/laravel-persian-validation": "^2.1",
-        "shetabit/payment": "*",
+        "shetabit/payment": "^6.4",
         "spatie/laravel-backup": "^10.3",
         "spatie/laravel-medialibrary": "^11.23",
         "spatie/laravel-one-time-passwords": "^1.1",
