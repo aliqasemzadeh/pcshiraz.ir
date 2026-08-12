@@ -477,13 +477,16 @@ new #[Layout('layouts.app')] class extends Component
                         >
                             <x-lucide-plus class="h-4 w-4" />
                         </x-ui.button>
-                        <a
-                            href="{{ route('cart') }}"
+                        <x-ui.button
+                            :href="route('cart')"
+                            color="blue"
+                            size="sm"
+                            :loading="false"
+                            class="ms-1"
                             wire:navigate
-                            class="ms-1 inline-flex items-center justify-center rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-blue-700"
                         >
                             {{ __('app.go_to_cart') }}
-                        </a>
+                        </x-ui.button>
                     </div>
                 @else
                     <x-ui.button type="button" color="green" size="sm" target="addToCart" wire:click="addToCart" class="shrink-0">
