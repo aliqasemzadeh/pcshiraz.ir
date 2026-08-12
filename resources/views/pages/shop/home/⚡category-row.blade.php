@@ -65,7 +65,7 @@ new #[Lazy] class extends Component
             <div class="flex items-center justify-between gap-3">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ $this->category->title }}</h2>
                 <a
-                    href="{{ route('shop.category', $this->category) }}"
+                    href="{{ route('shop.category', $this->category->shopRoute()) }}"
                     wire:navigate.hover
                     class="text-sm font-medium text-brand hover:underline"
                 >

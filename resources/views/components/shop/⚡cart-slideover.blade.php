@@ -153,9 +153,8 @@ new class extends Component
                                     <div class="flex items-start justify-between gap-2">
                                         @if ($item)
                                             <a
-                                                href="{{ route('shop.item', $item) }}"
-                                                wire:navigate
-                                                x-on:click="$dispatch('modal-close')"
+                                                href="{{ route('shop.item', $item->shopRoute()) }}"
+                                                x-on:click.prevent="$dispatch('modal-close'); $nextTick(() => Livewire.navigate($el.href))"
                                                 class="line-clamp-2 text-sm font-medium text-gray-900 hover:text-brand dark:text-white"
                                             >
                                                 {{ $item->title }}
@@ -237,8 +236,7 @@ new class extends Component
                             color="green"
                             :loading="false"
                             class="w-full"
-                            wire:navigate
-                            x-on:click="$dispatch('modal-close')"
+                            x-on:click.prevent="$dispatch('modal-close'); $nextTick(() => Livewire.navigate($el.href))"
                         >
                             {{ __('app.finalize_order') }}
                         </x-ui.button>

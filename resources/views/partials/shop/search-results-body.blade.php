@@ -35,7 +35,7 @@
                 @endphp
                 <li role="option">
                     <a
-                        href="{{ route('shop.item', $item) }}"
+                        href="{{ route('shop.item', $item->shopRoute()) }}"
                         wire:navigate
                         @click="closePanel()"
                         class="flex items-center gap-3 px-3 py-2.5 transition hover:bg-brand-softer md:px-4 md:py-3"

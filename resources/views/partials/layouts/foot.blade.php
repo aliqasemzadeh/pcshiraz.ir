@@ -1,3 +1,5 @@
 @livewireScripts
 <x-toaster-hub />
-<livewire:modal />
+@persist('livewire-modal')
+    <livewire:modal />
+@endpersist

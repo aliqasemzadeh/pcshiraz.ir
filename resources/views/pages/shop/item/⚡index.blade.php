@@ -40,7 +40,7 @@ new #[Layout('layouts.app')] class extends Component
         <section class="space-y-3">
             <div class="flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $group['category']->title }}</h2>
-                <a href="{{ route('shop.category', $group['category']) }}" wire:navigate class="text-sm text-brand hover:underline">
+                <a href="{{ route('shop.category', $group['category']->shopRoute()) }}" wire:navigate class="text-sm text-brand hover:underline">
                     {{ __('general.view_all_in_category') }}
                 </a>
             </div>
@@ -58,7 +58,7 @@ new #[Layout('layouts.app')] class extends Component
                         @foreach ($group['items'] as $item)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/60">
                                 <td class="px-4 py-3">
-                                    <a href="{{ route('shop.item', $item) }}" wire:navigate class="font-medium text-gray-900 hover:text-brand dark:text-white">
+                                    <a href="{{ route('shop.item', $item->shopRoute()) }}" wire:navigate class="font-medium text-gray-900 hover:text-brand dark:text-white">
                                         {{ $item->title }}
                                     </a>
                                     @if (! $item->is_purchasable)

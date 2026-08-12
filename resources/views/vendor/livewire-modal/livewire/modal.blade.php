@@ -63,7 +63,7 @@
 
         this.modalComponents.push(eventComponent);
 
-        this.$wire.$refresh();
+        this.$nextTick(() => this.$wire.$refresh());
     },
     openModal(eventComponent) {
         eventComponent.id = this.generateModalId();
@@ -73,7 +73,7 @@
         this.modalHistory.push(eventComponent.id);
 
         this.modalOpen = true;
-        this.$wire.$refresh();
+        this.$nextTick(() => this.$wire.$refresh());
     },
     openPreloadedModal(component) {
         component.preloaded = false;
@@ -117,13 +117,13 @@
 
         this.modalOpen = this.modalHistory.length > 0;
 
-        this.$wire.$refresh();
+        this.$nextTick(() => this.$wire.$refresh());
     },
     onCloseAllModal() {
         this.modalHistory = [];
         this.modalComponents = [];
         this.modalOpen = false;
-        this.$wire.$refresh();
+        this.$nextTick(() => this.$wire.$refresh());
     },
     init() {
         this.$watch('modalOpen', (value) => {
@@ -142,7 +142,7 @@
             }
         });
     },
-}" x-show="modalOpen" x-on:modal-open.window="onOpenModal"
+}" wire:ignore.self x-show="modalOpen" x-on:modal-open.window="onOpenModal"
     x-on:modal-preload.window="onPreloadModal" x-on:modal-close.window="onCloseModal"
     x-on:modal-close-all.window="onCloseAllModal" x-on:mousedown.self="onCloseModal"
     x-on:keyup.escape.prevent.stop="onCloseModal" x-transition.opacity.duration.250ms
