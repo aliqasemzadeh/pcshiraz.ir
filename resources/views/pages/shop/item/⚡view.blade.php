@@ -3,6 +3,7 @@
 use App\Models\CartItem;
 use App\Models\Item;
 use App\Services\Sale\CartService;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -15,9 +16,15 @@ new #[Layout('layouts.app')] class extends Component
 {
     public Item $item;
 
-    public function mount(Item $item): void
+    public function mount(Item $item, string $slug): void
     {
         abort_unless($item->is_active, 404);
+
+        if ($slug !== $item->slug) {
+            throw new HttpResponseException(
+                redirect()->route('shop.item', $item->shopRoute(), 301)
+            );
+        }
 
         $this->item = $item->load([
             'brand',
@@ -134,7 +141,7 @@ new #[Layout('layouts.app')] class extends Component
         <a href="{{ route('home') }}" wire:navigate class="hover:text-brand">{{ __('general.home') }}</a>
         <span class="mx-1">/</span>
         @if ($item->category)
-            <a href="{{ route('shop.category', $item->category) }}" wire:navigate.hover class="hover:text-brand">{{ $item->category->title }}</a>
+            <a href="{{ route('shop.category', $item->category->shopRoute()) }}" wire:navigate.hover class="hover:text-brand">{{ $item->category->title }}</a>
             <span class="mx-1">/</span>
         @endif
         <span class="text-gray-800 dark:text-gray-200">{{ $item->title }}</span>
@@ -281,7 +288,7 @@ new #[Layout('layouts.app')] class extends Component
             <div class="rounded-xl border border-gray-200 bg-gray-50 p-4 sm:p-6 lg:p-8 dark:border-gray-700 dark:bg-gray-800">
                 @if ($item->brand)
                     <a
-                        href="{{ route('shop.category.brand', [$item->category, $item->brand]) }}"
+                        href="{{ route('shop.category.brand', $item->category->shopBrandRoute($item->brand)) }}"
                         wire:navigate.hover
                         class="text-sm font-medium text-brand hover:underline"
                     >

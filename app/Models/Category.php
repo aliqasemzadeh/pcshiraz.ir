@@ -59,6 +59,30 @@ class Category extends Model implements HasMedia
             ->distinct();
     }
 
+    /**
+     * @return array{category: self, slug: string}
+     */
+    public function shopRoute(): array
+    {
+        return [
+            'category' => $this,
+            'slug' => $this->slug,
+        ];
+    }
+
+    /**
+     * @return array{category: self, slug: string, brand: Brand, brandSlug: string}
+     */
+    public function shopBrandRoute(Brand $brand): array
+    {
+        return [
+            'category' => $this,
+            'slug' => $this->slug,
+            'brand' => $brand,
+            'brandSlug' => $brand->slug,
+        ];
+    }
+
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('logo_image')

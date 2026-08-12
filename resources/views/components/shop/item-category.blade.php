@@ -21,7 +21,7 @@
 @endphp
 
 <a
-    href="{{ route('shop.category', $category) }}"
+    href="{{ route('shop.category', $category->shopRoute()) }}"
     wire:navigate.hover
     {{ $attributes->class('group flex flex-col items-center text-center') }}
 >

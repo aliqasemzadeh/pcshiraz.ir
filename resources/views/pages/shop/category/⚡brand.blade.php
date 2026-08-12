@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Item;
 use App\Services\Shop\CatalogCache;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
@@ -31,8 +32,14 @@ new #[Layout('layouts.app')] class extends Component
     #[Url]
     public array $colors = [];
 
-    public function mount(Category $category, Brand $brand): void
+    public function mount(Category $category, string $slug, Brand $brand, string $brandSlug): void
     {
+        if ($slug !== $category->slug || $brandSlug !== $brand->slug) {
+            throw new HttpResponseException(
+                redirect()->route('shop.category.brand', $category->shopBrandRoute($brand), 301)
+            );
+        }
+
         $this->category = $category;
         $this->brand = $brand;
         $this->perPage = (int) config('main.per_page', 30);
@@ -168,7 +175,7 @@ new #[Layout('layouts.app')] class extends Component
                 <span class="text-gray-400">/</span>
                 {{ $brand->title }}
             </h1>
-            <a href="{{ route('shop.category', $category) }}" wire:navigate.hover class="mt-1 inline-block text-sm text-brand hover:underline">
+            <a href="{{ route('shop.category', $category->shopRoute()) }}" wire:navigate.hover class="mt-1 inline-block text-sm text-brand hover:underline">
                 {{ __('general.view_all_in_category') }}
             </a>
         </div>

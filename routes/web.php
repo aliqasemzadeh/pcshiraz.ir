@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\BannerClickController;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Item;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -16,12 +19,37 @@ Route::middleware('auth')->group(function () {
 Route::livewire('/cart', 'pages::shop.cart.index')->name('cart');
 Route::livewire('/order/{order}/success', 'pages::shop.order.success')->name('shop.order.success');
 
-Route::livewire('/category/{category:slug}', 'pages::shop.category.index')->name('shop.category');
-Route::livewire('/category/{category:slug}/{brand:slug}', 'pages::shop.category.brand')->name('shop.category.brand');
+Route::livewire('/category/{category}/{slug}/{brand}/{brandSlug}', 'pages::shop.category.brand')
+    ->whereNumber(['category', 'brand'])
+    ->name('shop.category.brand');
+Route::livewire('/category/{category}/{slug}', 'pages::shop.category.index')
+    ->whereNumber('category')
+    ->name('shop.category');
 Route::livewire('/items', 'pages::shop.item.index')->name('shop.items');
-Route::livewire('/item/{item:slug}', 'pages::shop.item.view')->name('shop.item');
+Route::livewire('/item/{item}/{slug}', 'pages::shop.item.view')
+    ->whereNumber('item')
+    ->name('shop.item');
 Route::livewire('/tag/{tag}', 'pages::shop.tag.index')->name('shop.tag');
 Route::get('/banner/{banner}', BannerClickController::class)->name('banner.click');
+
+Route::get('/category/{categorySlug}/{brandSlug}', function (string $categorySlug, string $brandSlug) {
+    $category = Category::query()->where('slug', $categorySlug)->firstOrFail();
+    $brand = Brand::query()->where('slug', $brandSlug)->firstOrFail();
+
+    return redirect()->route('shop.category.brand', $category->shopBrandRoute($brand), 301);
+})->where('categorySlug', '^(?!\\d+$).+')->name('shop.category.brand.legacy');
+
+Route::get('/category/{categorySlug}', function (string $categorySlug) {
+    $category = Category::query()->where('slug', $categorySlug)->firstOrFail();
+
+    return redirect()->route('shop.category', $category->shopRoute(), 301);
+})->where('categorySlug', '^(?!\\d+$).+')->name('shop.category.legacy');
+
+Route::get('/item/{itemSlug}', function (string $itemSlug) {
+    $item = Item::query()->where('slug', $itemSlug)->firstOrFail();
+
+    return redirect()->route('shop.item', $item->shopRoute(), 301);
+})->where('itemSlug', '^(?!\\d+$).+')->name('shop.item.legacy');
 
 Route::post('/logout', function () {
     Auth::logout();

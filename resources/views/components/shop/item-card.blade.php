@@ -15,7 +15,7 @@
 @endphp
 
 <a
-    href="{{ route('shop.item', $item) }}"
+    href="{{ route('shop.item', $item->shopRoute()) }}"
     wire:navigate.hover
     class="group flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition hover:border-brand/40 hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
 >

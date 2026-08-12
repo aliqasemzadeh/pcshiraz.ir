@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Item;
 use App\Services\Shop\CatalogCache;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
@@ -33,8 +34,14 @@ new #[Layout('layouts.app')] class extends Component
     #[Url]
     public array $colors = [];
 
-    public function mount(Category $category): void
+    public function mount(Category $category, string $slug): void
     {
+        if ($slug !== $category->slug) {
+            throw new HttpResponseException(
+                redirect()->route('shop.category', $category->shopRoute(), 301)
+            );
+        }
+
         $this->category = $category;
         $this->perPage = (int) config('main.per_page', 30);
 

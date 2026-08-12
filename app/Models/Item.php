@@ -104,6 +104,17 @@ class Item extends Model implements HasMedia
         return $this->belongsTo(Category::class);
     }
 
+    /**
+     * @return array{item: self, slug: string}
+     */
+    public function shopRoute(): array
+    {
+        return [
+            'item' => $this,
+            'slug' => $this->slug,
+        ];
+    }
+
     public function itemPrices(): HasMany
     {
         return $this->hasMany(ItemPrice::class);
