@@ -79,22 +79,31 @@
             this.dragStartX = event.clientX
             this.dragStartScroll = this.$refs.slider.scrollLeft
             this.dragMoved = false
-            this.dragging = true
-            this.$refs.slider.setPointerCapture(event.pointerId)
+            this.dragging = false
         },
         onPointerMove(event) {
-            if (! this.dragging || event.pointerId !== this.dragPointerId) return
+            if (event.pointerId !== this.dragPointerId) return
 
             let delta = event.clientX - this.dragStartX
-            if (Math.abs(delta) > 5) this.dragMoved = true
+
+            if (! this.dragging) {
+                if (Math.abs(delta) <= 5) return
+
+                this.dragging = true
+                this.dragMoved = true
+                this.$refs.slider.setPointerCapture(event.pointerId)
+            }
 
             this.$refs.slider.scrollLeft = this.dragStartScroll - delta
             event.preventDefault()
         },
         onPointerUp(event) {
-            if (! this.dragging) return
+            if (event.pointerId !== this.dragPointerId) return
 
-            this.$refs.slider.releasePointerCapture?.(event.pointerId)
+            if (this.dragging) {
+                this.$refs.slider.releasePointerCapture?.(event.pointerId)
+            }
+
             this.dragging = false
             this.dragPointerId = null
             this.updateEdgeState()
