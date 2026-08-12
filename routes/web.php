@@ -78,6 +78,7 @@ Route::prefix('sale')->name('panels.sale.')->group(function () {
     Route::livewire('/catalog/categories', 'pages::panels.sale.catalog.category.index')->name('catalog.category.index');
     Route::livewire('/catalog/items', 'pages::panels.sale.catalog.item.index')->name('catalog.item.index');
     Route::livewire('/catalog/items/{item}/prices', 'pages::panels.sale.catalog.item.price.index')->name('catalog.item.price.index');
+    Route::livewire('/catalog/items/{item}/gallery', 'pages::panels.sale.catalog.item.gallery.index')->name('catalog.item.gallery.index');
     Route::livewire('/banners', 'pages::panels.sale.banner.index')->name('banner.index');
     Route::livewire('/articles', 'pages::panels.sale.article.index')->name('article.index');
 });

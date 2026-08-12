@@ -21,6 +21,20 @@
         {{ __('general.pricing') }}
     </x-fwb.tooltip>
 
+    <x-fwb.tooltip :id="'pg-tooltip-gallery-'.$rowId" placement="top">
+        <x-slot:triggerSlot>
+            <a
+                href="{{ route('panels.sale.catalog.item.gallery.index', $row) }}"
+                wire:navigate
+                class="inline-flex items-center justify-center rounded-base border border-transparent bg-indigo-700 p-2 text-white shadow-xs hover:bg-indigo-800 focus:outline-none focus:ring-4 focus:ring-indigo-300 dark:bg-indigo-600 dark:hover:bg-indigo-700"
+            >
+                <x-lucide-images class="h-4 w-4" />
+                <span class="sr-only">{{ __('general.gallery') }}</span>
+            </a>
+        </x-slot:triggerSlot>
+        {{ __('general.gallery') }}
+    </x-fwb.tooltip>
+
     <x-fwb.tooltip :id="'pg-tooltip-edit-'.$rowId" placement="top">
         <x-slot:triggerSlot>
             <x-ui.button
