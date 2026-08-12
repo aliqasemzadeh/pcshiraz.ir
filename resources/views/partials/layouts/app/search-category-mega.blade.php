@@ -1,8 +1,16 @@
 @php
     $menuCategories = $shopCategoryMenu ?? [];
     $homeUrl = route('home');
-    $categoryUrlTemplate = route('shop.category', ['category' => '__CATEGORY__']);
-    $brandUrlTemplate = route('shop.category.brand', ['category' => '__CATEGORY__', 'brand' => '__BRAND__']);
+    $categoryUrlTemplate = route('shop.category', [
+        'category' => '__CATEGORY_ID__',
+        'slug' => '__CATEGORY_SLUG__',
+    ]);
+    $brandUrlTemplate = route('shop.category.brand', [
+        'category' => '__CATEGORY_ID__',
+        'slug' => '__CATEGORY_SLUG__',
+        'brand' => '__BRAND_ID__',
+        'brandSlug' => '__BRAND_SLUG__',
+    ]);
 @endphp
 
 <div
@@ -30,7 +38,9 @@
             this.selectedLabel = category.title;
             this.open = false;
             window.Alpine.navigate(
-                @js($categoryUrlTemplate).replace('__CATEGORY__', encodeURIComponent(category.slug))
+                @js($categoryUrlTemplate)
+                    .replace('__CATEGORY_ID__', category.id)
+                    .replace('__CATEGORY_SLUG__', encodeURIComponent(category.slug))
             );
         },
         goBrand(category, brand) {
@@ -38,8 +48,10 @@
             this.open = false;
             window.Alpine.navigate(
                 @js($brandUrlTemplate)
-                    .replace('__CATEGORY__', encodeURIComponent(category.slug))
-                    .replace('__BRAND__', encodeURIComponent(brand.slug))
+                    .replace('__CATEGORY_ID__', category.id)
+                    .replace('__CATEGORY_SLUG__', encodeURIComponent(category.slug))
+                    .replace('__BRAND_ID__', brand.id)
+                    .replace('__BRAND_SLUG__', encodeURIComponent(brand.slug))
             );
         },
         initial(title) {
