@@ -18,7 +18,7 @@
             @include('partials.layouts.theme')
         </div>
 
-        <div class="hidden shrink-0 md:block" wire:ignore>
+        <div class="hidden shrink-0 md:block">
             <livewire:shop.cart-badge variant="navbar" :key="'shop-cart-badge-navbar'" />
         </div>
 

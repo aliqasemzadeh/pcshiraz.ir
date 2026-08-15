@@ -19,10 +19,14 @@ new class extends Component
     #[On('shop.cart.updated')]
     public function refreshCount(): void
     {
-        unset($this->count);
+        $this->count = app(CartService::class)->itemsCount(Auth::user());
     }
 };
 ?>
+
+@php
+    $displayCount = $this->count > 99 ? '99+' : $this->count;
+@endphp
 
 @if ($variant === 'bottom')
     <a
@@ -36,12 +40,11 @@ new class extends Component
     >
         <span class="relative mb-1 inline-flex">
             <x-lucide-shopping-cart class="h-5 w-5" />
-            <span @class([
-                'absolute -end-2 -top-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-navbar bg-rose-600 px-1 text-[10px] font-bold leading-none text-white',
-                'invisible' => $this->count < 1,
-            ])>
-                {{ $this->count > 99 ? '99+' : $this->count }}
-            </span>
+            @if ($this->count > 0)
+                <span class="absolute -end-2 -top-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-navbar bg-rose-600 px-1 text-[10px] font-bold leading-none text-white">
+                    {{ $displayCount }}
+                </span>
+            @endif
         </span>
         <span class="text-xs">{{ __('general.cart') }}</span>
     </a>
@@ -54,11 +57,10 @@ new class extends Component
     >
         <x-lucide-shopping-cart class="h-5 w-5" />
         <span class="sr-only">{{ __('general.cart') }}</span>
-        <span @class([
-            'absolute -end-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-navbar bg-rose-600 px-1 text-[10px] font-bold leading-none text-white',
-            'invisible' => $this->count < 1,
-        ])>
-            {{ $this->count > 99 ? '99+' : $this->count }}
-        </span>
+        @if ($this->count > 0)
+            <span class="absolute -end-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-navbar bg-rose-600 px-1 text-[10px] font-bold leading-none text-white">
+                {{ $displayCount }}
+            </span>
+        @endif
     </a>
 @endif

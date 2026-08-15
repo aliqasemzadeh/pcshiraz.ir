@@ -1,4 +1,4 @@
-<div class="fixed bottom-0 start-0 z-40 w-full border-t border-nav-border bg-navbar md:hidden" wire:ignore x-data>
+<div class="fixed bottom-0 start-0 z-40 w-full border-t border-nav-border bg-navbar md:hidden" x-data>
     <div class="mx-auto grid h-16 max-w-lg grid-cols-3 font-medium">
         <a
             href="{{ route('home') }}"
