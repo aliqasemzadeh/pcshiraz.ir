@@ -27,6 +27,8 @@ class InstallmentPlanForm extends Form
 
     public ?string $min_order_amount = null;
 
+    public ?string $max_order_amount = null;
+
     public int $priority = 0;
 
     public bool $is_active = true;
@@ -43,6 +45,7 @@ class InstallmentPlanForm extends Form
         $this->down_payment_required_above = $plan->down_payment_required_above !== null ? (string) $plan->down_payment_required_above : null;
         $this->min_down_payment_percent = (string) $plan->min_down_payment_percent;
         $this->min_order_amount = $plan->min_order_amount !== null ? (string) $plan->min_order_amount : null;
+        $this->max_order_amount = $plan->max_order_amount !== null ? (string) $plan->max_order_amount : null;
         $this->priority = $plan->priority;
         $this->is_active = $plan->is_active;
     }
@@ -62,6 +65,7 @@ class InstallmentPlanForm extends Form
             'down_payment_required_above' => ['nullable', 'numeric', 'min:0'],
             'min_down_payment_percent' => ['required', 'numeric', 'min:0', 'max:100'],
             'min_order_amount' => ['nullable', 'numeric', 'min:0'],
+            'max_order_amount' => ['nullable', 'numeric', 'min:0'],
             'priority' => ['required', 'integer'],
             'is_active' => ['boolean'],
         ];
@@ -82,6 +86,7 @@ class InstallmentPlanForm extends Form
             'down_payment_required_above' => __('general.down_payment_required_above'),
             'min_down_payment_percent' => __('general.min_down_payment_percent'),
             'min_order_amount' => __('general.min_order_amount'),
+            'max_order_amount' => __('general.max_order_amount'),
             'priority' => __('general.priority'),
             'is_active' => __('general.active'),
         ];
@@ -119,6 +124,7 @@ class InstallmentPlanForm extends Form
             'down_payment_required_above' => $this->blankToNull($this->down_payment_required_above),
             'min_down_payment_percent' => $this->min_down_payment_percent,
             'min_order_amount' => $this->blankToNull($this->min_order_amount),
+            'max_order_amount' => $this->blankToNull($this->max_order_amount),
             'priority' => $this->priority,
             'is_active' => $this->is_active,
         ];

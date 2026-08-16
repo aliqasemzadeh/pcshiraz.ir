@@ -44,6 +44,12 @@ final class InstallmentPlanTable extends PowerGridComponent
             ->add('term_months')
             ->add('down_payment_percent')
             ->add('monthly_interest_percent')
+            ->add('order_amount_range', function (InstallmentPlan $plan) {
+                $min = $plan->min_order_amount !== null ? number_format((float) $plan->min_order_amount) : '—';
+                $max = $plan->max_order_amount !== null ? number_format((float) $plan->max_order_amount) : '—';
+
+                return e($min.' – '.$max);
+            })
             ->add('is_active_label', fn (InstallmentPlan $plan) => $plan->is_active
                 ? '<span class="text-green-600">'.e(__('general.active')).'</span>'
                 : '<span class="text-red-600">'.e(__('general.inactive')).'</span>')
@@ -73,6 +79,8 @@ final class InstallmentPlanTable extends PowerGridComponent
 
             Column::make(__('general.monthly_interest_percent'), 'monthly_interest_percent')
                 ->sortable(),
+
+            Column::make(__('general.order_amount_range'), 'order_amount_range'),
 
             Column::make(__('general.active'), 'is_active_label'),
 

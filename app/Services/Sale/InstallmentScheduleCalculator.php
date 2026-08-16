@@ -49,6 +49,10 @@ class InstallmentScheduleCalculator
             throw new InvalidArgumentException(__('general.order_below_plan_minimum'));
         }
 
+        if ($plan->max_order_amount !== null && bccomp($base, (string) $plan->max_order_amount, 4) > 0) {
+            throw new InvalidArgumentException(__('general.order_above_plan_maximum'));
+        }
+
         $effectiveDownPercent = (float) $plan->down_payment_percent;
 
         if (
