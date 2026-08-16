@@ -95,6 +95,101 @@ class InstallmentScheduleCalculatorTest extends TestCase
     }
 
     #[Test]
+    public function it_calculates_example_100m_with_10_percent_down_and_2_month_term(): void
+    {
+        $plan = new InstallmentPlan([
+            'term_months' => 2,
+            'down_payment_percent' => 10,
+            'monthly_interest_percent' => 2,
+            'min_order_amount' => 0,
+            'max_order_amount' => 100000000,
+            'max_financiable_amount' => null,
+            'down_payment_required_above' => null,
+            'min_down_payment_percent' => 0,
+        ]);
+
+        $result = app(InstallmentScheduleCalculator::class)->calculate($plan, 100000000);
+
+        $this->assertSame(10.0, $result['effective_down_payment_percent']);
+        $this->assertSame('10000000.0000', $result['plan_down_payment_amount']);
+        $this->assertSame('90000000.0000', $result['financed_amount']);
+        $this->assertSame('46800000.0000', $result['monthly_payment']);
+        $this->assertSame('3600000.0000', $result['total_interest']);
+        $this->assertSame('103600000.0000', $result['total_payable']);
+    }
+
+    #[Test]
+    public function it_rejects_when_order_exceeds_max_order_amount(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $plan = new InstallmentPlan([
+            'term_months' => 2,
+            'down_payment_percent' => 10,
+            'monthly_interest_percent' => 2,
+            'min_order_amount' => 0,
+            'max_order_amount' => 100000000,
+            'max_financiable_amount' => null,
+            'down_payment_required_above' => null,
+            'min_down_payment_percent' => 0,
+        ]);
+
+        app(InstallmentScheduleCalculator::class)->calculate($plan, 100000000.0001);
+    }
+
+    #[Test]
+    public function it_rejects_orders_above_300m_for_top_tier_plan(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $plan = new InstallmentPlan([
+            'term_months' => 18,
+            'down_payment_percent' => 30,
+            'monthly_interest_percent' => 3,
+            'min_order_amount' => '200000000.0001',
+            'max_order_amount' => 300000000,
+            'max_financiable_amount' => null,
+            'down_payment_required_above' => null,
+            'min_down_payment_percent' => 0,
+        ]);
+
+        app(InstallmentScheduleCalculator::class)->calculate($plan, 300000000.0001);
+    }
+
+    #[Test]
+    public function it_accepts_exactly_100m_on_first_tier_only(): void
+    {
+        $firstTier = new InstallmentPlan([
+            'term_months' => 2,
+            'down_payment_percent' => 10,
+            'monthly_interest_percent' => 2,
+            'min_order_amount' => 0,
+            'max_order_amount' => 100000000,
+            'max_financiable_amount' => null,
+            'down_payment_required_above' => null,
+            'min_down_payment_percent' => 0,
+        ]);
+
+        $secondTier = new InstallmentPlan([
+            'term_months' => 2,
+            'down_payment_percent' => 20,
+            'monthly_interest_percent' => 2,
+            'min_order_amount' => '100000000.0001',
+            'max_order_amount' => 200000000,
+            'max_financiable_amount' => null,
+            'down_payment_required_above' => null,
+            'min_down_payment_percent' => 0,
+        ]);
+
+        $calculator = app(InstallmentScheduleCalculator::class);
+
+        $this->assertTrue($calculator->isEligible($firstTier, 100000000));
+        $this->assertFalse($calculator->isEligible($secondTier, 100000000));
+        $this->assertFalse($calculator->isEligible($firstTier, '100000000.0001'));
+        $this->assertTrue($calculator->isEligible($secondTier, '100000000.0001'));
+    }
+
+    #[Test]
     public function it_rejects_when_financed_exceeds_max(): void
     {
         $this->expectException(InvalidArgumentException::class);
