@@ -32,8 +32,8 @@ class UpdateProjectJob implements ShouldQueue
         }
 
         $steps = $this->runComposer
-            ? ['composer', 'migrate', 'cache', 'theme', 'queue']
-            : ['migrate', 'cache', 'theme', 'queue'];
+            ? ['composer', 'migrate', 'permissions', 'cache', 'theme', 'queue']
+            : ['migrate', 'permissions', 'cache', 'theme', 'queue'];
         $stepIndex = 0;
         $total = count($steps) + 1; // +1 for git already done
 
@@ -50,6 +50,10 @@ class UpdateProjectJob implements ShouldQueue
         $stepIndex++;
         SystemCommandProgress::step($this->runId, 'migrate', (int) round(($stepIndex / $total) * 100));
         $this->runMigrations();
+
+        $stepIndex++;
+        SystemCommandProgress::step($this->runId, 'permissions:sync', (int) round(($stepIndex / $total) * 100));
+        $this->runArtisan('permissions:sync');
 
         $stepIndex++;
         SystemCommandProgress::step($this->runId, 'clear caches', (int) round(($stepIndex / $total) * 100));
