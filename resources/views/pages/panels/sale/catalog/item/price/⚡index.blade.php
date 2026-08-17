@@ -277,10 +277,10 @@ new #[Layout('layouts.panels')] class extends Component
                 </div>
 
                 <div class="flex flex-wrap gap-2">
-                    <x-ui.button type="button" color="blue" target="loadDigikalaVariants">
+                    <x-ui.button type="button" color="blue" target="loadDigikalaVariants" wire:click="loadDigikalaVariants">
                         {{ __('app.digikala_load_variants') }}
                     </x-ui.button>
-                    <x-ui.button type="button" color="teal" target="syncDigikalaNow">
+                    <x-ui.button type="button" color="teal" target="syncDigikalaNow" wire:click="syncDigikalaNow">
                         {{ __('app.digikala_sync_now') }}
                     </x-ui.button>
                 </div>
@@ -318,7 +318,7 @@ new #[Layout('layouts.panels')] class extends Component
                     </div>
                 @endif
 
-                <x-ui.button type="button" color="green" target="saveDigikalaSettings" class="w-full">
+                <x-ui.button type="button" color="green" target="saveDigikalaSettings" wire:click="saveDigikalaSettings" class="w-full">
                     {{ __('app.digikala_save_settings') }}
                 </x-ui.button>
             </div>
