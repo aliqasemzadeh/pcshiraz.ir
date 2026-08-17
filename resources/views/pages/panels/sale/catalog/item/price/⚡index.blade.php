@@ -4,6 +4,8 @@ use App\Enums\PriceTypeEnum;
 use App\Livewire\Forms\ItemPriceForm;
 use App\Models\Item;
 use App\Models\ItemPrice;
+use App\Services\Sale\DigikalaPriceSyncService;
+use App\Support\DigikalaPriceFetcher;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -18,12 +20,24 @@ new #[Layout('layouts.panels')] class extends Component
 
     public string $activeType = '';
 
+    public string $digikalaUrl = '';
+
+    public ?int $digikalaVariantId = null;
+
+    public bool $digikalaAutoSync = false;
+
+    /** @var list<array{variant_id: int, color_id: ?int, color_title: string, price_toman: ?int, is_available: bool}> */
+    public array $digikalaVariants = [];
+
     public function mount(Item $item): void
     {
         $this->item = $item->load(['brand', 'category', 'media']);
         $this->activeType = PriceTypeEnum::Cash->value;
         $this->form->setType($this->activeType);
         $this->form->setStockFromItem($this->item);
+        $this->digikalaUrl = (string) ($item->digikala_url ?? '');
+        $this->digikalaVariantId = $item->digikala_variant_id;
+        $this->digikalaAutoSync = (bool) $item->digikala_auto_sync;
     }
 
     public function selectType(string $type): void
@@ -43,6 +57,108 @@ new #[Layout('layouts.panels')] class extends Component
 
         Toaster::success(__('general.saved'));
         unset($this->activePrices, $this->priceHistory);
+    }
+
+    public function loadDigikalaVariants(): void
+    {
+        $this->validate([
+            'digikalaUrl' => ['required', 'regex:/digikala\.com\/product\/dkp-\d+/i'],
+        ], [], [
+            'digikalaUrl' => __('app.digikala_url'),
+        ]);
+
+        $this->digikalaVariants = DigikalaPriceFetcher::fetchVariants($this->digikalaUrl);
+
+        if ($this->digikalaVariants === []) {
+            Toaster::error(__('app.digikala_variants_not_found'));
+
+            return;
+        }
+
+        if ($this->digikalaVariantId === null) {
+            $suggested = DigikalaPriceFetcher::suggestVariantId($this->digikalaVariants, $this->item->color_name);
+
+            if ($suggested !== null) {
+                $this->digikalaVariantId = $suggested;
+            }
+        }
+
+        Toaster::success(__('app.digikala_variants_loaded'));
+    }
+
+    public function saveDigikalaSettings(): void
+    {
+        $this->validate([
+            'digikalaUrl' => ['nullable', 'regex:/digikala\.com\/product\/dkp-\d+/i'],
+            'digikalaVariantId' => ['nullable', 'integer', 'min:1'],
+            'digikalaAutoSync' => ['boolean'],
+        ], [], [
+            'digikalaUrl' => __('app.digikala_url'),
+            'digikalaVariantId' => __('app.digikala_variant'),
+            'digikalaAutoSync' => __('app.digikala_auto_sync'),
+        ]);
+
+        if ($this->digikalaUrl !== '' && $this->digikalaVariants !== [] && $this->digikalaVariantId === null) {
+            $this->addError('digikalaVariantId', __('app.digikala_variant_required'));
+
+            return;
+        }
+
+        $productId = $this->digikalaUrl !== ''
+            ? DigikalaPriceFetcher::extractProductId($this->digikalaUrl)
+            : null;
+
+        $this->item->update([
+            'digikala_url' => $this->digikalaUrl !== '' ? $this->digikalaUrl : null,
+            'digikala_product_id' => $productId,
+            'digikala_variant_id' => $this->digikalaVariantId,
+            'digikala_auto_sync' => $this->digikalaAutoSync,
+        ]);
+
+        $this->item->refresh();
+
+        Toaster::success(__('general.saved'));
+    }
+
+    public function syncDigikalaNow(DigikalaPriceSyncService $syncService): void
+    {
+        if ($this->item->digikala_product_id === null) {
+            Toaster::error(__('app.digikala_product_not_configured'));
+
+            return;
+        }
+
+        $result = $syncService->syncItem($this->item->refresh());
+
+        if ($result->success) {
+            Toaster::success($result->message ?? __('app.digikala_sync_success'));
+        } else {
+            Toaster::error($result->message ?? __('app.digikala_sync_failed'));
+        }
+
+        unset($this->activePrices, $this->priceHistory);
+    }
+
+    #[Computed]
+    public function digikalaVariantOptions(): array
+    {
+        $options = ['' => __('app.digikala_select_variant')];
+
+        foreach ($this->digikalaVariants as $variant) {
+            $label = $variant['color_title'];
+
+            if ($variant['price_toman'] !== null) {
+                $label .= ' — '.number_format($variant['price_toman']).' '.__('app.toman');
+            }
+
+            if (! $variant['is_available']) {
+                $label .= ' ('.__('app.digikala_unavailable').')';
+            }
+
+            $options[(string) $variant['variant_id']] = $label;
+        }
+
+        return $options;
     }
 
     #[Computed]
@@ -140,6 +256,71 @@ new #[Layout('layouts.panels')] class extends Component
                         @endif
                     </p>
                 </div>
+            </div>
+        </x-fwb.card>
+
+        <x-fwb.card>
+            <h3 class="mb-4 text-lg font-semibold text-heading">{{ __('app.digikala_sync') }}</h3>
+
+            <div class="space-y-4">
+                <div>
+                    <x-fwb.input
+                        wire:model="digikalaUrl"
+                        :label="__('app.digikala_url')"
+                        type="url"
+                        dir="ltr"
+                        placeholder="https://www.digikala.com/product/dkp-..."
+                    />
+                    @error('digikalaUrl')
+                        <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                    <x-ui.button type="button" color="blue" target="loadDigikalaVariants">
+                        {{ __('app.digikala_load_variants') }}
+                    </x-ui.button>
+                    <x-ui.button type="button" color="teal" target="syncDigikalaNow">
+                        {{ __('app.digikala_sync_now') }}
+                    </x-ui.button>
+                </div>
+
+                @if ($this->digikalaVariants !== [])
+                    <div>
+                        <x-fwb.select
+                            wire:model="digikalaVariantId"
+                            :label="__('app.digikala_variant')"
+                            :options="$this->digikalaVariantOptions"
+                        />
+                        @error('digikalaVariantId')
+                            <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+                @endif
+
+                <div>
+                    <x-fwb.checkbox
+                        wire:model="digikalaAutoSync"
+                        :label="__('app.digikala_auto_sync')"
+                    />
+                    @error('digikalaAutoSync')
+                        <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                @if ($item->digikala_last_synced_at)
+                    <div class="rounded-lg border border-default bg-neutral-secondary-soft p-3 text-sm text-body">
+                        <div>{{ __('app.digikala_last_synced_at') }}: {{ Jalalian::fromDateTime($item->digikala_last_synced_at)->format('Y/m/d H:i') }}</div>
+                        <div>{{ __('general.status') }}: {{ __('app.digikala_sync_status_'.$item->digikala_last_sync_status) }}</div>
+                        @if ($item->digikala_last_sync_message)
+                            <div>{{ $item->digikala_last_sync_message }}</div>
+                        @endif
+                    </div>
+                @endif
+
+                <x-ui.button type="button" color="green" target="saveDigikalaSettings" class="w-full">
+                    {{ __('app.digikala_save_settings') }}
+                </x-ui.button>
             </div>
         </x-fwb.card>
 

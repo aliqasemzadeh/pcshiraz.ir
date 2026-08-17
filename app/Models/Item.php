@@ -40,6 +40,13 @@ use Spatie\Tags\HasTags;
     'seo_title',
     'meta_description',
     'meta',
+    'digikala_url',
+    'digikala_product_id',
+    'digikala_variant_id',
+    'digikala_auto_sync',
+    'digikala_last_synced_at',
+    'digikala_last_sync_status',
+    'digikala_last_sync_message',
 ])]
 class Item extends Model implements HasMedia
 {
@@ -56,7 +63,17 @@ class Item extends Model implements HasMedia
             'is_contact_price' => 'boolean',
             'views_count' => 'integer',
             'meta' => 'array',
+            'digikala_variant_id' => 'integer',
+            'digikala_auto_sync' => 'boolean',
+            'digikala_last_synced_at' => 'datetime',
         ];
+    }
+
+    public function scopeDigikalaAutoSync(Builder $query): Builder
+    {
+        return $query
+            ->where('digikala_auto_sync', true)
+            ->whereNotNull('digikala_product_id');
     }
 
     protected static function booted(): void
