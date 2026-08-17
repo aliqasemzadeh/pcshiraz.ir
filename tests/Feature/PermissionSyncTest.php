@@ -31,11 +31,58 @@ class PermissionSyncTest extends TestCase
     }
 
     #[Test]
-    public function sync_assigns_new_module_permissions_to_roles_with_existing_module_access(): void
+    public function sync_creates_default_roles_with_module_permissions(): void
+    {
+        $this->artisan('permissions:sync')
+            ->assertSuccessful();
+
+        $saleManager = Role::findByName('sale-manager', 'web');
+        $administrator = Role::findByName('administrator', 'web');
+        $organizationManager = Role::findByName('organization-manager', 'web');
+
+        $this->assertTrue($saleManager->hasPermissionTo('sale.item_edit'));
+        $this->assertTrue($saleManager->hasPermissionTo('sale.order_view'));
+        $this->assertTrue($administrator->hasPermissionTo('administrator.organization_view'));
+        $this->assertTrue($organizationManager->hasPermissionTo('organization.order_approve'));
+        $this->assertFalse($saleManager->hasPermissionTo('administrator.organization_view'));
+    }
+
+    #[Test]
+    public function sync_creates_super_admin_with_all_permissions(): void
+    {
+        $this->artisan('permissions:sync')
+            ->assertSuccessful();
+
+        $superAdmin = Role::findByName('super-admin', 'web');
+
+        $this->assertTrue($superAdmin->hasPermissionTo('sale.item_edit'));
+        $this->assertTrue($superAdmin->hasPermissionTo('administrator.organization_delete'));
+        $this->assertTrue($superAdmin->hasPermissionTo('organization.order_reject'));
+    }
+
+    #[Test]
+    public function sync_full_syncs_predefined_role_when_permissions_change(): void
     {
         Permission::findOrCreate('sale.item_view', 'web');
 
         $role = Role::findOrCreate('sale-manager', 'web');
+        $role->syncPermissions(['sale.item_view']);
+
+        $this->artisan('permissions:sync')
+            ->assertSuccessful();
+
+        $role->refresh();
+
+        $this->assertTrue($role->hasPermissionTo('sale.item_edit'));
+        $this->assertTrue($role->hasPermissionTo('sale.order_view'));
+    }
+
+    #[Test]
+    public function sync_assigns_new_module_permissions_to_custom_roles_with_existing_module_access(): void
+    {
+        Permission::findOrCreate('sale.item_view', 'web');
+
+        $role = Role::findOrCreate('content-editor', 'web');
         $role->givePermissionTo('sale.item_view');
 
         $user = User::factory()->create();
@@ -55,7 +102,7 @@ class PermissionSyncTest extends TestCase
     {
         Permission::findOrCreate('sale.item_view', 'web');
 
-        $role = Role::findOrCreate('sale-manager', 'web');
+        $role = Role::findOrCreate('content-editor', 'web');
         $role->givePermissionTo('sale.item_view');
 
         $this->artisan('permissions:sync --no-roles')
@@ -64,5 +111,9 @@ class PermissionSyncTest extends TestCase
         $role->refresh();
 
         $this->assertFalse($role->hasPermissionTo('sale.item_edit'));
+        $this->assertDatabaseMissing('roles', [
+            'name' => 'super-admin',
+            'guard_name' => 'web',
+        ]);
     }
 }
