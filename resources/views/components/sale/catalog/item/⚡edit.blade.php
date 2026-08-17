@@ -89,6 +89,7 @@ new class extends Component
         Toaster::success(__('general.saved'));
         $this->dispatch('modal-close');
         $this->dispatch('pg:eventRefresh-saleCatalogItemsTable');
+        $this->dispatch('shop.item.updated');
     }
 
     protected function imageUrl(Item $item): ?string

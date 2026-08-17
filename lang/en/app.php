@@ -211,4 +211,8 @@ return [
     'digikala_sync_status_failed' => 'Failed',
     'digikala_sync_status_unchanged' => 'Unchanged',
     'toman' => 'Toman',
+    'item_quick_manage' => 'Quick item management',
+    'item_full_pricing' => 'Full pricing',
+    'item_edit_product' => 'Edit product',
+    'item_stock_updated' => 'Stock updated.',
 ];

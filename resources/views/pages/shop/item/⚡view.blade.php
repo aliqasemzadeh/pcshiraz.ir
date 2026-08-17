@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Masmerise\Toaster\Toaster;
 
@@ -36,6 +37,21 @@ new #[Layout('layouts.app')] class extends Component
         ]);
 
         defer(fn () => DB::table('items')->where('id', $item->id)->increment('views_count'));
+    }
+
+    #[On('shop.item.updated')]
+    public function refreshItem(): void
+    {
+        $this->item->refresh()->load([
+            'brand',
+            'category',
+            'media',
+            'tags',
+            'activeCashPrice',
+            'activeInstallmentPrice',
+        ]);
+
+        unset($this->cartItem);
     }
 
     #[Computed]
@@ -136,6 +152,10 @@ new #[Layout('layouts.app')] class extends Component
 @endphp
 
 <div @class(['space-y-8', 'pb-28 md:pb-0' => $showStickyCart])>
+    @can('sale.item_edit')
+        <livewire:shop.item.quick-manage :item-id="$item->id" :key="'item-quick-manage-'.$item->id" />
+    @endcan
+
     <nav class="text-sm text-gray-500">
         <a href="{{ route('home') }}" wire:navigate class="hover:text-brand">{{ __('general.home') }}</a>
         <span class="mx-1">/</span>

@@ -211,4 +211,8 @@ return [
     'digikala_sync_status_failed' => 'ناموفق',
     'digikala_sync_status_unchanged' => 'بدون تغییر',
     'toman' => 'تومان',
+    'item_quick_manage' => 'مدیریت سریع کالا',
+    'item_full_pricing' => 'قیمت‌گذاری کامل',
+    'item_edit_product' => 'ویرایش کالا',
+    'item_stock_updated' => 'موجودی بروزرسانی شد.',
 ];
