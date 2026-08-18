@@ -3,12 +3,14 @@
 namespace Tests\Feature;
 
 use App\Enums\PriceTypeEnum;
+use App\Enums\PriceUnitEnum;
 use App\Jobs\UpdatePriceJob;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Item;
 use App\Models\ItemPrice;
 use App\Services\Sale\DigikalaPriceSyncService;
+use App\Settings\GeneralSettings;
 use App\Support\DigikalaPriceFetcher;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -107,6 +109,35 @@ class DigikalaPriceSyncTest extends TestCase
 
         $this->assertNotNull($activeInstallment);
         $this->assertSame('12500000.0000', (string) $activeInstallment->sale_price);
+    }
+
+    #[Test]
+    public function sync_item_stores_digikala_toman_even_when_display_unit_is_rial(): void
+    {
+        $settings = app(GeneralSettings::class);
+        $settings->price_unit = PriceUnitEnum::Rial->value;
+        $settings->save();
+
+        Http::fake([
+            'api.digikala.com/v1/product/20109389/*' => Http::response($this->sampleProductPayload()),
+        ]);
+
+        $item = $this->createItemWithDigikalaConfig(variantId: 111);
+
+        $result = app(DigikalaPriceSyncService::class)->syncItem($item->fresh());
+
+        $this->assertTrue($result->success);
+        $this->assertSame(12500000, $result->price);
+
+        $activePrice = ItemPrice::query()
+            ->where('item_id', $item->id)
+            ->where('price_type', PriceTypeEnum::Cash)
+            ->where('is_active', true)
+            ->first();
+
+        $this->assertNotNull($activePrice);
+        $this->assertSame('12500000.0000', (string) $activePrice->sale_price);
+        $this->assertSame('12500000.0000', (string) $activePrice->price);
     }
 
     #[Test]

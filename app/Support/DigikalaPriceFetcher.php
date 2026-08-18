@@ -210,6 +210,9 @@ class DigikalaPriceFetcher
         return $result;
     }
 
+    /**
+     * DigiKala amounts are already Toman. Return them as-is; do not convert with Price::toDisplay/fromDisplay.
+     */
     private static function extractVariantPriceToman(array $variant): ?int
     {
         $price = self::getNestedValue($variant, 'price.selling_price')
