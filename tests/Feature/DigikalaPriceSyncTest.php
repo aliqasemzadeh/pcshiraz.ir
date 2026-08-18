@@ -144,10 +144,10 @@ class DigikalaPriceSyncTest extends TestCase
     public function sync_item_converts_api_rial_selling_price_to_toman(): void
     {
         Http::fake([
-            'api.digikala.com/v1/product/20109389/*' => Http::response([
+            'api.digikala.com/v1/product/99999999/*' => Http::response([
                 'data' => [
                     'product' => [
-                        'id' => 20109389,
+                        'id' => 99999999,
                         'variants' => [
                             [
                                 'id' => 111,
@@ -166,6 +166,10 @@ class DigikalaPriceSyncTest extends TestCase
         ]);
 
         $item = $this->createItemWithDigikalaConfig(variantId: 111);
+        $item->update([
+            'digikala_url' => 'https://www.digikala.com/product/dkp-99999999/sample-product/',
+            'digikala_product_id' => '99999999',
+        ]);
 
         $result = app(DigikalaPriceSyncService::class)->syncItem($item->fresh());
 
