@@ -45,8 +45,8 @@ final class InstallmentPlanTable extends PowerGridComponent
             ->add('down_payment_percent')
             ->add('monthly_interest_percent')
             ->add('order_amount_range', function (InstallmentPlan $plan) {
-                $min = $plan->min_order_amount !== null ? number_format((float) $plan->min_order_amount) : '—';
-                $max = $plan->max_order_amount !== null ? number_format((float) $plan->max_order_amount) : '—';
+                $min = $plan->min_order_amount !== null ? format_price((float) $plan->min_order_amount) : '—';
+                $max = $plan->max_order_amount !== null ? format_price((float) $plan->max_order_amount) : '—';
 
                 return e($min.' – '.$max);
             })

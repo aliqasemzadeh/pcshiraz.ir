@@ -16,6 +16,7 @@ use App\Services\Sale\CartService;
 use App\Services\Sale\CheckoutService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
+use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -203,6 +204,74 @@ class CartCheckoutSaleTypeTest extends TestCase
         $downPaymentRow = $order->installments->firstWhere('sequence', 0);
         $this->assertNotNull($downPaymentRow);
         $this->assertSame('600000.0000', (string) $downPaymentRow->total_amount);
+    }
+
+    #[Test]
+    public function cart_page_down_payment_follows_selected_installment_plan(): void
+    {
+        [$user, $installmentItem] = $this->createUserWithPricedItem(
+            cashPrice: '1000000',
+            installmentPrice: '1000000',
+        );
+        $cashOnlyItem = $this->createItemWithPrices(cashPrice: '500000', installmentPrice: null);
+
+        $organization = Organization::query()->create([
+            'code' => 'ORGCARTPLAN1234',
+            'is_active' => true,
+        ]);
+
+        $tenPercentPlan = InstallmentPlan::query()->create([
+            'title' => '10 percent plan',
+            'organization_id' => $organization->id,
+            'term_months' => 10,
+            'down_payment_percent' => 10,
+            'monthly_interest_percent' => 0,
+            'max_financiable_amount' => 50000000,
+            'down_payment_required_above' => null,
+            'min_down_payment_percent' => 0,
+            'min_order_amount' => 0,
+            'priority' => 2,
+            'is_active' => true,
+        ]);
+
+        $twentyPercentPlan = InstallmentPlan::query()->create([
+            'title' => '20 percent plan',
+            'organization_id' => $organization->id,
+            'term_months' => 10,
+            'down_payment_percent' => 20,
+            'monthly_interest_percent' => 0,
+            'max_financiable_amount' => 50000000,
+            'down_payment_required_above' => null,
+            'min_down_payment_percent' => 0,
+            'min_order_amount' => 0,
+            'priority' => 1,
+            'is_active' => true,
+        ]);
+
+        $cartService = app(CartService::class);
+        $cart = $cartService->getOrCreateCart($user);
+        $cartService->setSaleType($cart, PriceTypeEnum::Installment);
+        $cartService->addItem($user, $installmentItem->fresh(), 1);
+        $cartService->addItem($user, $cashOnlyItem, 1);
+
+        $component = Livewire::actingAs($user)
+            ->test('pages::shop.cart.index')
+            ->set('organization_code', $organization->code)
+            ->call('validateOrganizationCode')
+            ->assertSet('installment_plan_id', $tenPercentPlan->id)
+            ->assertSee(number_format(100000))
+            ->assertSee(number_format(600000));
+
+        $preview = $component->instance()->selectedPlanPreview;
+        $this->assertSame('100000.0000', $preview['plan_down_payment_amount']);
+        $this->assertSame('600000.0000', $preview['down_payment_amount']);
+
+        $component->set('installment_plan_id', $twentyPercentPlan->id);
+
+        $preview = $component->instance()->selectedPlanPreview;
+        $this->assertSame('200000.0000', $preview['plan_down_payment_amount']);
+        $this->assertSame('700000.0000', $preview['down_payment_amount']);
+        $component->assertSee(number_format(200000))->assertSee(number_format(700000));
     }
 
     #[Test]

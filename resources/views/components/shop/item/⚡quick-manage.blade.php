@@ -257,7 +257,7 @@ new class extends Component
                     <div class="w-28 sm:w-32">
                         <x-fwb.input
                             wire:model="form.price"
-                            :label="__('general.price')"
+                            :label="__('general.price').' ('.price_unit_label().')'"
                             type="text"
                             inputmode="numeric"
                             dir="ltr"
@@ -269,7 +269,7 @@ new class extends Component
                     <div class="w-28 sm:w-32">
                         <x-fwb.input
                             wire:model="form.sale_price"
-                            :label="__('general.sale_price')"
+                            :label="__('general.sale_price').' ('.price_unit_label().')'"
                             type="text"
                             inputmode="numeric"
                             dir="ltr"

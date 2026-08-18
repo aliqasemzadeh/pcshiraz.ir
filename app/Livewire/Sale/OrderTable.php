@@ -41,7 +41,7 @@ final class OrderTable extends PowerGridComponent
             ->add('buyer', fn (Order $order) => e($order->user?->mobile ?? '—'))
             ->add('sale_type_label', fn (Order $order) => e($order->sale_type->label()))
             ->add('status_label', fn (Order $order) => e($order->status->label()))
-            ->add('total_amount_formatted', fn (Order $order) => number_format((float) $order->total_amount))
+            ->add('total_amount_formatted', fn (Order $order) => format_price((float) $order->total_amount))
             ->add('created_at_formatted', function (Order $order) {
                 if ($order->created_at === null) {
                     return '—';
