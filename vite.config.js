@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import { bunny } from 'laravel-vite-plugin/fonts';
@@ -18,7 +19,9 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            '@alpinejs/mask': '@alpinejs/mask/dist/module.esm.js',
+            '@alpinejs/mask': fileURLToPath(
+                new URL('./node_modules/@alpinejs/mask/dist/module.esm.js', import.meta.url)
+            ),
         },
     },
     server: {
