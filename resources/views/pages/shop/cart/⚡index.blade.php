@@ -327,7 +327,7 @@ new #[Layout('layouts.app')] class extends Component
             </div>
         @endif
 
-        @if ($planPreview !== null)
+        @if ($this->cart->sale_type === PriceTypeEnum::Installment && $planPreview !== null)
             <div class="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm text-teal-800 dark:border-teal-800 dark:bg-teal-950/40 dark:text-teal-200">
                 {{ __('app.plan_total_down_payment', ['amount' => format_price((float) $planPreview['down_payment_amount'])]) }}
             </div>

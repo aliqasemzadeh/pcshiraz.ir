@@ -13,6 +13,13 @@ class PriceTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        app()->setLocale('fa');
+    }
+
     #[Test]
     public function it_formats_toman_amounts_without_conversion(): void
     {
