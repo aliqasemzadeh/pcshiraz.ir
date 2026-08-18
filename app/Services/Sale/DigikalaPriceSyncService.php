@@ -99,7 +99,7 @@ class DigikalaPriceSyncService
     }
 
     /**
-     * Persist the DigiKala Toman amount as-is. Do not run Price::toDisplay/fromDisplay (Rial ×10 / ÷10).
+     * Persist the fetcher Toman amount (API Rial already ÷10). Do not run Price::toDisplay.
      */
     protected function createSyncedPrice(Item $item, PriceTypeEnum $type, int $price, mixed $salesCap): ItemPrice
     {
