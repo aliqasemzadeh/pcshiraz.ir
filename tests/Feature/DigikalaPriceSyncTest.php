@@ -141,6 +141,48 @@ class DigikalaPriceSyncTest extends TestCase
     }
 
     #[Test]
+    public function sync_item_converts_api_rial_selling_price_to_toman(): void
+    {
+        Http::fake([
+            'api.digikala.com/v1/product/20109389/*' => Http::response([
+                'data' => [
+                    'product' => [
+                        'id' => 20109389,
+                        'variants' => [
+                            [
+                                'id' => 111,
+                                'status' => 'marketable',
+                                'color' => ['id' => 1, 'title' => 'مشکی'],
+                                'price' => ['selling_price' => 335130000],
+                            ],
+                        ],
+                        'default_variant' => [
+                            'id' => 111,
+                            'price' => ['selling_price' => 335130000],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        $item = $this->createItemWithDigikalaConfig(variantId: 111);
+
+        $result = app(DigikalaPriceSyncService::class)->syncItem($item->fresh());
+
+        $this->assertTrue($result->success);
+        $this->assertSame(33513000, $result->price);
+
+        $activePrice = ItemPrice::query()
+            ->where('item_id', $item->id)
+            ->where('price_type', PriceTypeEnum::Installment)
+            ->where('is_active', true)
+            ->first();
+
+        $this->assertNotNull($activePrice);
+        $this->assertSame('33513000.0000', (string) $activePrice->sale_price);
+    }
+
+    #[Test]
     public function sync_item_skips_when_cash_and_installment_are_unchanged(): void
     {
         Http::fake([
@@ -253,18 +295,18 @@ class DigikalaPriceSyncTest extends TestCase
                             'id' => 111,
                             'status' => 'marketable',
                             'color' => ['id' => 1, 'title' => 'مشکی'],
-                            'price' => ['selling_price' => 12500000],
+                            'price' => ['selling_price' => 125000000],
                         ],
                         [
                             'id' => 222,
                             'status' => 'marketable',
                             'color' => ['id' => 2, 'title' => 'آبی'],
-                            'price' => ['selling_price' => 12800000],
+                            'price' => ['selling_price' => 128000000],
                         ],
                     ],
                     'default_variant' => [
                         'id' => 111,
-                        'price' => ['selling_price' => 12500000],
+                        'price' => ['selling_price' => 125000000],
                     ],
                 ],
             ],
