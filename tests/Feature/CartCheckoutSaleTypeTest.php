@@ -259,8 +259,8 @@ class CartCheckoutSaleTypeTest extends TestCase
             ->set('organization_code', $organization->code)
             ->call('validateOrganizationCode')
             ->assertSet('installment_plan_id', $tenPercentPlan->id)
-            ->assertSee(number_format(100000))
-            ->assertSee(number_format(600000));
+            ->assertSee(format_price(100000))
+            ->assertSee(format_price(600000));
 
         $preview = $component->instance()->selectedPlanPreview;
         $this->assertSame('100000.0000', $preview['plan_down_payment_amount']);
@@ -271,7 +271,7 @@ class CartCheckoutSaleTypeTest extends TestCase
         $preview = $component->instance()->selectedPlanPreview;
         $this->assertSame('200000.0000', $preview['plan_down_payment_amount']);
         $this->assertSame('700000.0000', $preview['down_payment_amount']);
-        $component->assertSee(number_format(200000))->assertSee(number_format(700000));
+        $component->assertSee(format_price(200000))->assertSee(format_price(700000));
     }
 
     #[Test]
