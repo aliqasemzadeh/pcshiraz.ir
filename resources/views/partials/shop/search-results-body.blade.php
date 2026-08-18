@@ -64,9 +64,9 @@
                             @if ($item->is_contact_price)
                                 <span class="text-xs font-semibold text-amber-600 md:text-sm">{{ __('general.contact_price') }}</span>
                             @elseif ($cash)
-                                <span class="block text-sm font-bold text-brand md:text-base">{{ number_format((float) $cash->sale_price) }}</span>
+                                <span class="block text-sm font-bold text-brand md:text-base">{{ format_price((float) $cash->sale_price) }}</span>
                                 @if ($hasDiscount)
-                                    <span class="block text-[11px] text-navbar-fg line-through">{{ number_format((float) $cash->price) }}</span>
+                                    <span class="block text-[11px] text-navbar-fg line-through">{{ format_price((float) $cash->price) }}</span>
                                 @endif
                             @else
                                 <span class="text-xs text-navbar-fg">—</span>

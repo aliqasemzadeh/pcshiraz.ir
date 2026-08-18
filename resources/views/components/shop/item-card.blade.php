@@ -63,18 +63,18 @@
             @elseif ($cash)
                 <div class="flex flex-wrap items-baseline gap-2">
                     <span class="text-base font-bold text-brand">
-                        {{ number_format((float) $cash->sale_price) }}
+                        {{ format_price((float) $cash->sale_price) }}
                     </span>
                     @if ($hasDiscount)
                         <span class="text-sm text-gray-400 line-through">
-                            {{ number_format((float) $cash->price) }}
+                            {{ format_price((float) $cash->price) }}
                         </span>
                     @endif
                 </div>
                 @if ($installment)
                     <div class="text-xs text-sky-700 dark:text-sky-300">
                         {{ __('app.installment_price') }}:
-                        {{ number_format((float) $installment->sale_price) }}
+                        {{ format_price((float) $installment->sale_price) }}
                     </div>
                 @endif
             @else

@@ -353,10 +353,10 @@ new #[Layout('layouts.app')] class extends Component
                                     <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('app.cash_price') }}</div>
                                     <div class="mt-1 flex flex-wrap items-baseline gap-3">
                                         <span class="text-2xl font-extrabold text-gray-900 sm:text-3xl dark:text-white">
-                                            {{ number_format((float) $cash->sale_price) }}
+                                            {{ format_price((float) $cash->sale_price) }}
                                         </span>
                                         @if ($hasDiscount)
-                                            <span class="text-lg text-gray-400 line-through">{{ number_format((float) $cash->price) }}</span>
+                                            <span class="text-lg text-gray-400 line-through">{{ format_price((float) $cash->price) }}</span>
                                         @endif
                                     </div>
                                 </div>
@@ -367,7 +367,7 @@ new #[Layout('layouts.app')] class extends Component
                             <div>
                                 <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('app.installment_price') }}</div>
                                 <div class="mt-1 text-xl font-bold text-sky-700 dark:text-sky-300 sm:text-2xl">
-                                    {{ number_format((float) $installment->sale_price) }}
+                                    {{ format_price((float) $installment->sale_price) }}
                                 </div>
                             </div>
                         @elseif ($cash)
@@ -463,7 +463,7 @@ new #[Layout('layouts.app')] class extends Component
                 <div class="min-w-0 flex-1">
                     @if ($displayPrice !== null)
                         <div class="truncate text-sm font-semibold text-gray-900 dark:text-white">
-                            {{ number_format((float) $displayPrice) }}
+                            {{ format_price((float) $displayPrice) }}
                         </div>
                         <div class="truncate text-xs text-gray-500 dark:text-gray-400">{{ $item->title }}</div>
                     @else

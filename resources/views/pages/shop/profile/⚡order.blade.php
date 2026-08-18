@@ -70,8 +70,7 @@ new #[Layout('layouts.app')] class extends Component
                             <div class="text-start sm:text-end">
                                 <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('general.total_payable') }}</div>
                                 <div class="font-semibold text-gray-900 dark:text-white">
-                                    {{ number_format((float) $order->total_payable) }}
-                                    <span class="text-xs font-normal text-gray-500">{{ __('app.rial') }}</span>
+                                    {{ format_price((float) $order->total_payable) }}
                                 </div>
                             </div>
                         </div>

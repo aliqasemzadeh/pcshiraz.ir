@@ -68,7 +68,7 @@ new #[Layout('layouts.app')] class extends Component
                                 <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ $item->brand?->title ?? '—' }}</td>
                                 <td class="px-4 py-3 font-semibold text-gray-900 dark:text-white">
                                     @if ($item->activeCashPrice)
-                                        {{ number_format((float) $item->activeCashPrice->sale_price) }}
+                                        {{ format_price((float) $item->activeCashPrice->sale_price) }}
                                     @else
                                         —
                                     @endif
