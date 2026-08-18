@@ -2,7 +2,7 @@ import 'flowbite';
 import { initFlowbite } from 'flowbite';
 import smoothscroll from 'smoothscroll-polyfill';
 import { Chart, registerables } from 'chart.js';
-import mask from '@alpinejs/mask';
+import mask from '../../node_modules/@alpinejs/mask/dist/module.esm.js';
 import './../../vendor/power-components/livewire-powergrid/dist/powergrid';
 import '../../vendor/masmerise/livewire-toaster/resources/js';
 import jalaliDatepicker from './alpine/jalali-datepicker.js';

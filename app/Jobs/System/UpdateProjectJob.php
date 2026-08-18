@@ -160,6 +160,10 @@ class UpdateProjectJob implements ShouldQueue
 
     protected function addTheme(): void
     {
+        if (! $this->runNpmInstall()) {
+            return;
+        }
+
         Log::info('Building theme assets (npm run build)...');
         SystemCommandProgress::appendOutput($this->runId, '> npm run build');
 
@@ -183,6 +187,35 @@ class UpdateProjectJob implements ShouldQueue
             Log::error('Theme build failed: '.$exception->getMessage());
             SystemCommandProgress::appendOutput($this->runId, $exception->getMessage());
         }
+    }
+
+    protected function runNpmInstall(): bool
+    {
+        Log::info('Installing npm dependencies...');
+        SystemCommandProgress::appendOutput($this->runId, '> npm install');
+
+        try {
+            $process = Process::forever()
+                ->path(base_path())
+                ->run($this->npmCommand().' install');
+
+            if ($process->successful()) {
+                $output = trim($process->output());
+                Log::info("npm install successful:\n".$output);
+                SystemCommandProgress::appendOutput($this->runId, $output !== '' ? $output : 'npm install successful.');
+
+                return true;
+            }
+
+            $error = trim($process->errorOutput() ?: $process->output());
+            Log::error("npm install failed:\n".$error);
+            SystemCommandProgress::appendOutput($this->runId, $error);
+        } catch (Throwable $exception) {
+            Log::error('npm install failed: '.$exception->getMessage());
+            SystemCommandProgress::appendOutput($this->runId, $exception->getMessage());
+        }
+
+        return false;
     }
 
     protected function restartQueue(): void
