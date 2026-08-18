@@ -362,14 +362,10 @@ new #[Layout('layouts.panels')] class extends Component
 
                 <form wire:submit="save" class="space-y-4">
                     <div>
-                        <x-fwb.input
+                        <x-input
+                            money
                             wire:model="form.price"
                             :label="__('general.price').' ('.price_unit_label().')'"
-                            type="text"
-                            inputmode="numeric"
-                            dir="ltr"
-                            x-mask:dynamic="\$money(\$input, '.', ',', 0)"
-                            x-init="\$el.dispatchEvent(new Event('input'))"
                         />
                         @error('form.price')
                             <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
@@ -377,14 +373,10 @@ new #[Layout('layouts.panels')] class extends Component
                     </div>
 
                     <div>
-                        <x-fwb.input
+                        <x-input
+                            money
                             wire:model="form.sale_price"
                             :label="__('general.sale_price').' ('.price_unit_label().')'"
-                            type="text"
-                            inputmode="numeric"
-                            dir="ltr"
-                            x-mask:dynamic="\$money(\$input, '.', ',', 0)"
-                            x-init="\$el.dispatchEvent(new Event('input'))"
                         />
                         @error('form.sale_price')
                             <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>

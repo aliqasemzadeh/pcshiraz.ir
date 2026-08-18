@@ -27,9 +27,18 @@ class Price
             : $amount;
     }
 
+    public static function unmask(int|string|float|null $value): string
+    {
+        if ($value === null) {
+            return '';
+        }
+
+        return str_replace([',', ' '], '', (string) $value);
+    }
+
     public static function fromDisplay(int|string|float|null $display): float
     {
-        $amount = (float) ($display ?? 0);
+        $amount = (float) self::unmask($display);
 
         return self::unit() === PriceUnitEnum::Rial
             ? round($amount / 10, 4)

@@ -75,8 +75,8 @@ class ItemPriceForm extends Form
 
     public function store(Item $item, bool $alsoSetInstallment = false): ItemPrice
     {
-        $this->price = $this->unmaskMoney((string) $this->price);
-        $this->sale_price = $this->unmaskMoney((string) $this->sale_price);
+        $this->price = Price::unmask((string) $this->price);
+        $this->sale_price = Price::unmask((string) $this->sale_price);
 
         if ($this->sales_cap === '' || $this->sales_cap === null) {
             $this->sales_cap = null;
@@ -129,10 +129,5 @@ class ItemPriceForm extends Form
         ]);
 
         return $price;
-    }
-
-    protected function unmaskMoney(string $value): string
-    {
-        return str_replace([',', ' '], '', $value);
     }
 }

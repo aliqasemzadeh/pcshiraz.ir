@@ -95,6 +95,7 @@ class InstallmentPlanForm extends Form
 
     public function store(): InstallmentPlan
     {
+        $this->unmaskMoneyFields();
         $this->validate();
 
         return InstallmentPlan::query()->create($this->payload());
@@ -103,6 +104,7 @@ class InstallmentPlanForm extends Form
     public function update(InstallmentPlan $plan): InstallmentPlan
     {
         $this->installmentPlan = $plan;
+        $this->unmaskMoneyFields();
         $this->validate();
 
         $plan->update($this->payload());
@@ -129,6 +131,25 @@ class InstallmentPlanForm extends Form
             'priority' => $this->priority,
             'is_active' => $this->is_active,
         ];
+    }
+
+    protected function unmaskMoneyFields(): void
+    {
+        $this->max_financiable_amount = $this->unmaskMoneyField($this->max_financiable_amount);
+        $this->down_payment_required_above = $this->unmaskMoneyField($this->down_payment_required_above);
+        $this->min_order_amount = $this->unmaskMoneyField($this->min_order_amount);
+        $this->max_order_amount = $this->unmaskMoneyField($this->max_order_amount);
+    }
+
+    protected function unmaskMoneyField(?string $value): ?string
+    {
+        if ($value === null || trim($value) === '') {
+            return null;
+        }
+
+        $unmasked = Price::unmask($value);
+
+        return $unmasked === '' ? null : $unmasked;
     }
 
     protected function moneyToDisplay(mixed $value): ?string

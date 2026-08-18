@@ -44,6 +44,24 @@ class PriceTest extends TestCase
         $this->assertStringContainsString('ریال', price_in_words(12500000));
     }
 
+    #[Test]
+    public function it_unmasks_thousands_separators_before_converting_from_display(): void
+    {
+        $this->setPriceUnit(PriceUnitEnum::Toman);
+
+        $this->assertSame('12500000', Price::unmask('12,500,000'));
+        $this->assertSame('12500000', Price::unmask('12 500 000'));
+        $this->assertSame(12500000.0, Price::fromDisplay('12,500,000'));
+    }
+
+    #[Test]
+    public function it_unmasks_rial_display_amounts_before_converting_to_toman(): void
+    {
+        $this->setPriceUnit(PriceUnitEnum::Rial);
+
+        $this->assertSame(12500000.0, Price::fromDisplay('125,000,000'));
+    }
+
     protected function setPriceUnit(PriceUnitEnum $unit): void
     {
         $settings = app(GeneralSettings::class);

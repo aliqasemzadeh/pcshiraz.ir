@@ -254,27 +254,19 @@ new class extends Component
 
                 <form wire:submit="savePrice" class="flex flex-wrap items-end gap-2">
                     <div class="w-28 sm:w-32">
-                        <x-fwb.input
+                        <x-input
+                            money
                             wire:model="form.price"
                             :label="__('general.price').' ('.price_unit_label().')'"
-                            type="text"
-                            inputmode="numeric"
-                            dir="ltr"
                             class="text-sm"
-                            x-mask:dynamic="\$money(\$input, '.', ',', 0)"
-                            x-init="\$el.dispatchEvent(new Event('input'))"
                         />
                     </div>
                     <div class="w-28 sm:w-32">
-                        <x-fwb.input
+                        <x-input
+                            money
                             wire:model="form.sale_price"
                             :label="__('general.sale_price').' ('.price_unit_label().')'"
-                            type="text"
-                            inputmode="numeric"
-                            dir="ltr"
                             class="text-sm"
-                            x-mask:dynamic="\$money(\$input, '.', ',', 0)"
-                            x-init="\$el.dispatchEvent(new Event('input'))"
                         />
                     </div>
                     <x-ui.button type="submit" size="sm" color="green" target="savePrice">
