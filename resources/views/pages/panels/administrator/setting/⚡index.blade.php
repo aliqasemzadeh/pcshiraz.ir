@@ -281,6 +281,21 @@ new #[Layout('layouts.panels')] class extends Component
                                 <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
+
+                        <div>
+                            <x-fwb.select
+                                wire:model="generalForm.price_unit"
+                                :label="__('app.price_unit')"
+                                :helper="__('app.price_unit_help')"
+                            >
+                                @foreach (\App\Enums\PriceUnitEnum::labels() as $value => $label)
+                                    <option value="{{ $value }}">{{ $label }}</option>
+                                @endforeach
+                            </x-fwb.select>
+                            @error('generalForm.price_unit')
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
 
                     <div class="grid gap-4 md:grid-cols-2">
