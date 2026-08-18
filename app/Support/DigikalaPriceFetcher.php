@@ -211,7 +211,7 @@ class DigikalaPriceFetcher
     }
 
     /**
-     * DigiKala amounts are already Toman. Return them as-is; do not convert with Price::toDisplay/fromDisplay.
+     * DigiKala JSON selling_price is Rial. Convert to Toman for storage; do not use Price::toDisplay.
      */
     private static function extractVariantPriceToman(array $variant): ?int
     {
@@ -219,11 +219,7 @@ class DigikalaPriceFetcher
             ?? self::getNestedValue($variant, 'price.sellingPrice')
             ?? self::getNestedValue($variant, 'price.rrp_price');
 
-        if (! is_numeric($price)) {
-            return null;
-        }
-
-        return (int) $price;
+        return self::apiPriceToToman($price);
     }
 
     private static function requestProductJson(string $productId, mixed $logger = null): ?array
@@ -338,10 +334,10 @@ class DigikalaPriceFetcher
         ];
 
         foreach ($paths as $path) {
-            $price = self::getNestedValue($product, $path);
+            $toman = self::apiPriceToToman(self::getNestedValue($product, $path));
 
-            if ($price && is_numeric($price)) {
-                return (int) $price;
+            if ($toman !== null) {
+                return $toman;
             }
         }
 
@@ -390,10 +386,10 @@ class DigikalaPriceFetcher
                     ];
 
                     foreach ($paths as $path) {
-                        $value = self::getNestedValue($jsonData, $path);
+                        $toman = self::apiPriceToToman(self::getNestedValue($jsonData, $path));
 
-                        if ($value && is_numeric($value)) {
-                            return (int) $value;
+                        if ($toman !== null) {
+                            return $toman;
                         }
                     }
                 }
@@ -414,18 +410,16 @@ class DigikalaPriceFetcher
             $patterns = [
                 '/"selling_price"\s*:\s*(\d+)/',
                 '/"sellingPrice"\s*:\s*(\d+)/',
-                '/"price"\s*:\s*(\d+)/',
                 '/"final_price"\s*:\s*(\d+)/',
                 '/"finalPrice"\s*:\s*(\d+)/',
-                '/price["\']?\s*[:=]\s*["\']?(\d{4,})/',
             ];
 
             foreach ($patterns as $pattern) {
                 if (preg_match($pattern, $html, $matches)) {
-                    $price = (int) $matches[1];
+                    $toman = self::apiPriceToToman($matches[1]);
 
-                    if ($price >= 1000 && $price <= 100000000) {
-                        return $price;
+                    if ($toman !== null && $toman >= 1000 && $toman <= 100000000) {
+                        return $toman;
                     }
                 }
             }
@@ -542,6 +536,24 @@ class DigikalaPriceFetcher
             'Accept-Language' => 'fa-IR,fa;q=0.9,en-US;q=0.8,en;q=0.7',
             'Referer' => 'https://www.digikala.com/',
         ];
+    }
+
+    /**
+     * DigiKala API JSON prices are Rial. Store Toman (1 Toman = 10 Rial).
+     */
+    private static function apiPriceToToman(mixed $price): ?int
+    {
+        if (! is_numeric($price)) {
+            return null;
+        }
+
+        $rial = (int) $price;
+
+        if ($rial <= 0) {
+            return null;
+        }
+
+        return intdiv($rial, 10);
     }
 
     private static function getNestedValue(array $array, string $path): mixed
