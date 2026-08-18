@@ -38,4 +38,9 @@ return [
     'organization_user_role' => [
         'approver' => 'Approver',
     ],
+
+    'price_unit' => [
+        'rial' => 'Rial',
+        'toman' => 'Toman',
+    ],
 ];

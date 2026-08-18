@@ -23,6 +23,8 @@ class GeneralSettings extends Settings
 
     public ?string $favicon_path;
 
+    public string $price_unit;
+
     public static function group(): string
     {
         return 'general';

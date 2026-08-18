@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Forms;
 
+use App\Enums\PriceUnitEnum;
 use App\Settings\GeneralSettings;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -25,6 +26,8 @@ class GeneralSettingsForm extends Form
 
     public string $timezone = 'Asia/Tehran';
 
+    public string $price_unit = PriceUnitEnum::Toman->value;
+
     public TemporaryUploadedFile|string|null $logo = null;
 
     public TemporaryUploadedFile|string|null $favicon = null;
@@ -41,6 +44,7 @@ class GeneralSettingsForm extends Form
         $this->site_tags = $settings->site_tags;
         $this->locale = $settings->locale;
         $this->timezone = $settings->timezone;
+        $this->price_unit = $settings->price_unit;
         $this->logo_path = $settings->logo_path;
         $this->favicon_path = $settings->favicon_path;
         $this->logo = null;
@@ -61,6 +65,7 @@ class GeneralSettingsForm extends Form
             'site_tags.*' => ['string', 'max:50'],
             'locale' => ['required', 'string', Rule::in(['fa', 'en'])],
             'timezone' => ['required', 'timezone'],
+            'price_unit' => ['required', 'string', Rule::enum(PriceUnitEnum::class)],
             'logo' => [
                 'nullable',
                 'file',
@@ -88,6 +93,7 @@ class GeneralSettingsForm extends Form
             'site_tags' => __('app.site_tags'),
             'locale' => __('app.locale'),
             'timezone' => __('app.timezone'),
+            'price_unit' => __('app.price_unit'),
             'logo' => __('app.site_logo'),
             'favicon' => __('app.favicon'),
         ];
@@ -125,6 +131,7 @@ class GeneralSettingsForm extends Form
         $settings->site_tags = array_values($this->site_tags);
         $settings->locale = $this->locale;
         $settings->timezone = $this->timezone;
+        $settings->price_unit = $this->price_unit;
 
         if ($this->logo instanceof TemporaryUploadedFile) {
             $this->deleteStoredFile($settings->logo_path);

@@ -80,6 +80,20 @@ new #[Layout('layouts.app')] class extends Component
         );
     }
 
+    #[Computed]
+    public function selectedPlanPreview(): ?array
+    {
+        if ($this->installment_plan_id === null) {
+            return null;
+        }
+
+        $row = $this->eligiblePlans->first(
+            fn (array $row) => $row['plan']->id === (int) $this->installment_plan_id,
+        );
+
+        return $row['preview'] ?? null;
+    }
+
     public function mount(): void
     {
         if (! Auth::check()) {
@@ -106,8 +120,8 @@ new #[Layout('layouts.app')] class extends Component
             return;
         }
 
-        unset($this->cart, $this->breakdown, $this->subtotal, $this->eligiblePlans);
-        $this->resetPlanSelection();
+        unset($this->cart, $this->breakdown, $this->subtotal, $this->eligiblePlans, $this->selectedPlanPreview);
+        $this->syncPlanSelection();
         $this->dispatch('shop.cart.updated');
 
         if ($result['removed'] > 0) {
@@ -132,8 +146,8 @@ new #[Layout('layouts.app')] class extends Component
         }
 
         app(CartService::class)->updateQuantity($cartItem, max(1, (int) $quantity));
-        unset($this->cart, $this->breakdown, $this->subtotal, $this->eligiblePlans);
-        $this->resetPlanSelection();
+        unset($this->cart, $this->breakdown, $this->subtotal, $this->eligiblePlans, $this->selectedPlanPreview);
+        $this->syncPlanSelection();
         $this->dispatch('shop.cart.updated');
     }
 
@@ -150,8 +164,8 @@ new #[Layout('layouts.app')] class extends Component
         }
 
         app(CartService::class)->removeItem($cartItem);
-        unset($this->cart, $this->breakdown, $this->subtotal, $this->eligiblePlans);
-        $this->resetPlanSelection();
+        unset($this->cart, $this->breakdown, $this->subtotal, $this->eligiblePlans, $this->selectedPlanPreview);
+        $this->syncPlanSelection();
         $this->dispatch('shop.cart.updated');
         Toaster::success(__('general.deleted'));
     }
@@ -186,7 +200,7 @@ new #[Layout('layouts.app')] class extends Component
             $this->codeValidated = false;
             $this->organizationId = null;
             $this->installment_plan_id = null;
-            unset($this->eligiblePlans);
+            unset($this->eligiblePlans, $this->selectedPlanPreview);
             $this->addError('organization_code', __('general.invalid_organization_code'));
 
             return;
@@ -196,7 +210,8 @@ new #[Layout('layouts.app')] class extends Component
         $this->codeValidated = true;
         $this->organizationId = $organization->id;
         $this->organization_code = $organization->code;
-        unset($this->eligiblePlans);
+        unset($this->eligiblePlans, $this->selectedPlanPreview);
+        $this->syncPlanSelection(forceFirst: true);
         Toaster::success(__('general.organization_code_valid'));
     }
 
@@ -246,9 +261,28 @@ new #[Layout('layouts.app')] class extends Component
         return $this->cart?->sale_type === PriceTypeEnum::Installment;
     }
 
-    protected function resetPlanSelection(): void
+    protected function syncPlanSelection(bool $forceFirst = false): void
     {
+        $currentId = $forceFirst ? null : $this->installment_plan_id;
         $this->installment_plan_id = null;
+        unset($this->eligiblePlans, $this->selectedPlanPreview);
+
+        if (! $this->codeValidated || ! $this->isInstallmentSale()) {
+            return;
+        }
+
+        $plans = $this->eligiblePlans;
+
+        if ($plans->isEmpty()) {
+            return;
+        }
+
+        $stillEligible = $currentId !== null
+            && $plans->contains(fn (array $row) => $row['plan']->id === (int) $currentId);
+
+        $this->installment_plan_id = $stillEligible
+            ? (int) $currentId
+            : $plans->first()['plan']->id;
     }
 };
 ?>
@@ -258,6 +292,7 @@ new #[Layout('layouts.app')] class extends Component
 @php
     $cartService = app(CartService::class);
     $breakdown = $this->breakdown;
+    $planPreview = $this->selectedPlanPreview;
 @endphp
 
 <div class="mx-auto max-w-5xl space-y-6 px-4 py-8">
@@ -290,6 +325,12 @@ new #[Layout('layouts.app')] class extends Component
         @if ($this->cart->sale_type === PriceTypeEnum::Installment && bccomp($breakdown['cash_only_subtotal'], '0', 4) > 0)
             <div class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
                 {{ __('app.cash_items_as_down_payment', ['amount' => number_format((float) $breakdown['cash_only_subtotal'])]) }}
+            </div>
+        @endif
+
+        @if ($planPreview !== null)
+            <div class="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm text-teal-800 dark:border-teal-800 dark:bg-teal-950/40 dark:text-teal-200">
+                {{ __('app.plan_total_down_payment', ['amount' => number_format((float) $planPreview['down_payment_amount'])]) }}
             </div>
         @endif
 
@@ -378,6 +419,44 @@ new #[Layout('layouts.app')] class extends Component
                             </div>
                         </div>
                     </div>
+                    @if ($planPreview !== null)
+                        <div class="flex justify-between gap-4">
+                            <span>{{ __('app.plan_down_payment_amount') }}</span>
+                            <div class="text-end">
+                                <div>{{ number_format((float) $planPreview['plan_down_payment_amount']) }}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">
+                                    {{ PersianNumberToWords::convert($planPreview['plan_down_payment_amount']) }} {{ __('app.rial') }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between gap-4 font-medium text-gray-900 dark:text-white">
+                            <span>{{ __('general.down_payment') }}</span>
+                            <div class="text-end">
+                                <div>{{ number_format((float) $planPreview['down_payment_amount']) }}</div>
+                                <div class="text-xs font-normal text-gray-500 dark:text-gray-400">
+                                    {{ PersianNumberToWords::convert($planPreview['down_payment_amount']) }} {{ __('app.rial') }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between gap-4">
+                            <span>{{ __('general.monthly_payment') }}</span>
+                            <div class="text-end">
+                                <div>{{ number_format((float) $planPreview['monthly_payment']) }}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">
+                                    {{ PersianNumberToWords::convert($planPreview['monthly_payment']) }} {{ __('app.rial') }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between gap-4">
+                            <span>{{ __('general.total_payable') }}</span>
+                            <div class="text-end">
+                                <div>{{ number_format((float) $planPreview['total_payable']) }}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">
+                                    {{ PersianNumberToWords::convert($planPreview['total_payable']) }} {{ __('app.rial') }}
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             @endif
 
@@ -419,7 +498,7 @@ new #[Layout('layouts.app')] class extends Component
                             @else
                                 @forelse ($this->eligiblePlans as $row)
                                     <label class="flex cursor-pointer gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-700 has-[:checked]:border-brand has-[:checked]:ring-1 has-[:checked]:ring-brand">
-                                        <input type="radio" wire:model="installment_plan_id" value="{{ $row['plan']->id }}" class="mt-1" />
+                                        <input type="radio" wire:model.live="installment_plan_id" value="{{ $row['plan']->id }}" class="mt-1" />
                                         <div class="space-y-1 text-sm">
                                             <div class="font-medium text-gray-900 dark:text-white">{{ $row['plan']->title }}</div>
                                             <div class="text-gray-500">
