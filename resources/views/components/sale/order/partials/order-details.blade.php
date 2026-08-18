@@ -25,36 +25,36 @@
         </div>
         <div>
             <div class="text-body">{{ __('general.total_amount') }}</div>
-            <div class="font-medium text-heading">{{ number_format((float) $order->total_amount) }}</div>
+            <div class="font-medium text-heading">{{ format_price((float) $order->total_amount) }}</div>
         </div>
         <div>
             <div class="text-body">{{ __('general.total_payable') }}</div>
-            <div class="font-medium text-heading">{{ number_format((float) $order->total_payable) }}</div>
+            <div class="font-medium text-heading">{{ format_price((float) $order->total_payable) }}</div>
         </div>
         @if ($order->sale_type === PriceTypeEnum::Installment)
             <div>
                 <div class="text-body">{{ __('app.installment_subtotal') }}</div>
-                <div class="font-medium text-heading">{{ number_format((float) $order->installment_subtotal) }}</div>
+                <div class="font-medium text-heading">{{ format_price((float) $order->installment_subtotal) }}</div>
             </div>
             <div>
                 <div class="text-body">{{ __('app.cash_only_subtotal') }}</div>
-                <div class="font-medium text-heading">{{ number_format((float) $order->cash_only_subtotal) }}</div>
+                <div class="font-medium text-heading">{{ format_price((float) $order->cash_only_subtotal) }}</div>
             </div>
             <div>
                 <div class="text-body">{{ __('app.plan_down_payment_amount') }}</div>
-                <div class="font-medium text-heading">{{ number_format((float) $order->plan_down_payment_amount) }}</div>
+                <div class="font-medium text-heading">{{ format_price((float) $order->plan_down_payment_amount) }}</div>
             </div>
             <div>
                 <div class="text-body">{{ __('general.down_payment') }}</div>
-                <div class="font-medium text-heading">{{ number_format((float) $order->down_payment_amount) }}</div>
+                <div class="font-medium text-heading">{{ format_price((float) $order->down_payment_amount) }}</div>
             </div>
             <div>
                 <div class="text-body">{{ __('general.financed_amount') }}</div>
-                <div class="font-medium text-heading">{{ number_format((float) $order->financed_amount) }}</div>
+                <div class="font-medium text-heading">{{ format_price((float) $order->financed_amount) }}</div>
             </div>
             <div>
                 <div class="text-body">{{ __('general.total_interest') }}</div>
-                <div class="font-medium text-heading">{{ number_format((float) $order->total_interest) }}</div>
+                <div class="font-medium text-heading">{{ format_price((float) $order->total_interest) }}</div>
             </div>
         @endif
     </div>
@@ -78,8 +78,8 @@
                             <td class="px-3 py-2">{{ $item->title }}</td>
                             <td class="px-3 py-2">{{ $item->price_type?->label() ?? '—' }}</td>
                             <td class="px-3 py-2">{{ $item->quantity }}</td>
-                            <td class="px-3 py-2">{{ number_format((float) $item->unit_price) }}</td>
-                            <td class="px-3 py-2">{{ number_format((float) $item->line_total) }}</td>
+                            <td class="px-3 py-2">{{ format_price((float) $item->unit_price) }}</td>
+                            <td class="px-3 py-2">{{ format_price((float) $item->line_total) }}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -111,9 +111,9 @@
                                 <td class="px-3 py-2">
                                     {{ Jalalian::fromDateTime($installment->due_date)->format('Y/m/d') }}
                                 </td>
-                                <td class="px-3 py-2">{{ number_format((float) $installment->principal_amount) }}</td>
-                                <td class="px-3 py-2">{{ number_format((float) $installment->interest_amount) }}</td>
-                                <td class="px-3 py-2">{{ number_format((float) $installment->total_amount) }}</td>
+                                <td class="px-3 py-2">{{ format_price((float) $installment->principal_amount) }}</td>
+                                <td class="px-3 py-2">{{ format_price((float) $installment->interest_amount) }}</td>
+                                <td class="px-3 py-2">{{ format_price((float) $installment->total_amount) }}</td>
                                 <td class="px-3 py-2">{{ $installment->status->label() }}</td>
                             </tr>
                         @endforeach

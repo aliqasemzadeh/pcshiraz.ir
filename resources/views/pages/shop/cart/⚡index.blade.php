@@ -4,7 +4,6 @@ use App\Enums\PriceTypeEnum;
 use App\Services\Sale\CartService;
 use App\Services\Sale\CheckoutService;
 use App\Services\Sale\InstallmentPlanMatcher;
-use App\Support\PersianNumberToWords;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
@@ -324,7 +323,7 @@ new #[Layout('layouts.app')] class extends Component
 
         @if ($this->cart->sale_type === PriceTypeEnum::Installment && bccomp($breakdown['cash_only_subtotal'], '0', 4) > 0)
             <div class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
-                {{ __('app.cash_items_as_down_payment', ['amount' => number_format((float) $breakdown['cash_only_subtotal'])]) }}
+                {{ __('app.cash_items_as_down_payment', ['amount' => format_price((float) $breakdown['cash_only_subtotal'])]) }}
             </div>
         @endif
 
@@ -361,7 +360,7 @@ new #[Layout('layouts.app')] class extends Component
                             @endif
                         </div>
                         <div class="text-sm text-gray-500">
-                            {{ number_format((float) $cartItem->unit_price) }}
+                            {{ format_price((float) $cartItem->unit_price) }}
                             <span class="text-xs">({{ $linePriceType->label() }})</span>
                         </div>
                     </div>
@@ -404,18 +403,18 @@ new #[Layout('layouts.app')] class extends Component
                     <div class="flex justify-between gap-4">
                         <span>{{ __('app.installment_subtotal') }}</span>
                         <div class="text-end">
-                            <div>{{ number_format((float) $breakdown['installment_subtotal']) }}</div>
+                            <div>{{ format_price((float) $breakdown['installment_subtotal']) }}</div>
                             <div class="text-xs text-gray-500 dark:text-gray-400">
-                                {{ PersianNumberToWords::convert($breakdown['installment_subtotal']) }} {{ __('app.rial') }}
+                                {{ price_in_words($breakdown['installment_subtotal']) }}
                             </div>
                         </div>
                     </div>
                     <div class="flex justify-between gap-4">
                         <span>{{ __('app.cash_only_subtotal') }}</span>
                         <div class="text-end">
-                            <div>{{ number_format((float) $breakdown['cash_only_subtotal']) }}</div>
+                            <div>{{ format_price((float) $breakdown['cash_only_subtotal']) }}</div>
                             <div class="text-xs text-gray-500 dark:text-gray-400">
-                                {{ PersianNumberToWords::convert($breakdown['cash_only_subtotal']) }} {{ __('app.rial') }}
+                                {{ price_in_words($breakdown['cash_only_subtotal']) }}
                             </div>
                         </div>
                     </div>
@@ -463,9 +462,9 @@ new #[Layout('layouts.app')] class extends Component
             <div class="mb-4 flex justify-between gap-4 text-lg font-semibold">
                 <span>{{ __('general.subtotal') }}</span>
                 <div class="text-end">
-                    <div>{{ number_format((float) $this->subtotal) }}</div>
+                    <div>{{ format_price((float) $this->subtotal) }}</div>
                     <div class="text-sm font-normal text-gray-500 dark:text-gray-400">
-                        {{ PersianNumberToWords::convert($this->subtotal) }} {{ __('app.rial') }}
+                        {{ price_in_words($this->subtotal) }}
                     </div>
                 </div>
             </div>
@@ -503,10 +502,10 @@ new #[Layout('layouts.app')] class extends Component
                                             <div class="font-medium text-gray-900 dark:text-white">{{ $row['plan']->title }}</div>
                                             <div class="text-gray-500">
                                                 {{ __('general.term_months') }}: {{ $row['plan']->term_months }}
-                                                · {{ __('general.down_payment') }}: {{ number_format((float) $row['preview']['down_payment_amount']) }}
-                                                · {{ __('app.plan_down_payment_amount') }}: {{ number_format((float) $row['preview']['plan_down_payment_amount']) }}
-                                                · {{ __('general.monthly_payment') }}: {{ number_format((float) $row['preview']['monthly_payment']) }}
-                                                · {{ __('general.total_payable') }}: {{ number_format((float) $row['preview']['total_payable']) }}
+                                                · {{ __('general.down_payment') }}: {{ format_price((float) $row['preview']['down_payment_amount']) }}
+                                                · {{ __('app.plan_down_payment_amount') }}: {{ format_price((float) $row['preview']['plan_down_payment_amount']) }}
+                                                · {{ __('general.monthly_payment') }}: {{ format_price((float) $row['preview']['monthly_payment']) }}
+                                                · {{ __('general.total_payable') }}: {{ format_price((float) $row['preview']['total_payable']) }}
                                             </div>
                                         </div>
                                     </label>

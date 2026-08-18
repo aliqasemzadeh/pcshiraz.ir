@@ -148,7 +148,7 @@ new #[Layout('layouts.panels')] class extends Component
             $label = $variant['color_title'];
 
             if ($variant['price_toman'] !== null) {
-                $label .= ' — '.number_format($variant['price_toman']).' '.__('app.toman');
+                $label .= ' — '.format_price($variant['price_toman']);
             }
 
             if (! $variant['is_available']) {
@@ -351,8 +351,8 @@ new #[Layout('layouts.panels')] class extends Component
 
                 @if ($current)
                     <div class="mb-4 rounded-lg border border-default bg-neutral-secondary-soft p-3 text-sm text-body">
-                        <div>{{ __('general.price') }}: {{ number_format((float) $current->price) }}</div>
-                        <div>{{ __('general.sale_price') }}: {{ number_format((float) $current->sale_price) }}</div>
+                        <div>{{ __('general.price') }}: {{ format_price((float) $current->price) }}</div>
+                        <div>{{ __('general.sale_price') }}: {{ format_price((float) $current->sale_price) }}</div>
                         @if ($current->sales_cap !== null)
                             <div>{{ __('general.sales_cap') }}: {{ number_format($current->sales_cap) }}</div>
                         @endif
@@ -364,7 +364,7 @@ new #[Layout('layouts.panels')] class extends Component
                     <div>
                         <x-fwb.input
                             wire:model="form.price"
-                            :label="__('general.price')"
+                            :label="__('general.price').' ('.price_unit_label().')'"
                             type="text"
                             inputmode="numeric"
                             dir="ltr"
@@ -379,7 +379,7 @@ new #[Layout('layouts.panels')] class extends Component
                     <div>
                         <x-fwb.input
                             wire:model="form.sale_price"
-                            :label="__('general.sale_price')"
+                            :label="__('general.sale_price').' ('.price_unit_label().')'"
                             type="text"
                             inputmode="numeric"
                             dir="ltr"
@@ -449,8 +449,8 @@ new #[Layout('layouts.panels')] class extends Component
                         <tbody>
                             @forelse ($this->priceHistory as $price)
                                 <tr class="border-b border-default">
-                                    <td class="px-2 py-2 text-heading" dir="ltr">{{ number_format((float) $price->price) }}</td>
-                                    <td class="px-2 py-2 text-heading" dir="ltr">{{ number_format((float) $price->sale_price) }}</td>
+                                    <td class="px-2 py-2 text-heading" dir="ltr">{{ format_price((float) $price->price) }}</td>
+                                    <td class="px-2 py-2 text-heading" dir="ltr">{{ format_price((float) $price->sale_price) }}</td>
                                     <td class="px-2 py-2">
                                         @if ($price->is_active)
                                             <span class="text-fg-success-strong">{{ __('general.active') }}</span>
