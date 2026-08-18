@@ -37,6 +37,12 @@ class ItemPriceForm extends Form
         $this->stock = (int) $item->stock;
     }
 
+    public function fillAmounts(string|int|float|null $price, string|int|float|null $salePrice): void
+    {
+        $this->price = $price !== null && $price !== '' ? (string) Price::toDisplay($price) : '';
+        $this->sale_price = $salePrice !== null && $salePrice !== '' ? (string) Price::toDisplay($salePrice) : '';
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -91,12 +97,14 @@ class ItemPriceForm extends Form
         $this->validate();
 
         $stock = (int) $this->stock;
+        $storedPrice = (string) Price::fromDisplay($this->price);
+        $storedSalePrice = (string) Price::fromDisplay($this->sale_price);
 
         $price = ItemPrice::query()->create([
             'item_id' => $item->id,
             'price_type' => $this->price_type,
-            'price' => $this->price,
-            'sale_price' => $this->sale_price,
+            'price' => $storedPrice,
+            'sale_price' => $storedSalePrice,
             'sales_cap' => $this->sales_cap,
             'is_active' => $this->is_active,
         ]);
@@ -108,8 +116,8 @@ class ItemPriceForm extends Form
             ItemPrice::query()->create([
                 'item_id' => $item->id,
                 'price_type' => PriceTypeEnum::Installment,
-                'price' => $this->price,
-                'sale_price' => $this->sale_price,
+                'price' => $storedPrice,
+                'sale_price' => $storedSalePrice,
                 'sales_cap' => $this->sales_cap,
                 'is_active' => $this->is_active,
             ]);

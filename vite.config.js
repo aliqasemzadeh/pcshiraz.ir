@@ -16,6 +16,11 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
+    resolve: {
+        alias: {
+            '@alpinejs/mask': '@alpinejs/mask/dist/module.esm.js',
+        },
+    },
     server: {
         watch: {
             ignored: ['**/storage/framework/views/**'],

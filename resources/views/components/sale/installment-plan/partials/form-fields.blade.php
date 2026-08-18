@@ -55,14 +55,14 @@
 </div>
 
 <div>
-    <x-fwb.input wire:model="form.max_financiable_amount" :label="__('general.max_financiable_amount')" type="number" step="0.01" min="0" />
+    <x-fwb.input wire:model="form.max_financiable_amount" :label="__('general.max_financiable_amount').' ('.price_unit_label().')'" type="number" step="0.01" min="0" />
     @error('form.max_financiable_amount')
         <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
     @enderror
 </div>
 
 <div>
-    <x-fwb.input wire:model="form.down_payment_required_above" :label="__('general.down_payment_required_above')" type="number" step="0.01" min="0" />
+    <x-fwb.input wire:model="form.down_payment_required_above" :label="__('general.down_payment_required_above').' ('.price_unit_label().')'" type="number" step="0.01" min="0" />
     @error('form.down_payment_required_above')
         <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
     @enderror
@@ -77,13 +77,13 @@
 
 <div class="grid grid-cols-2 gap-3">
     <div>
-        <x-fwb.input wire:model="form.min_order_amount" :label="__('general.min_order_amount')" type="number" step="0.01" min="0" />
+        <x-fwb.input wire:model="form.min_order_amount" :label="__('general.min_order_amount').' ('.price_unit_label().')'" type="number" step="0.01" min="0" />
         @error('form.min_order_amount')
             <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
         @enderror
     </div>
     <div>
-        <x-fwb.input wire:model="form.max_order_amount" :label="__('general.max_order_amount')" type="number" step="0.01" min="0" />
+        <x-fwb.input wire:model="form.max_order_amount" :label="__('general.max_order_amount').' ('.price_unit_label().')'" type="number" step="0.01" min="0" />
         @error('form.max_order_amount')
             <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
         @enderror

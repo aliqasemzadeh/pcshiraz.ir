@@ -152,8 +152,7 @@ new class extends Component
         $current = $this->activePrices[$this->activeType] ?? null;
 
         if ($current !== null) {
-            $this->form->price = (string) $current->price;
-            $this->form->sale_price = (string) $current->sale_price;
+            $this->form->fillAmounts($current->price, $current->sale_price);
             $this->form->sales_cap = $current->sales_cap;
         } else {
             $this->form->price = '';

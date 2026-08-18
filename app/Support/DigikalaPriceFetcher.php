@@ -220,9 +220,7 @@ class DigikalaPriceFetcher
             return null;
         }
 
-        $value = (int) $price;
-
-        return $value >= 100000 ? (int) ($value / 10) : $value;
+        return (int) $price;
     }
 
     private static function requestProductJson(string $productId, mixed $logger = null): ?array
@@ -340,7 +338,7 @@ class DigikalaPriceFetcher
             $price = self::getNestedValue($product, $path);
 
             if ($price && is_numeric($price)) {
-                return (int) ($price / 10);
+                return (int) $price;
             }
         }
 
@@ -392,7 +390,7 @@ class DigikalaPriceFetcher
                         $value = self::getNestedValue($jsonData, $path);
 
                         if ($value && is_numeric($value)) {
-                            return (int) ($value / 10);
+                            return (int) $value;
                         }
                     }
                 }
@@ -424,7 +422,7 @@ class DigikalaPriceFetcher
                     $price = (int) $matches[1];
 
                     if ($price >= 1000 && $price <= 100000000) {
-                        return $price >= 100000 ? (int) ($price / 10) : $price;
+                        return $price;
                     }
                 }
             }
@@ -433,7 +431,7 @@ class DigikalaPriceFetcher
                 $price = (int) $matches[1];
 
                 if ($price >= 1000 && $price <= 100000000) {
-                    return $price >= 100000 ? (int) ($price / 10) : $price;
+                    return $price;
                 }
             }
         } catch (\Exception $e) {

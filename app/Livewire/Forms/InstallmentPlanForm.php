@@ -3,6 +3,7 @@
 namespace App\Livewire\Forms;
 
 use App\Models\InstallmentPlan;
+use App\Support\Price;
 use Livewire\Form;
 
 class InstallmentPlanForm extends Form
@@ -41,11 +42,11 @@ class InstallmentPlanForm extends Form
         $this->term_months = $plan->term_months;
         $this->down_payment_percent = (string) $plan->down_payment_percent;
         $this->monthly_interest_percent = (string) $plan->monthly_interest_percent;
-        $this->max_financiable_amount = $plan->max_financiable_amount !== null ? (string) $plan->max_financiable_amount : null;
-        $this->down_payment_required_above = $plan->down_payment_required_above !== null ? (string) $plan->down_payment_required_above : null;
+        $this->max_financiable_amount = $this->moneyToDisplay($plan->max_financiable_amount);
+        $this->down_payment_required_above = $this->moneyToDisplay($plan->down_payment_required_above);
         $this->min_down_payment_percent = (string) $plan->min_down_payment_percent;
-        $this->min_order_amount = $plan->min_order_amount !== null ? (string) $plan->min_order_amount : null;
-        $this->max_order_amount = $plan->max_order_amount !== null ? (string) $plan->max_order_amount : null;
+        $this->min_order_amount = $this->moneyToDisplay($plan->min_order_amount);
+        $this->max_order_amount = $this->moneyToDisplay($plan->max_order_amount);
         $this->priority = $plan->priority;
         $this->is_active = $plan->is_active;
     }
@@ -120,14 +121,34 @@ class InstallmentPlanForm extends Form
             'term_months' => $this->term_months,
             'down_payment_percent' => $this->down_payment_percent,
             'monthly_interest_percent' => $this->monthly_interest_percent,
-            'max_financiable_amount' => $this->blankToNull($this->max_financiable_amount),
-            'down_payment_required_above' => $this->blankToNull($this->down_payment_required_above),
+            'max_financiable_amount' => $this->moneyToStorage($this->max_financiable_amount),
+            'down_payment_required_above' => $this->moneyToStorage($this->down_payment_required_above),
             'min_down_payment_percent' => $this->min_down_payment_percent,
-            'min_order_amount' => $this->blankToNull($this->min_order_amount),
-            'max_order_amount' => $this->blankToNull($this->max_order_amount),
+            'min_order_amount' => $this->moneyToStorage($this->min_order_amount),
+            'max_order_amount' => $this->moneyToStorage($this->max_order_amount),
             'priority' => $this->priority,
             'is_active' => $this->is_active,
         ];
+    }
+
+    protected function moneyToDisplay(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return (string) Price::toDisplay($value);
+    }
+
+    protected function moneyToStorage(?string $value): ?string
+    {
+        $value = $this->blankToNull($value);
+
+        if ($value === null) {
+            return null;
+        }
+
+        return (string) Price::fromDisplay($value);
     }
 
     protected function blankToNull(?string $value): ?string
