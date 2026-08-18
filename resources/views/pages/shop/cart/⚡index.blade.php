@@ -345,10 +345,22 @@ new #[Layout('layouts.app')] class extends Component
                     $isCashOnly = $cartService->lineIsCashOnly($this->cart, $cartItem);
                     $linePriceType = $cartService->linePriceType($this->cart, $cartItem);
                 @endphp
+                @php
+                    $itemMedia = $cartItem->item?->getFirstMedia('product_image');
+                    $itemImageUrl = $itemMedia ? ($itemMedia->getUrl('thumb') ?: $itemMedia->getUrl()) : null;
+                @endphp
                 <div class="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex-row sm:items-center sm:justify-between">
-                    <div class="space-y-1">
-                        <div class="flex flex-wrap items-center gap-2">
-                            <div class="font-medium text-gray-900 dark:text-white">{{ $cartItem->item?->title }}</div>
+                    <div class="flex items-center gap-3">
+                        <a href="{{ $cartItem->item ? route('shop.item', $cartItem->item->shopRoute()) : '#' }}" wire:navigate.hover class="shrink-0">
+                            @if ($itemImageUrl)
+                                <img src="{{ $itemImageUrl }}" alt="{{ $cartItem->item?->title }}" class="h-16 w-16 rounded-lg border border-gray-200 object-contain p-1 dark:border-gray-700" loading="lazy" />
+                            @else
+                                <div class="flex h-16 w-16 items-center justify-center rounded-lg border border-gray-200 bg-gray-100 text-sm text-gray-400 dark:border-gray-700 dark:bg-gray-900">—</div>
+                            @endif
+                        </a>
+                        <div class="space-y-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <a href="{{ $cartItem->item ? route('shop.item', $cartItem->item->shopRoute()) : '#' }}" wire:navigate.hover class="font-medium text-gray-900 hover:text-brand dark:text-white dark:hover:text-brand">{{ $cartItem->item?->title }}</a>
                             @if ($this->cart->sale_type === PriceTypeEnum::Installment)
                                 <span @class([
                                     'rounded-full px-2 py-0.5 text-xs font-medium',
@@ -359,9 +371,10 @@ new #[Layout('layouts.app')] class extends Component
                                 </span>
                             @endif
                         </div>
-                        <div class="text-sm text-gray-500">
-                            {{ format_price((float) $cartItem->unit_price) }}
-                            <span class="text-xs">({{ $linePriceType->label() }})</span>
+                            <div class="text-sm text-gray-500">
+                                {{ format_price((float) $cartItem->unit_price) }}
+                                <span class="text-xs">({{ $linePriceType->label() }})</span>
+                            </div>
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
