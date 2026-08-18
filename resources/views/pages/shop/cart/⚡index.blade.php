@@ -329,7 +329,7 @@ new #[Layout('layouts.app')] class extends Component
 
         @if ($planPreview !== null)
             <div class="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm text-teal-800 dark:border-teal-800 dark:bg-teal-950/40 dark:text-teal-200">
-                {{ __('app.plan_total_down_payment', ['amount' => number_format((float) $planPreview['down_payment_amount'])]) }}
+                {{ __('app.plan_total_down_payment', ['amount' => format_price((float) $planPreview['down_payment_amount'])]) }}
             </div>
         @endif
 
@@ -422,36 +422,36 @@ new #[Layout('layouts.app')] class extends Component
                         <div class="flex justify-between gap-4">
                             <span>{{ __('app.plan_down_payment_amount') }}</span>
                             <div class="text-end">
-                                <div>{{ number_format((float) $planPreview['plan_down_payment_amount']) }}</div>
+                                <div>{{ format_price((float) $planPreview['plan_down_payment_amount']) }}</div>
                                 <div class="text-xs text-gray-500 dark:text-gray-400">
-                                    {{ PersianNumberToWords::convert($planPreview['plan_down_payment_amount']) }} {{ __('app.rial') }}
+                                    {{ price_in_words($planPreview['plan_down_payment_amount']) }}
                                 </div>
                             </div>
                         </div>
                         <div class="flex justify-between gap-4 font-medium text-gray-900 dark:text-white">
                             <span>{{ __('general.down_payment') }}</span>
                             <div class="text-end">
-                                <div>{{ number_format((float) $planPreview['down_payment_amount']) }}</div>
+                                <div>{{ format_price((float) $planPreview['down_payment_amount']) }}</div>
                                 <div class="text-xs font-normal text-gray-500 dark:text-gray-400">
-                                    {{ PersianNumberToWords::convert($planPreview['down_payment_amount']) }} {{ __('app.rial') }}
+                                    {{ price_in_words($planPreview['down_payment_amount']) }}
                                 </div>
                             </div>
                         </div>
                         <div class="flex justify-between gap-4">
                             <span>{{ __('general.monthly_payment') }}</span>
                             <div class="text-end">
-                                <div>{{ number_format((float) $planPreview['monthly_payment']) }}</div>
+                                <div>{{ format_price((float) $planPreview['monthly_payment']) }}</div>
                                 <div class="text-xs text-gray-500 dark:text-gray-400">
-                                    {{ PersianNumberToWords::convert($planPreview['monthly_payment']) }} {{ __('app.rial') }}
+                                    {{ price_in_words($planPreview['monthly_payment']) }}
                                 </div>
                             </div>
                         </div>
                         <div class="flex justify-between gap-4">
                             <span>{{ __('general.total_payable') }}</span>
                             <div class="text-end">
-                                <div>{{ number_format((float) $planPreview['total_payable']) }}</div>
+                                <div>{{ format_price((float) $planPreview['total_payable']) }}</div>
                                 <div class="text-xs text-gray-500 dark:text-gray-400">
-                                    {{ PersianNumberToWords::convert($planPreview['total_payable']) }} {{ __('app.rial') }}
+                                    {{ price_in_words($planPreview['total_payable']) }}
                                 </div>
                             </div>
                         </div>
