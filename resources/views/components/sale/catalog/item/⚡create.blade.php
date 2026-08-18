@@ -26,13 +26,23 @@ new class extends Component
 
     public ?string $currentImageUrl = null;
 
+    public bool $fromGroupItem = false;
+
     /**
      * @param  array<string, mixed>|null  $imported
      */
-    public function mount(?array $imported = null): void
+    public function mount(?array $imported = null, ?int $sourceItemId = null): void
     {
         if ($imported !== null) {
             $this->form->fillFromImport($imported);
+        } elseif ($sourceItemId !== null) {
+            $item = Item::query()
+                ->with(['media', 'tags'])
+                ->findOrFail($sourceItemId);
+
+            $this->form->fillFromItem($item);
+            $this->currentImageUrl = $this->imageUrl($item);
+            $this->fromGroupItem = true;
         }
     }
 
@@ -98,6 +108,20 @@ new class extends Component
         $this->form->stock = 1;
         $this->form->tags = [];
         $this->currentImageUrl = null;
+        $this->fromGroupItem = false;
+    }
+
+    protected function imageUrl(Item $item): ?string
+    {
+        $media = $item->getFirstMedia('product_image');
+
+        if ($media === null) {
+            return null;
+        }
+
+        $url = $media->getUrl('thumb') ?: $media->getUrl();
+
+        return $url !== '' ? $url : null;
     }
 
     #[Computed]
@@ -177,7 +201,7 @@ new class extends Component
         class="w-full max-w-lg overflow-auto bg-white p-5 dark:bg-gray-800"
     >
         <h2 class="mb-4 text-xl font-semibold text-heading">
-            {{ __('general.create_item') }}
+            {{ $fromGroupItem ? __('general.create_group_item') : __('general.create_item') }}
         </h2>
 
         <form wire:submit="save" class="space-y-4">

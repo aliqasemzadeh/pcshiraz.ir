@@ -90,6 +90,8 @@ return [
     'role' => 'Role',
     'permission' => 'Permission',
     'create_item' => 'Create item',
+    'create_group_item' => 'Create group item',
+    'create_group_item_from' => 'Create new item in group',
     'edit_item' => 'Edit item',
     'import_from_hamrahtel' => 'Import from Hamrahtel',
     'import_url' => 'Product page URL',

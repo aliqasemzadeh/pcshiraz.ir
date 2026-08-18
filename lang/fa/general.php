@@ -90,6 +90,8 @@ return [
     'role' => 'نقش',
     'permission' => 'مجوز',
     'create_item' => 'ایجاد کالا',
+    'create_group_item' => 'ایجاد کالای گروهی',
+    'create_group_item_from' => 'ساخت کالای جدید در گروه',
     'edit_item' => 'ویرایش کالا',
     'import_from_hamrahtel' => 'دریافت از همراه‌تل',
     'import_url' => 'آدرس صفحه کالا',

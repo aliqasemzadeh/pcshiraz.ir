@@ -65,6 +65,8 @@ class ItemForm extends Form
 
     public string $tag_input = '';
 
+    public ?int $source_item_id = null;
+
     public function setItem(Item $item): void
     {
         $this->item = $item;
@@ -139,6 +141,37 @@ class ItemForm extends Form
 
         $this->remote_image_url = $data['image_url'] ?? null;
         $this->product_image = null;
+    }
+
+    public function fillFromItem(Item $item): void
+    {
+        $this->source_item_id = $item->id;
+        $this->brand_id = $item->brand_id;
+        $this->category_id = $item->category_id;
+        $this->item_type = $item->item_type instanceof ItemTypeEnum
+            ? $item->item_type->value
+            : (string) $item->item_type;
+        $this->group_id = $item->group_id;
+        $this->is_main = false;
+        $this->is_active = (bool) $item->is_active;
+        $this->is_purchasable = (bool) $item->is_purchasable;
+        $this->stock = (int) $item->stock;
+        $this->is_contact_price = (bool) $item->is_contact_price;
+        $this->title = $item->title;
+        $this->slug = $item->slug.'-'.Str::lower(Str::random(4));
+        $this->description = $item->description;
+        $this->color_code = $item->color_code;
+        $this->color_name = $item->color_name;
+        $this->weight = $item->weight;
+        $this->length = $item->length;
+        $this->width = $item->width;
+        $this->height = $item->height;
+        $this->seo_title = $item->seo_title;
+        $this->meta_description = $item->meta_description;
+        $this->product_image = null;
+        $this->remote_image_url = null;
+        $this->tags = $item->tags->pluck('name')->map(fn ($name) => (string) $name)->values()->all();
+        $this->tag_input = '';
     }
 
     public function addTag(): void
@@ -299,6 +332,7 @@ class ItemForm extends Form
 
         $this->syncTags($item);
         $this->attachImage($item);
+        $this->copyImageFromSource($item);
         CatalogCache::forgetAll();
 
         return $item->refresh();
@@ -403,5 +437,33 @@ class ItemForm extends Form
         }
 
         $this->remote_image_url = null;
+    }
+
+    protected function copyImageFromSource(Item $item): void
+    {
+        if ($this->source_item_id === null) {
+            return;
+        }
+
+        if ($this->product_image instanceof TemporaryUploadedFile) {
+            return;
+        }
+
+        if (is_string($this->remote_image_url) && $this->remote_image_url !== '') {
+            return;
+        }
+
+        if ($item->getFirstMedia('product_image') !== null) {
+            return;
+        }
+
+        $source = Item::query()->find($this->source_item_id);
+        $media = $source?->getFirstMedia('product_image');
+
+        if ($media === null) {
+            return;
+        }
+
+        $media->copy($item, 'product_image');
     }
 }

@@ -35,6 +35,22 @@
         {{ __('general.gallery') }}
     </x-fwb.tooltip>
 
+    <x-fwb.tooltip :id="'pg-tooltip-group-'.$rowId" placement="top">
+        <x-slot:triggerSlot>
+            <x-ui.button
+                type="button"
+                size="icon"
+                color="purple"
+                :loading="false"
+                x-on:click="Livewire.dispatch('modal-open', { modal: 'sale.catalog.item.create', props: { sourceItemId: {{ $rowId }} } })"
+            >
+                <x-lucide-layers class="h-4 w-4" />
+                <span class="sr-only">{{ __('general.create_group_item_from') }}</span>
+            </x-ui.button>
+        </x-slot:triggerSlot>
+        {{ __('general.create_group_item_from') }}
+    </x-fwb.tooltip>
+
     <x-fwb.tooltip :id="'pg-tooltip-edit-'.$rowId" placement="top">
         <x-slot:triggerSlot>
             <x-ui.button
