@@ -66,8 +66,11 @@ class ItemPriceForm extends Form
         ];
     }
 
-    public function store(Item $item): ItemPrice
+    public function store(Item $item, bool $alsoSetInstallment = false): ItemPrice
     {
+        $this->price = $this->unmaskMoney((string) $this->price);
+        $this->sale_price = $this->unmaskMoney((string) $this->sale_price);
+
         if ($this->sales_cap === '' || $this->sales_cap === null) {
             $this->sales_cap = null;
         }
@@ -97,11 +100,30 @@ class ItemPriceForm extends Form
             'is_active' => $this->is_active,
         ]);
 
+        if (
+            $alsoSetInstallment
+            && $this->price_type === PriceTypeEnum::Cash->value
+        ) {
+            ItemPrice::query()->create([
+                'item_id' => $item->id,
+                'price_type' => PriceTypeEnum::Installment,
+                'price' => $this->price,
+                'sale_price' => $this->sale_price,
+                'sales_cap' => $this->sales_cap,
+                'is_active' => $this->is_active,
+            ]);
+        }
+
         $item->update([
             'stock' => $stock,
             'is_purchasable' => $stock > 0,
         ]);
 
         return $price;
+    }
+
+    protected function unmaskMoney(string $value): string
+    {
+        return str_replace([',', ' '], '', $value);
     }
 }

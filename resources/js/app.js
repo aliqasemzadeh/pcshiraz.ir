@@ -2,6 +2,7 @@ import 'flowbite';
 import { initFlowbite } from 'flowbite';
 import smoothscroll from 'smoothscroll-polyfill';
 import { Chart, registerables } from 'chart.js';
+import mask from '@alpinejs/mask';
 import './../../vendor/power-components/livewire-powergrid/dist/powergrid';
 import '../../vendor/masmerise/livewire-toaster/resources/js';
 import jalaliDatepicker from './alpine/jalali-datepicker.js';
@@ -21,6 +22,7 @@ window.addEventListener('pg-livewire-request-finished', bootFlowbite);
 document.addEventListener('livewire:morph.updated', bootFlowbite);
 
 document.addEventListener('alpine:init', () => {
+    Alpine.plugin(mask);
     Alpine.data('jalaliDatepicker', jalaliDatepicker);
 
     Alpine.directive('modal', (el, { value, modifiers, expression }, { evaluate, cleanup }) => {

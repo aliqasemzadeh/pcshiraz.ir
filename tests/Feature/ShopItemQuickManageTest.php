@@ -82,7 +82,83 @@ class ShopItemQuickManageTest extends TestCase
 
         $this->assertNotNull($activePrice);
         $this->assertSame('14500000.0000', (string) $activePrice->sale_price);
+        $this->assertSame('15000000.0000', (string) $activePrice->price);
         $this->assertSame(3, $item->fresh()->stock);
+
+        $activeInstallment = ItemPrice::query()
+            ->where('item_id', $item->id)
+            ->where('price_type', PriceTypeEnum::Installment)
+            ->where('is_active', true)
+            ->first();
+
+        $this->assertNotNull($activeInstallment);
+        $this->assertSame('14500000.0000', (string) $activeInstallment->sale_price);
+        $this->assertSame('15000000.0000', (string) $activeInstallment->price);
+    }
+
+    #[Test]
+    public function authorized_user_can_save_masked_cash_price(): void
+    {
+        $user = $this->createAuthorizedUser();
+        $item = $this->createItem(stock: 2);
+
+        Livewire::actingAs($user)
+            ->test('shop.item.quick-manage', ['itemId' => $item->id])
+            ->set('form.price', '15,000,000')
+            ->set('form.sale_price', '14,500,000')
+            ->call('savePrice')
+            ->assertHasNoErrors()
+            ->assertDispatched('shop.item.updated');
+
+        $activePrice = ItemPrice::query()
+            ->where('item_id', $item->id)
+            ->where('price_type', PriceTypeEnum::Cash)
+            ->where('is_active', true)
+            ->first();
+
+        $this->assertNotNull($activePrice);
+        $this->assertSame('14500000.0000', (string) $activePrice->sale_price);
+        $this->assertSame('15000000.0000', (string) $activePrice->price);
+    }
+
+    #[Test]
+    public function saving_installment_price_does_not_change_cash_price(): void
+    {
+        $user = $this->createAuthorizedUser();
+        $item = $this->createItem();
+
+        ItemPrice::query()->create([
+            'item_id' => $item->id,
+            'price_type' => PriceTypeEnum::Cash,
+            'price' => 10000000,
+            'sale_price' => 10000000,
+            'is_active' => true,
+        ]);
+
+        Livewire::actingAs($user)
+            ->test('shop.item.quick-manage', ['itemId' => $item->id])
+            ->call('selectType', PriceTypeEnum::Installment->value)
+            ->set('form.price', '12000000')
+            ->set('form.sale_price', '12000000')
+            ->call('savePrice')
+            ->assertDispatched('shop.item.updated');
+
+        $activeCash = ItemPrice::query()
+            ->where('item_id', $item->id)
+            ->where('price_type', PriceTypeEnum::Cash)
+            ->where('is_active', true)
+            ->first();
+
+        $activeInstallment = ItemPrice::query()
+            ->where('item_id', $item->id)
+            ->where('price_type', PriceTypeEnum::Installment)
+            ->where('is_active', true)
+            ->first();
+
+        $this->assertNotNull($activeCash);
+        $this->assertSame('10000000.0000', (string) $activeCash->sale_price);
+        $this->assertNotNull($activeInstallment);
+        $this->assertSame('12000000.0000', (string) $activeInstallment->sale_price);
     }
 
     #[Test]
@@ -109,6 +185,15 @@ class ShopItemQuickManageTest extends TestCase
         $this->assertNotNull($activePrice);
         $this->assertSame('12500000.0000', (string) $activePrice->sale_price);
         $this->assertSame('success', $item->fresh()->digikala_last_sync_status);
+
+        $activeInstallment = ItemPrice::query()
+            ->where('item_id', $item->id)
+            ->where('price_type', PriceTypeEnum::Installment)
+            ->where('is_active', true)
+            ->first();
+
+        $this->assertNotNull($activeInstallment);
+        $this->assertSame('12500000.0000', (string) $activeInstallment->sale_price);
     }
 
     #[Test]

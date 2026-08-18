@@ -63,7 +63,10 @@ new class extends Component
         $this->authorizeAccess();
 
         $this->form->price_type = $this->activeType;
-        $this->form->store($this->item);
+        $this->form->store(
+            $this->item,
+            alsoSetInstallment: $this->activeType === PriceTypeEnum::Cash->value,
+        );
 
         $this->loadItem();
         $this->prefillPriceFromActive();
@@ -255,22 +258,24 @@ new class extends Component
                         <x-fwb.input
                             wire:model="form.price"
                             :label="__('general.price')"
-                            type="number"
-                            min="0"
-                            step="1"
+                            type="text"
+                            inputmode="numeric"
                             dir="ltr"
                             class="text-sm"
+                            x-mask:dynamic="\$money(\$input, '.', ',', 0)"
+                            x-init="\$el.dispatchEvent(new Event('input'))"
                         />
                     </div>
                     <div class="w-28 sm:w-32">
                         <x-fwb.input
                             wire:model="form.sale_price"
                             :label="__('general.sale_price')"
-                            type="number"
-                            min="0"
-                            step="1"
+                            type="text"
+                            inputmode="numeric"
                             dir="ltr"
                             class="text-sm"
+                            x-mask:dynamic="\$money(\$input, '.', ',', 0)"
+                            x-init="\$el.dispatchEvent(new Event('input'))"
                         />
                     </div>
                     <x-ui.button type="submit" size="sm" color="green" target="savePrice">

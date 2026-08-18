@@ -26,13 +26,22 @@ class DigikalaPriceSyncService
             return $this->recordFailure($item, __('app.digikala_sync_failed'));
         }
 
-        $activeCashPrice = ItemPrice::query()
+        $activePrices = ItemPrice::query()
             ->where('item_id', $item->id)
-            ->where('price_type', PriceTypeEnum::Cash)
             ->where('is_active', true)
-            ->first();
+            ->whereIn('price_type', [PriceTypeEnum::Cash, PriceTypeEnum::Installment])
+            ->get()
+            ->keyBy(fn (ItemPrice $itemPrice) => $itemPrice->price_type instanceof PriceTypeEnum
+                ? $itemPrice->price_type->value
+                : (string) $itemPrice->price_type);
 
-        if ($activeCashPrice !== null && (int) $activeCashPrice->sale_price === $price) {
+        $activeCashPrice = $activePrices->get(PriceTypeEnum::Cash->value);
+        $activeInstallmentPrice = $activePrices->get(PriceTypeEnum::Installment->value);
+
+        $cashMatches = $activeCashPrice !== null && (int) $activeCashPrice->sale_price === $price;
+        $installmentMatches = $activeInstallmentPrice !== null && (int) $activeInstallmentPrice->sale_price === $price;
+
+        if ($cashMatches && $installmentMatches) {
             $item->update([
                 'digikala_last_synced_at' => now(),
                 'digikala_last_sync_status' => 'unchanged',
@@ -47,18 +56,13 @@ class DigikalaPriceSyncService
             );
         }
 
-        ItemPrice::query()->create([
-            'item_id' => $item->id,
-            'price_type' => PriceTypeEnum::Cash,
-            'price' => $price,
-            'sale_price' => $price,
-            'sales_cap' => $activeCashPrice?->sales_cap,
-            'is_active' => true,
-            'meta' => [
-                'source' => 'digikala',
-                'synced_at' => now()->toIso8601String(),
-            ],
-        ]);
+        if (! $cashMatches) {
+            $this->createSyncedPrice($item, PriceTypeEnum::Cash, $price, $activeCashPrice?->sales_cap);
+        }
+
+        if (! $installmentMatches) {
+            $this->createSyncedPrice($item, PriceTypeEnum::Installment, $price, $activeInstallmentPrice?->sales_cap);
+        }
 
         $item->update([
             'digikala_last_synced_at' => now(),
@@ -92,6 +96,22 @@ class DigikalaPriceSyncService
             });
 
         return $count;
+    }
+
+    protected function createSyncedPrice(Item $item, PriceTypeEnum $type, int $price, mixed $salesCap): ItemPrice
+    {
+        return ItemPrice::query()->create([
+            'item_id' => $item->id,
+            'price_type' => $type,
+            'price' => $price,
+            'sale_price' => $price,
+            'sales_cap' => $salesCap,
+            'is_active' => true,
+            'meta' => [
+                'source' => 'digikala',
+                'synced_at' => now()->toIso8601String(),
+            ],
+        ]);
     }
 
     protected function recordFailure(Item $item, string $message): DigikalaSyncResult

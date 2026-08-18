@@ -98,10 +98,19 @@ class DigikalaPriceSyncTest extends TestCase
         $this->assertNotNull($activePrice);
         $this->assertSame('12500000.0000', (string) $activePrice->sale_price);
         $this->assertSame('success', $item->fresh()->digikala_last_sync_status);
+
+        $activeInstallment = ItemPrice::query()
+            ->where('item_id', $item->id)
+            ->where('price_type', PriceTypeEnum::Installment)
+            ->where('is_active', true)
+            ->first();
+
+        $this->assertNotNull($activeInstallment);
+        $this->assertSame('12500000.0000', (string) $activeInstallment->sale_price);
     }
 
     #[Test]
-    public function sync_item_skips_when_price_is_unchanged(): void
+    public function sync_item_skips_when_cash_and_installment_are_unchanged(): void
     {
         Http::fake([
             'api.digikala.com/v1/product/20109389/*' => Http::response($this->sampleProductPayload()),
@@ -117,6 +126,14 @@ class DigikalaPriceSyncTest extends TestCase
             'is_active' => true,
         ]);
 
+        ItemPrice::query()->create([
+            'item_id' => $item->id,
+            'price_type' => PriceTypeEnum::Installment,
+            'price' => 12500000,
+            'sale_price' => 12500000,
+            'is_active' => true,
+        ]);
+
         $beforeCount = ItemPrice::query()->where('item_id', $item->id)->count();
 
         $result = app(DigikalaPriceSyncService::class)->syncItem($item->fresh());
@@ -124,6 +141,56 @@ class DigikalaPriceSyncTest extends TestCase
         $this->assertTrue($result->success);
         $this->assertSame('unchanged', $result->status);
         $this->assertSame($beforeCount, ItemPrice::query()->where('item_id', $item->id)->count());
+    }
+
+    #[Test]
+    public function sync_item_creates_installment_when_cash_already_matches(): void
+    {
+        Http::fake([
+            'api.digikala.com/v1/product/20109389/*' => Http::response($this->sampleProductPayload()),
+        ]);
+
+        $item = $this->createItemWithDigikalaConfig(variantId: 111);
+
+        ItemPrice::query()->create([
+            'item_id' => $item->id,
+            'price_type' => PriceTypeEnum::Cash,
+            'price' => 12500000,
+            'sale_price' => 12500000,
+            'is_active' => true,
+        ]);
+
+        ItemPrice::query()->create([
+            'item_id' => $item->id,
+            'price_type' => PriceTypeEnum::Installment,
+            'price' => 10000000,
+            'sale_price' => 10000000,
+            'is_active' => true,
+        ]);
+
+        $result = app(DigikalaPriceSyncService::class)->syncItem($item->fresh());
+
+        $this->assertTrue($result->success);
+        $this->assertSame('success', $result->status);
+
+        $activeCash = ItemPrice::query()
+            ->where('item_id', $item->id)
+            ->where('price_type', PriceTypeEnum::Cash)
+            ->where('is_active', true)
+            ->first();
+
+        $activeInstallment = ItemPrice::query()
+            ->where('item_id', $item->id)
+            ->where('price_type', PriceTypeEnum::Installment)
+            ->where('is_active', true)
+            ->first();
+
+        $this->assertNotNull($activeCash);
+        $this->assertSame('12500000.0000', (string) $activeCash->sale_price);
+        $this->assertNotNull($activeInstallment);
+        $this->assertSame('12500000.0000', (string) $activeInstallment->sale_price);
+        $this->assertSame(1, ItemPrice::query()->where('item_id', $item->id)->where('price_type', PriceTypeEnum::Cash)->count());
+        $this->assertSame(2, ItemPrice::query()->where('item_id', $item->id)->where('price_type', PriceTypeEnum::Installment)->count());
     }
 
     #[Test]
